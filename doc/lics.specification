@@ -1,0 +1,92 @@
+Specifications du langage intermediaire compilateur-simulateur (LICS) 
+
+brouillon 0.1
+
+1. Description générale
+
+   Un programme est une liste d'assertions, exécutées linéairement. 
+   Une Assertion est entièrement déterminée au moment de son execution.    
+   Un programme est interprété par cycles successifs, ayant chacun des entrées et des sorties.
+
+2. Assertion
+
+   2.1. Variables.
+
+   	Une Variable est un booléen. Elle est identifiée par un entier uniquen, notée _n_.
+	les booléens sont notés "True" et "False".
+	
+	Exemple :
+		_1_ = True
+
+   2.2. Fonctions logiques.
+   
+	LICS implémente les 4 primitives logiques usuelles : or, and, xor, not.
+	La notation postfixée est utilisée.
+	
+	Exemple :
+		_1_ = True
+		_2_ = xor True _1_
+		_3_ = not _2_
+
+   2.3.	 Instructions d'entrée/sortie
+   
+
+	LICS fournit deux instructions, "input" et "output" permettant de marquer la variable comme étant une variable d'entrée ou une variable de sortie.	
+
+	Exemple :
+		_1_ = input
+		_2_ = input
+		_3_ = and _1_ _2_
+
+	ainsi que deux autres instructions "inputreg" et "outputreg" marquant la variable comme une entrée	  ou une sortie d'un registre.
+	
+	Exemple :
+		_1_ = inputreg
+		_2_ = input
+		_3_ = not _1_
+		_4_ = or _3_ _2_
+		...
+		_4_ = output
+		_2_ = outputreg
+
+      Attention ! 
+      	l'ordre des instructions d'entrée/sortie est important.
+
+
+   2.3. Syntaxe
+
+   	Une assertion est la donnée d'une variable, d'une fonction et de ses arguments, l'opérateur d'assigement est '='.
+	Notons que la syntaxe _2_ = output est maladroite, mais peut être simplifiera le parsage. À voir…
+	
+	
+
+3. Grammaire
+
+type  programme = assertion list
+type variable
+type assertion = variable * expression
+
+type expression = 
+     True
+     |False
+     |fonction
+
+type fonction = const |unaire | binaire
+
+type const = 
+     input 
+     |inputreg
+     |output
+     |outputreg
+
+type  unaire = Not of variable
+
+type binaire = 
+     Or of variable * variable
+     |And of variable*variable
+     |Xor of variable*variable
+
+
+
+
+
