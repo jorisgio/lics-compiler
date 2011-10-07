@@ -66,7 +66,34 @@ brouillon 0.1
    	Une assertion est la donnée d'une variable, d'une fonction et de ses arguments, l'opérateur d'assigement est '='.
 	Notons que la syntaxe 2 = output est maladroite, mais peut être simplifiera le parsage. À voir…
 	
-	
+3. Structure
+
+   Un programme commence par la definitions des entrées.
+   Le corps du programme est divisé en blocs indépendants, partageant un unique
+   espace de nom pour les variables. Chaque bloc peut être executé en
+   parallèle. Un bloc est délimité par les mots clés "begin" "end"
+   Un programme finit par la définition des sorties.
+
+   Exemple
+        # entrées :
+        1 = input
+        2 = input
+        3 = inputreg
+        
+        # Corps
+        begin
+        4 = or 1 2
+        5 = and 4 1
+        end
+        
+        begin        
+        6 = xor 1 3
+        7 = not 6
+        end
+        
+        # sorties
+        7 = output
+        5 = outputreg
 
 3. Grammaire
 
