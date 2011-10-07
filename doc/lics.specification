@@ -12,11 +12,11 @@ brouillon 0.1
 
    2.1. Variables.
 
-   	Une Variable est un booléen. Elle est identifiée par un entier uniquen, notée _n_.
-	les booléens sont notés "True" et "False".
+   	Une Variable est un booléen. Elle est identifiée par un entier uniquen, notée n.
+	les booléens sont notés "True" et "False". (utilité ?)
 	
 	Exemple :
-		_1_ = True
+		1 = True
 
    2.2. Fonctions logiques.
    
@@ -24,9 +24,9 @@ brouillon 0.1
 	La notation postfixée est utilisée.
 	
 	Exemple :
-		_1_ = True
-		_2_ = xor True _1_
-		_3_ = not _2_
+		1 = True
+		2 = xor True 1
+		3 = not 2
 
    2.3.	 Instructions d'entrée/sortie
    
@@ -34,29 +34,37 @@ brouillon 0.1
 	LICS fournit deux instructions, "input" et "output" permettant de marquer la variable comme étant une variable d'entrée ou une variable de sortie.	
 
 	Exemple :
-		_1_ = input
-		_2_ = input
-		_3_ = and _1_ _2_
+		1 = input
+		2 = input
+		3 = and 1 2
 
 	ainsi que deux autres instructions "inputreg" et "outputreg" marquant la variable comme une entrée	  ou une sortie d'un registre.
 	
 	Exemple :
-		_1_ = inputreg
-		_2_ = input
-		_3_ = not _1_
-		_4_ = or _3_ _2_
+		1 = inputreg
+		2 = input
+		3 = not 1
+		4 = or 3 2
 		...
-		_4_ = output
-		_2_ = outputreg
+		4 = output
+		2 = outputreg
 
       Attention ! 
       	l'ordre des instructions d'entrée/sortie est important.
 
+   2.3. Mot-clé
+        le mot clé onetime signifie que l'assertion peut n'être calculée
+        qu'a pas la premiere passe.
+        
+        Exemple :
+                1 = input
+                2 = input
+                onetime  3 = and 1 2  
 
-   2.3. Syntaxe
+   2.4. Syntaxe
 
    	Une assertion est la donnée d'une variable, d'une fonction et de ses arguments, l'opérateur d'assigement est '='.
-	Notons que la syntaxe _2_ = output est maladroite, mais peut être simplifiera le parsage. À voir…
+	Notons que la syntaxe 2 = output est maladroite, mais peut être simplifiera le parsage. À voir…
 	
 	
 
