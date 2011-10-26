@@ -12,3 +12,8 @@
 *.out
 #ignore les annot
 *.annot
+
+# ignore les fichiers produits par ocmallex
+lexer.ml
+lexer.mli
+
