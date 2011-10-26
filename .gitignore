@@ -17,3 +17,8 @@
 lexer.ml
 lexer.mli
 
+#ignore les fichiers produits par menhir
+parser.ml
+parser.mli
+parser.automaton
+parser.conflicts
