@@ -31,13 +31,14 @@ type logical_expr =
 
 type logical_stmt =
     | Lassign of string * logical_expr
+    | Lrcall of string * param *                    /* appel recursif */
     
 (* porte *)
 
 type gate = {
     name : string ;
     inputs : string array ;
-    param : int_expr ;
+    param : int_expr option ;
     body : logical_stmt list ;
     outputs : string array ;
     }
@@ -47,8 +48,9 @@ type wire = { block_id : string ; out_id : int }
     
 (* block ( instance ) *)    
 type block = {
-  name : string;
-  param : int;
+  name : string; 
+  gate_type : string; (* type de la porte *)
+  param : int option;
   inputs : wire list;
 }
 
