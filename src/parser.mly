@@ -10,7 +10,7 @@ open Ast
 %token LPAREN RPAREN LBRACKET RBRACKET IN OUT
 %token AND OR XOR NAND NOT PLUS MINUS TIMES DIV
 %token COMMA SEMICOLON DOTDOT
-%token EQUAL EOF 
+%token EQUAL LOWER GREATER EOF 
 
 %nonassoc NOT
 %left OR XOR
@@ -90,5 +90,10 @@ int_expr:
 
 (* les blocks sont les instanciations des portes, pour construire réelement le circuit *)
 block:
-     l = IDENT {l}
+    gtype = UIDENT id = IDENT par = param IN inp = io
+    body = bstmt*
+    OUT out = io   { { name = id ; inputs = inp ; param = par ; outputs = out ; body = body } }
+    
 
+param:
+  LOWER exp = int_expr GREATER   { exp }

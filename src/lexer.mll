@@ -53,6 +53,8 @@ rule token = parse
         | ';'     { SEMICOLON }
         | '['     { LBRACKET }
         | ']'     { RBRACKET }
+	| '<'     { LOWER }
+	| '>'     { GREATER }
         | "&&"    { AND }
         | "||"    { OR }
         | "->"    { OUT }

@@ -36,13 +36,21 @@ type logical_stmt =
 
 type gate = {
     name : string ;
-    inputs : string list ;
+    inputs : string array ;
+    param : int_expr ;
     body : logical_stmt list ;
-    outputs : string list ;
+    outputs : string array ;
     }
+ 
+(* fils entre les instances de block, on garde le point de départ (nom du block et numéro de la sortie *)
+type wire = { block_id : string ; out_id : int }
     
 (* block ( instance ) *)    
-type block = string (* not implemented, juste une liste de noms *)
+type block = {
+  name : string;
+  param : int;
+  inputs : wire list;
+}
 
 (* circuit *)
 type circuit = {
