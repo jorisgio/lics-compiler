@@ -6,7 +6,7 @@ module Noeud = struct
 	let empty = Empty
 end
 type label = Noeud.label
-module Graphe = Builder.MakeLabeledGraph(Noued)
+module Graphe = Builder.MakeLabeledGraph(Noeud)
 module Vertex = Graphe.Vertex
 
 (*type renvoyé après la pemière passe (aka la construction du graphe) *)
