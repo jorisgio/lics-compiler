@@ -1,9 +1,16 @@
 (* Transformation du code en un graphe *)
 
 open Ast
+open Graphe
 
-type interm = { graph : Graph.t; inputs : Vertex.t list; outputs : Vertex.t list} 
-let Stbl = Hashtbl.Make(String)
+
+module Str = struct
+  include(String)
+  let equal a b = (Pervasives.compare a b = 0)
+  let hash = Hashtbl.hash
+end
+module  Stbl = Hashtbl.Make(Str)
+
 
 (* module implémentant l'environnement des variables locales *)
 module Smap = Map.Make(String)
@@ -27,33 +34,36 @@ let rec parse_gates gates_map =
     end
   )
 
-
-(* gestion de l'induction *)
-
-(* NOT IMPLEMENTED *)
-
 (* table des blocks *)
 let block_tbl = Stbl.create 42 
 
-(* on maintient la taille du graphe dans size *)
-let size = ref 0 in
-let addVertex g = size :=  size + 1 ; Graph.addVertex g !size
-let setLabel g label = Graph.setLabel g !size label
+(* on maintient la taille du graphe *)
+let size : Noeud.t ref = ref 0
+ 
+let addVertex g = size :=  size + 1 ; Graphe.addVertex g !size
+let setLabel g label = Graphe.setLabel g !size label
 
-(* convertit un opérateur en étiquette, *TODO* *)
-let lop_to_label = ()
-let lp_to_label = ()
-let bool_to_label = ()
+  (* convertit un opérateur en étiquette, *TODO* *)
+let lop_to_label : (lop -> label) = function
+  | And -> And
+  | Or -> Or
+  | Xor -> Xor
+    
+let lp_to_label : (prefix -> label) = function
+  | Not -> Not 
 
-
+let bool_to_label : (bool -> label) = function
+  | true -> True
+  | false -> False
+    
 (* construit le nouveau graphe en ajoutant un block et renvoit ce graphe*)
 let rec add_block_to_graph gcur b = 
-    (* renvoit le couple du nouveau graphe * l'index du noeud de sortie après avoir traité l'expression *)
+  (* renvoit le couple du nouveau graphe * l'index du noeud de sortie après avoir traité l'expression *)
   let rec process_expr gcur env  = function
     | Bconst cst -> 
       let gcur = addVertex gcur in
       let gcur = setLabel gcur (bool_to_label cst) in
-	gcur,!size
+      gcur,!size
     | Bvar ident -> 
       let src = Smap.find ident env in
       gcur,src
@@ -63,15 +73,15 @@ let rec add_block_to_graph gcur b =
       let gcur = setLabel gcur (lop_to_label oper) in
       let gcur,i1 = process_expr gcur expr1 in
       let gcur,i2 = process_expr gcur expr2 in
-      let gcur = Graph.addEdge gcur i1 cur in
-      let gcur = Graph.addEdge gcur i2 cur in
+      let gcur = Graphe.addEdge gcur i1 cur in
+      let gcur = Graphe.addEdge gcur i2 cur in
       gcur,cur
     | Bprefix(oper, expr) ->
       let cur = !size in
       let gcur = addVertex gcur in
       let gcur = setlabel gcur (lp_to_label oper) in
       let gcur,i = process_expr gcur expr in
-      let gcur = Graph.addEdge gcur i cur in
+      let gcur = Graphe.addEdge gcur i cur in
       gcur,cur
   in
   (*renvoit le couple nouveau graphe * nouvel env après avoir traité le stmt *)
@@ -113,7 +123,7 @@ let buildgraph cir =
     let li = (!size+1)::li in
     let curgraph = addVertex curgraph in
     let curgraph = setLabel curgraph  Input in
-    curgraph,li) Graph.empty cir.start.inputs in
+    curgraph,li) Graphe.empty cir.start.inputs in
   Stbl.add block_tbl cir.start.name inputs;
   let curgraph = List.fold_left add_block_to_graph curgraph cir.blocks in
   {graph = curgraph, inputs = inputs, outputs = outputs }
