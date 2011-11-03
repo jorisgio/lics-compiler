@@ -13,6 +13,6 @@ module Vertex = Graphe.Vertex
 type interm_graph = { graph : Graphe.t; inputs : Noeud.t list; outputs : Noeud.t list}
 
 (* type renvoyé après la suppression des registres *)
-type combin_graph = { graph : Graphe.t; inputs : Noeud.t list; outputs : Noeud.t list; inregs : Noeud.t list; outregs : Noeut.t list}
+type combin_graph = { graph : Graphe.t; inputs : Noeud.t list; outputs : Noeud.t list; inregs : Noeud.t list; outregs : Noeud.t list}
 
 (* Type renvoyé par le tri topo *)
