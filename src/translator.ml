@@ -19,7 +19,7 @@ type stmt =
 type program = stmt list
 
 let lics_of_combin_graph g n = (* n = max_clé + 1 *)
-  let sorted_keys = topoSort g.graph in
+  let sorted_keys = TopoSort.topoSort g.graph in
   (* lors du parcours de la liste, à tout noeud on associe la liste des
      variables qui sont ses pères *)
   let pred = Array.create n [] in
