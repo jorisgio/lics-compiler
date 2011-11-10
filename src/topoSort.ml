@@ -16,7 +16,7 @@ let topoSort graph = (* graphe n'est pas coloré *)
         (ColoredGraph.find graph x)
         (l , ColoredGraph.setColor graph x Color.Bleu) (* marquer le noeud *)
       in
-      (Graphe.Vertex.getLabel (ColoredGraph.find graph x))::l , graph
+      (ColoredGraph.find graph x)::l , graph
   in
   fst (Graphe.Graphe.foldVertex
     (fun x _ -> traiter x) graph ([] , ColoredGraph.colorGraph graph))
