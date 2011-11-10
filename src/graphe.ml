@@ -1,7 +1,13 @@
 
 module Noeud = struct
 	type t = int
-	type label = Empty | And | Or | Not | Xor | Mux of int * int * int | Reg | Input | Output | Inreg | Outreg |  True | False
+	type label =
+          | Empty
+          | True | False
+          | Reg | Input | Output | Inreg | Outreg
+          | Not
+          | And | Or | Xor | Nand
+          | Mux of int * int * int
 	let compare = Pervasives.compare
 	let empty = Empty
 end
