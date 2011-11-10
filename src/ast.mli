@@ -31,7 +31,7 @@ type logical_expr =
 
 type logical_stmt =
     | Lassign of string * logical_expr
-    | Lrcall of string * param                 (* appel recursif *)
+    | Lrcall of string * string                 (* appel recursif *)
     
 (* porte *)
 

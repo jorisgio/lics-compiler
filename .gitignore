@@ -22,3 +22,6 @@ parser.ml
 parser.mli
 parser.automaton
 parser.conflicts
+
+#ignore lib
+lib/

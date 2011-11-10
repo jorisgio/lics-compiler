@@ -1,4 +1,4 @@
-
+exception Not_implemented
 module Noeud = struct
 	type t = int
 	type label = Empty | And | Or | Not | Xor | Reg | Input | Output | Inreg | Outreg |  True | False
