@@ -31,7 +31,11 @@ type logical_expr =
 
 type logical_stmt =
     | Lassign of string * logical_expr
+<<<<<<< HEAD:src/ast.mli
     | Lrcall of string * string                 (* appel recursif *)
+=======
+    | Lrcall of string * int                 (* appel recursif *)
+>>>>>>> FETCH_HEAD:src/ast.mli
     
 (* porte *)
 

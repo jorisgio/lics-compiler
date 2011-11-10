@@ -1,4 +1,4 @@
- (* Transformation du code en un graphe *)
+(* Transformation du code en un graphe *)
 
 open Ast
 open Graphe
