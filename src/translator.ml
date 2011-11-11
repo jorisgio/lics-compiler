@@ -1,4 +1,7 @@
 
+open Graphe
+open TopoSort
+
 (* types de description des actions à exécuter *)
 
 type unaire = Not
@@ -19,33 +22,33 @@ type stmt =
 type program = stmt list
 
 let lics_of_combin_graph g n = (* n = max_clé + 1 *)
-  let sorted_keys = TopoSort.topoSort g.graph in
+  let sorted_keys = topoSort g.cgraph in
   (* lors du parcours de la liste, à tout noeud on associe la liste des
      variables qui sont ses pères *)
   let pred = Array.create n [] in
   let rec elimine = function
     | [] -> []
-    | h::t -> if h = Graphe.Inreg 
-              || h = Graphe.Outreg 
-                || h = Graphe.Input 
-                  || h = Graphe.Output 
+    | h::t ->
+      let v = Vertex.getLabel (Graphe.find g.cgraph h) in
+      if v = Noeud.Inreg || v = Noeud.Outreg
+           || v = Noeud.Input || v = Noeud.Output 
       then elimine t
       else h:: elimine t in
   let translate k =
-    let v = Graphe.find k g in
-    Vertex.iterSucc (function x -> pred.(x) <- k) v ;
+    let v = Graphe.find g.cgraph k in
+    Vertex.iterSucc (function x -> pred.(x) <- k::pred.(x)) v ;
     match Vertex.getLabel v with
-      | Graphe.Empty | Graphe.Reg ->
+      | Noeud.Empty | Noeud.Reg ->
         failwith "lics_of_combin_graph: Noeud vide ou reg"
-      | Graphe.True ->
-        if pred.(k) = [] then Assign (k, Const (True))
+      | Noeud.True ->
+        if pred.(k) = [] then Assign (k, Const true)
         else failwith "lics_of_combin_graph:
 nombre d'entrées incorrect pour une constante"
-      | Graphe.False ->
-        if pred.(k) = [] then Assign (k, Const (False))
+      | Noeud.False ->
+        if pred.(k) = [] then Assign (k, Const false)
         else failwith "lics_of_combin_graph:
 nombre d'entrées incorrect pour une constante"
-      | Graphe.Not ->
+      | Noeud.Not ->
         begin
           try let [i] = pred.(k) in
               Assign (k, Unaire (Not, i))
@@ -53,11 +56,11 @@ nombre d'entrées incorrect pour une constante"
             "lics_of_combin_graph:
 nombre d'entrées incorrect pour un opérateur unaire"
         end
-      | Graphe.And | Graphe.Or | Graphe.Xor as op ->
+      | Noeud.And | Noeud.Or | Noeud.Xor as op ->
         let tr_op = function
-          | Graphe.And -> And
-          | Graphe.Or -> Or
-          | Graphe.Xor -> Xor
+          | Noeud.And -> And
+          | Noeud.Or -> Or
+          | Noeud.Xor -> Xor
         in
         begin
           try let [i;j] = pred.(k) in
@@ -66,15 +69,15 @@ nombre d'entrées incorrect pour un opérateur unaire"
             "lics_of_combin_graph:
 nombre d'entrées incorrect pour un opérateur unaire"
         end
-      | Graphe.Mux (a,b,c) ->
+      | Noeud.Mux (a,b,c) ->
         Assign (k, Ternaire (Mux, a, b, c))
       | _ -> failwith "lics_of_combin_graph: bad elimination"
   in
   let rec traite_cp typ = function (* typ = input ou output ou inreg ... *)
     | [] -> []
     | h::t ->
-      let v = Graphe.find h g in
-      Vertex.iterSucc (function x -> pred.(x) <- k) v ;
+      let v = Graphe.find g.cgraph h in
+      Vertex.iterSucc (function x -> pred.(x) <- h::pred.(x)) v ;
       (match typ with
         | "input" -> Input h
         | "inreg" -> Inputreg h
@@ -97,9 +100,8 @@ nombre d'entrées incorrect pour un outputreg"
         | _ -> failwith "lics_of_combin_graph: traite_cp"
       ):: traite_cp typ t
   in
-  traite_cp g.inputs "input" @
-    traite_cp g.inregs "inreg" @
+  traite_cp "input" g.cinputs @
+    traite_cp "inreg" g.cinregs @
     List.map translate (elimine sorted_keys) @
-    traite_cp g.outputs "output" @
-    traite_cp g.outregs "outreg"
-
+    traite_cp "output" g.coutputs @
+    traite_cp "outreg" g.coutregs
