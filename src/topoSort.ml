@@ -1,4 +1,3 @@
-module TopoSort = struct
 
 module Color = struct
   type t = Bleu | Noir
@@ -23,7 +22,6 @@ let topoSort graph = (* graphe n'est pas coloré *)
   fst (Graphe.Graphe.foldVertex
     (fun x _ -> traiter x) graph ([] , ColoredGraph.colorGraph graph))
 
-end
 
 (* Tests *)
 (*
