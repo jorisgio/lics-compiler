@@ -1,5 +1,9 @@
 %{
 open Ast
+
+let inputToWire b li =
+  List.map (fun i -> { out_id = int_of_string i ; block_id = b}) li
+
 %}
 
 
@@ -9,7 +13,7 @@ open Ast
 %token START DEF END RAM ROM
 %token LPAREN RPAREN LBRACKET RBRACKET IN OUT
 %token AND OR XOR NAND NOT PLUS MINUS TIMES DIV
-%token COMMA SEMICOLON DOTDOT
+%token COMMA SEMICOLON DOTDOT DOT
 %token EQUAL LOWER GREATER EOF 
 
 %nonassoc NOT
@@ -25,10 +29,10 @@ open Ast
 %%
 (* un circuit contient : un block d'entrée, une liste de définition de portes et une liste des blocks *)
 circuit:
-	START start = IDENT SEMICOLON
 	DEF
 	gate_types = gate*
-	END
+        END
+	start = block
 	blocks = block* EOF
 		{ { gates = gate_types ; start = start ; blocks = blocks } }
 
@@ -37,7 +41,7 @@ gate:
 	name = UIDENT IN inp = io
 	body = logical_statement*
 	OUT out = io
-		{ { name = (String.lowercase name); inputs = inp ; body = body ; outputs = out } }
+		{ { gname = name; ginputs = inp ; gbody = body ; goutputs = out; gparam = None } }
 
 io:
 	LPAREN l=separated_list(COMMA , IDENT) RPAREN 	{l}
@@ -90,10 +94,11 @@ int_expr:
 
 (* les blocks sont les instanciations des portes, pour construire réelement le circuit *)
 block:
-    gtype = UIDENT id = IDENT par = param IN inp = io
-    body = bstmt*
-    OUT out = io   { { name = id ; inputs = inp ; param = par ; outputs = out ; body = body } }
+    gtype = UIDENT id = IDENT IN 
+    LPAREN inp =separated_list(COMMA , wire)  RPAREN { { bname = id ; binputs = inp ; bparam = None; bgate_type = gtype } }
     
+wire:
+    bid = IDENT DOT outid = INT 	{ {block_id = bid; out_id = outid}}
 
 param:
   LOWER exp = int_expr GREATER   { exp }
