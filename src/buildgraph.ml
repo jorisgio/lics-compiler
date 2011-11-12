@@ -58,18 +58,18 @@ let buildgraph cir =
           let src = Smap.find ident env in
           gcur,src
       | Bbinop(oper, expr1, expr2) -> 
-          let cur = !size in
           let gcur = __addVertex gcur in 
           let gcur = __setLabel gcur (lop_to_label oper) in
+	  let cur = !size in
           let gcur,i1 = process_expr gcur env  expr1 in
           let gcur,i2 = process_expr gcur env expr2 in
           let gcur = Graphe.addEdge gcur i1 cur in
           let gcur = Graphe.addEdge gcur i2 cur in
           gcur,cur
       | Bprefix(oper, expr) ->
-          let cur = !size in
           let gcur = __addVertex gcur in
           let gcur = __setLabel gcur (lp_to_label oper) in
+	  let cur = !size in
           let gcur,i = process_expr gcur env expr in
           let gcur = Graphe.addEdge gcur i cur in
           gcur,cur
@@ -90,7 +90,11 @@ let buildgraph cir =
       Smap.add ident varray.(wir.out_id) curenv
     in
     (* on trouve la porte dont le block est une instance *)
-    let gate = Smap.find b.bgate_type gates_map in
+    let gate = 
+      try 
+	Smap.find b.bgate_type gates_map 
+      with Not_found -> failwith "kik0o"
+    in
     (* on crée l'env *)
     let env = List.fold_left2 add_wire_to_env Smap.empty gate.ginputs b.binputs in
     (* on applique process_stmt sur tout les stmts de la porte 
