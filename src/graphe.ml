@@ -11,8 +11,38 @@ module Noeud = struct
           | Mux of int * int * int
 	let compare = Pervasives.compare
 	let empty = Empty
+	let string_of_label = function
+	  | True -> "True"
+	  | False -> "False"
+	  | Empty -> "Empty"
+	  | Reg -> "Reg"
+	  | Input -> "Input"
+	  | Output -> "Output"
+	  | Inreg -> "Inreg"
+	  | Outreg -> "OUtreg"
+	  | Not -> "Not"
+	  | And -> "And"
+	  | Or -> "Or"
+	  | Xor -> "Xor"
+	  | Nand -> "Nand"
+	  | Mux(_,_,_) -> "Mux"
+	  
 end
-module Graphe = Builder.MakeLabeledGraph(Noeud)
+module Graphe = struct
+  include (Builder.MakeLabeledGraph(Noeud))
+  
+  (* print graph in f *)
+  let drawGraph g f =
+    let write key value =
+      Printf.fprintf f "%d[label=%s];\n" key (Noeud.string_of_label (Vertex.getLabel value));
+      let str= Vertex.foldSucc (fun  k acc-> acc ^ (Printf.sprintf "%d -> %d;\n" key k)) value "" in
+      if String.length str > 0 then Printf.fprintf f "%s" str;
+    in
+    Printf.fprintf f "digraph circuit {\n" ;
+    iterVertex write g;
+    Printf.fprintf f "}"
+
+end
 module Vertex = Graphe.Vertex
 
 (*type renvoyé après la pemière passe (aka la construction du graphe) *)
