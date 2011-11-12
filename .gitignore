@@ -25,3 +25,5 @@ parser.conflicts
 
 #ignore lib
 lib/
+#ignore ocamlbuild
+_build/

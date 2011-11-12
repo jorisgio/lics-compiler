@@ -1,38 +1,18 @@
-CMO=lexer.cmo parser.cmo interp.cmo main.cmo
-GENERATED = lexer.ml parser.ml parser.mli 
-BIN=mini-pascal
-FLAGS=
+all: native
+	
+native:
+	ocamlbuild $(ARGS)  src/main.native
+bytecode:
+	ocamlbuild $(ARGS) src/main.byte
+debug:
+	ocamlbuild $(ARGS) src/main.d.byte
 
-all: $(BIN)
-	./$(BIN) test.pas
+clean-native:
+	ocamlbuild $(ARGS) -clean  src/main.native
 
-$(BIN):$(CMO)
-	ocamlc $(FLAGS) -o $(BIN) graphics.cma $(CMO)
+clean-bytecode:
+	ocamlbuild $(ARGS) -clean  src/main.byte
 
-.SUFFIXES: .mli .ml .cmi .cmo .mll .mly  
-
-.mli.cmi:
-	ocamlc $(FLAGS) -c  $<
-
-.ml.cmo:
-	ocamlc $(FLAGS) -c  $<
-
-.mll.ml:
-	ocamllex $<
-
-.mly.ml:
-	menhir -v $<
-
-.mly.mli:
-	ocamlyacc -v $<
-clean:
-	rm -f *.cm[io] *.o *~ $(BIN) $(GENERATED) parser.output
-
-.depend depend:$(GENERATED)
-	rm -f .depend
-	ocamldep *.ml *.mli > .depend
-
-include .depend
-
-
+clean-debug:
+	ocamlbuild $(ARGS) -clean  src/main.d.byte
 
