@@ -21,6 +21,26 @@ type stmt =
 
 type program = stmt list
 
+(* Pour produire du Lics *)
+let op_to_string = function
+  | Or -> "or"
+  | And -> "and"
+  | Nand -> "nand"
+  | Xor -> "xor"
+    
+let expr_to_string = function 
+  | Const b -> string_of_bool b
+  | Unaire(Not,i)-> Printf.sprintf "Not %d" i
+  | Binaire(op,i1,i2) -> Printf.sprintf "%d %s %d" i1 (op_to_string op) i2
+  | Ternaire(Mux,i1,i2,i3) -> Printf.sprintf "Mux(%d,%d,%d)" i1 i2 i3
+    
+let stmt_to_string = function
+  | Assign(i1,exp) -> Printf.sprintf "%d = %s\n" i1 (expr_to_string exp)
+  | Input(i)  -> Printf.sprintf  "%d = input\n" i
+  | Output i -> Printf.sprintf "output %d\n" i
+  | Inputreg i -> Printf.sprintf "%d = inputreg\n" i
+  | Outputreg i-> Printf.sprintf "ouputreg %d\n" i
+
 let lics_of_combin_graph g n = (* n = max_clé + 1 *)
   let sorted_keys = topoSort g.cgraph in
   (* lors du parcours de la liste, à tout noeud on associe la liste des
