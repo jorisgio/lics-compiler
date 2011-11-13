@@ -87,7 +87,7 @@ nombre d'entrées incorrect pour un opérateur unaire"
               Assign (k, Binaire (tr_op op, i, j))
           with Match_failure _ -> failwith
             "lics_of_combin_graph:
-nombre d'entrées incorrect pour un opérateur unaire"
+nombre d'entrées incorrect pour un opérateur binaire"
         end
       | Noeud.Mux (a,b,c) ->
         Assign (k, Ternaire (Mux, a, b, c))
@@ -122,8 +122,10 @@ nombre d'entrées incorrect pour un outputreg"
         | _ -> failwith "lics_of_combin_graph: traite_cp"
       ):: traite_cp typ t
   in
-  traite_cp "input" g.cinputs @
-    traite_cp "inreg" g.cinregs @
-    List.map translate (elimine sorted_keys) @
-    traite_cp "output" g.coutputs @
-    traite_cp "outreg" g.coutregs
+  let l = traite_cp "input" g.cinputs in
+  let l = l @ traite_cp "inreg" g.cinregs in
+  let l = l @ List.map translate (elimine sorted_keys) in
+  let l = l @ traite_cp "output" g.coutputs in
+  let l = l @ traite_cp "outreg" g.coutregs in
+  l
+
