@@ -111,3 +111,6 @@ nombre d'entrées incorrect pour un outputreg"
   let l = l @ traite_cp "outreg" g.coutregs in
   l
 
+
+let licsBinFile_of_combin_graph g n s = (* s = nom du fichier à écrire *)
+  LicsFileIO.write s (lics_of_combin_graph g n)
