@@ -101,22 +101,24 @@ nombre d'entrées incorrect pour un opérateur unaire"
       (match typ with
         | "input" -> Input h
         | "inreg" -> Inputreg h
-        | "output" ->
-          begin
+        | "output" -> Output h
+(* CODE MORT : version non compatible *)
+(*          begin
           try let [i] = pred.(h) in (* c'est l'entrée qui donne l'argument *)
               Output i
           with Match_failure _ -> failwith
             "lics_of_combin_graph:
 nombre d'entrées incorrect pour un output"
-          end
-        | "outreg" ->
-          begin
+          end*)
+        | "outreg" -> Outputreg h
+(* CODE MORT : version non compatible *)
+(*          begin
           try let [i] = pred.(h) in (* c'est l'entrée qui donne l'argument *)
               Outputreg i
           with Match_failure _ -> failwith
             "lics_of_combin_graph:
 nombre d'entrées incorrect pour un outputreg"
-          end
+          end*)
         | _ -> failwith "lics_of_combin_graph: traite_cp"
       ):: traite_cp typ t
   in
