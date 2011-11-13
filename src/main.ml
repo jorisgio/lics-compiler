@@ -90,14 +90,14 @@ let seqlist =
 (* écriture dans un fichier (par défaut, stdout) *)
 let () =
   let f =
-    if !ofile !=  "" then
+    if String.length !ofile > 0 then
       open_out !ofile 
     else
-      Pervasives.stdout
+      Pervasives.stdout 
   in
   if !obj then
     output_value f seqlist 
   else
-    List.iter (fun elt -> Printf.fprintf f "%s" (Translator.stmt_to_string elt ) ) seqlist
+    List.iter (fun elt -> Printf.fprintf f  "%s" (Translator.stmt_to_string elt ) ) seqlist
   ;
   exit 0
