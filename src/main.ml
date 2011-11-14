@@ -56,8 +56,12 @@ let circuit =
     
 (* Si on ne veut que le parsage, on s'arrête là *)
 let () = if !parse_only then (deb "Parsage effectué\n" ; exit 0)
-
-(* Construction du graphe *)
+    
+(* Analyse sémantique *)
+let () = if not (Semantic.analyse circuit) then exit 1 ;
+  ()
+    
+  (* Construction du graphe *)
 let igraph =
   deb "Construction du graphe de circuit…\n";
   let g = Buildgraph.buildgraph circuit in
