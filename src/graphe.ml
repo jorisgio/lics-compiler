@@ -9,8 +9,14 @@ module Noeud = struct
           | Not
           | And | Or | Xor | Nand
           | Mux of int * int * int
+
+	(* Une comparaison sur les clés *)
 	let compare = Pervasives.compare
+	  
+	(* l'étiquette vide *)
 	let empty = Empty
+	  
+	(* printer *)
 	let string_of_label = function
 	  | True -> "True"
 	  | False -> "False"
@@ -25,9 +31,9 @@ module Noeud = struct
 	  | Or -> "Or"
 	  | Xor -> "Xor"
 	  | Nand -> "Nand"
-	  | Mux(_,_,_) -> "Mux"
-	  
+	  | Mux(_,_,_) -> "Mux"	  
 end
+
 module Graphe = struct
   include (Builder.MakeLabeledGraph(Noeud))
   
