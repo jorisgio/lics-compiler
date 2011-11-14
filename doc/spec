@@ -1,0 +1,43 @@
+Langage de description 
+
+Pour la grammaire, voir le parser
+
+On a deux blocs :
+
+définitons des portes, entouré par def…end
+défintions des blocks
+
+Une porte a un identifiant avec une majuscule en première lettre,
+une liste d'entrées, une liste de stmt, une liste de sortie
+
+Maporte <- (a,i1,i2,c0)
+stmts...
+->(o1,o2)
+
+Un statement est la definition des variables boléenes
+
+tmp1 = (b1 and b2) or foo;
+
+un block est : 
+   - un type de porte, 
+   - un identifiant, 
+   - une liste de fil qui assigne la sortie d'un bloc précédent à une entrée de la porte instanciée
+
+Maporte monblock <-(block1.3, blockfoo.2, blockfoo.3, blockbar.6)
+
+Le premier block est le block d'entrée, le dernier le block de sortie.
+
+NOT IMPLEMENTED :
+* des tableaux de booléens pouvant être passé en entrée.
+  Exemple :
+  tab1 = (i1,i2)
+  on a alors Maporte <- tab est équivalent ) Maporte <- (i1,i2)
+* induction sur les portes :
+  on introduit un paramètre, qui est une expression entières, et un stmt permettant d'appeler d'autres portes
+  on défini des règles grâce à ce paramètre :
+  exemple :
+  Mapore <2n> <-(i1,i2)
+  	 tmp = i1 or i2;
+  	 tableau = Maporte <n/2> <-(tmp, i2);
+	 -> tableau
+
