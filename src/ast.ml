@@ -10,7 +10,7 @@ type int_expr =
 (* expressions booléenes *)    
 type lop = And | Or | Xor | Nand
 
-type prefix = Not | Mux
+type prefix = Not
 
 type const =
     | Cbool of bool
@@ -25,6 +25,7 @@ type logical_expr =
     | Bbinop of lop * logical_expr * logical_expr
     | Bvar of string
     | Bprefix of prefix * logical_expr
+    | Bmux of logical_expr * logical_expr * logical_expr
     | Bcall of call
     
 (* assertions logiques *)
@@ -33,7 +34,7 @@ type logical_stmt =
     | Lassign of string * logical_expr
     | Lrcall of string * int                 (* appel recursif *)
     
-(* porte *)
+(* pdeorte *)
 
 type gate = {
     gname : string ;

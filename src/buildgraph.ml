@@ -27,9 +27,9 @@ module Graphe = struct
   let next = ref 0
     
   (* ajoute un noeud au graphe d'index le prochain disponible *)
-  let __addVertex g = next :=  !next + 1 ; addVertex g !next
+  let addVertex2 g = next :=  !next + 1 ; addVertex g !next
     
-  let __setLabel g label = Graphe.setLabel g !next label
+  let setLabel2 g label = setLabel g !next label
 end
 
 
@@ -55,6 +55,8 @@ end
 
 (* Fonctions traitant les portes *)
 module Gates = struct 
+  (*  Un seul noeud pour chaque constante ça parait une bonne idée *)
+  let constList = ref []
     
   (* parcours la liste des portes et les ajoutes à une Smap name -> porte *)
   let rec parse_gates gates_map q = match q with
@@ -67,29 +69,47 @@ module Gates = struct
      renvoit (graphe*noeud courant) 
      ou le noeud courant est le noeud représentant la valeur de "sortie" *)
   let rec process_expr gcur env  = function
-      | Bconst cst -> 
-          let gcur = Graphe.__addVertex gcur in
-          let gcur = Graphe.__setLabel gcur (Noeud.bool_to_label cst) in
-	  gcur,!Graphe.next
-      | Bvar ident -> 
-          let src = Smap.find ident env in
-          gcur,src
-      | Bbinop(oper, expr1, expr2) -> 
-          let gcur = Graphe.__addVertex gcur in 
-          let gcur = Graphe.__setLabel gcur (Noeud.lop_to_label oper) in
-	  let cur = !Graphe.next in
-          let gcur,i1 = process_expr gcur env  expr1 in
-          let gcur,i2 = process_expr gcur env expr2 in
-          let gcur = Graphe.addEdge gcur i1 cur in
-          let gcur = Graphe.addEdge gcur i2 cur in
-          gcur,cur
-      | Bprefix(oper, expr) ->
-          let gcur = Graphe.__addVertex gcur in
-          let gcur = Graphe.__setLabel gcur (Noeud.lp_to_label oper) in
-	  let cur = !Graphe.next in
-          let gcur,i = process_expr gcur env expr in
-          let gcur = Graphe.addEdge gcur i cur in
-          gcur,cur
+    | Bconst cst -> begin
+      try
+	let cur = List.assoc cst !constList in
+	gcur,cur
+      with Not_found -> 
+       	let gcur = Graphe.addVertex2 gcur in
+	let gcur = Graphe.setLabel2 gcur (Noeud.bool_to_label cst) in
+	constList := ((cst,!Graphe.next)::!constList);
+	(gcur,!Graphe.next)
+    end
+	
+    | Bvar ident -> 
+      let src = Smap.find ident env in
+      gcur,src
+    | Bbinop(oper, expr1, expr2) -> 
+      let gcur = Graphe.addVertex2 gcur in 
+      let gcur = Graphe.setLabel2 gcur (Noeud.lop_to_label oper) in
+      let cur = !Graphe.next in
+      let gcur,i1 = process_expr gcur env  expr1 in
+      let gcur,i2 = process_expr gcur env expr2 in
+      let gcur = Graphe.addEdge gcur i1 cur in
+      let gcur = Graphe.addEdge gcur i2 cur in
+      gcur,cur
+    | Bprefix(oper, expr) ->
+      let gcur = Graphe.addVertex2 gcur in
+      let gcur = Graphe.setLabel2 gcur (Noeud.lp_to_label oper) in
+      let cur = !Graphe.next in
+      let gcur,i = process_expr gcur env expr in
+      let gcur = Graphe.addEdge gcur i cur in
+      gcur,cur
+    | Bmux(e1,e2,e3) ->
+      let  gcur = Graphe.addVertex2 gcur in
+      let cur = !Graphe.next in
+      let gcur,i1 = process_expr gcur env e1 in
+      let gcur,i2 = process_expr gcur env e2 in
+      let gcur,i3 = process_expr gcur env e3 in
+      let gcur = Graphe.addEdge gcur i1 cur in
+      let gcur = Graphe.addEdge gcur i2 cur in
+      let gcur = Graphe.addEdge gcur i3 cur in
+      let gcur = Graphe.setLabel gcur cur (Noeud.Mux(i1,i2,i3)) in
+      gcur,cur
 
   (* Traite une instruction.
      Prend un coupe (graphe courant * env local)
@@ -144,8 +164,8 @@ module Blocks = struct
   let process_start_block b =
     let add (curgraph,li) _ =
       let li = (!(Graphe.next) + 1)::li in
-      let curgraph = Graphe.__addVertex curgraph in
-      let curgraph = Graphe.__setLabel curgraph Noeud.Input in
+      let curgraph = Graphe.addVertex2 curgraph in
+      let curgraph = Graphe.setLabel2 curgraph Noeud.Input in
       curgraph,li 
     in
     let g,inputs =  

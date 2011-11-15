@@ -12,11 +12,11 @@ let inputToWire b li =
 %token <string> IDENT UIDENT
 %token START DEF END RAM ROM
 %token LPAREN RPAREN LBRACKET RBRACKET IN OUT
-%token AND OR XOR NAND NOT PLUS MINUS TIMES DIV
+%token AND OR XOR NAND NOT PLUS MINUS TIMES DIV MUX
 %token COMMA SEMICOLON DOTDOT DOT
 %token EQUAL LOWER GREATER EOF 
 
-%nonassoc NOT
+%nonassoc NOT MUX
 %left OR XOR
 %left AND NAND
 %left TIMES DIV
@@ -54,6 +54,7 @@ logical_expr:
 	| id = IDENT	{ Bvar id  }
 	| e1 = logical_expr o = lop e2 = logical_expr 	{ Bbinop(o,e1,e2) }
 	| p = prefix e1 = logical_expr	{ Bprefix (p,e1) }
+	| MUX LPAREN e1 = logical_expr COMMA e2 = logical_expr COMMA e3 = logical_expr RPAREN { Bmux(e1,e2,e3) }
 	| LPAREN e1 = logical_expr RPAREN 	{ e1 }
 	| v = IDENT LBRACKET idx=int_expr RBRACKET   { Bcall(Aindex(v, idx)) } (* prend un index du tableau *)
 	| v = IDENT LBRACKET min=int_expr DOTDOT max=int_expr RBRACKET  { Bcall(Arange(v, min, max))}(*donne un sous tableau *)

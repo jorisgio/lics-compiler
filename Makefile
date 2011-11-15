@@ -15,4 +15,5 @@ clean-bytecode:
 
 clean-debug:
 	ocamlbuild $(ARGS) -clean  src/main.d.byte
-
+graph:
+	ocamldoc -dot -I _build/src -I _build/lib  _build/src/*.ml _build/lib/*.mli _build/lib/*.ml 
