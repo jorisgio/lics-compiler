@@ -10,6 +10,7 @@ let ofile = ref ""
 let debug = ref false
 let parse_only = ref false
 let obj = ref false
+let o1 = ref false
 
 (* affiche des messages d'erreur en cas de besoin *)
 let deb str = if !debug then Printf.eprintf str
@@ -19,6 +20,7 @@ let options = [ "-parse-only", Arg.Set parse_only, "N'effectue que le parsage";
 		"-g", Arg.Set debug, "Active les options de debogage";
 		"-o", Arg.Set_string ofile, "Nom du fichier de sortie";
 		"-obj", Arg.Set obj, "La sortie est un fichier contenant des objets ocaml";
+		"-O1", Arg.Set o1, "Active les optimisations du compilateur";
 	      ]
 
 (* Affiche la localisation dans le buffer lors de l'analyse lexicale/syntaxique *)
@@ -91,6 +93,19 @@ let seqlist =
   deb "Done.\n";
   l
 
+(* Allocation des registres (Optimisation) *)
+let seqlist = if !o1 then
+    begin
+      deb "Allocation de registre…\n";
+      let l,g = Regalloc.process seqlist in
+      if !debug then Regalloc.IGraphe.drawGraph g (open_out "reg.debug") ;
+      deb "Done.\n";
+      l
+    end
+  else
+    seqlist
+
+ 
 (* écriture dans un fichier (par défaut, stdout) *)
 let () =
   let f =
