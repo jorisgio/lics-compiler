@@ -25,7 +25,7 @@ module Noeud = struct
 	  | Input -> "Input"
 	  | Output -> "Output"
 	  | Inreg -> "Inreg"
-	  | Outreg -> "OUtreg"
+	  | Outreg -> "Outreg"
 	  | Not -> "Not"
 	  | And -> "And"
 	  | Or -> "Or"

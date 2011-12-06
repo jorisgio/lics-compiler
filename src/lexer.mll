@@ -9,7 +9,7 @@ let kwd_tbl =
         ["start", START; "def", DEF; "end", END;
                "ram", RAM; "rom", ROM;
                "and", AND; "nand", NAND; "or", OR; "xor", XOR; "not", NOT;
-	       "mux", MUX;
+	       "mux", MUX; "reg", REG;
                ]
                
 

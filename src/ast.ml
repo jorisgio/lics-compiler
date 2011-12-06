@@ -8,9 +8,9 @@ type int_expr =
     
 
 (* expressions booléenes *)    
-type lop = And | Or | Xor | Nand
+type lop = And | Or | Xor | Nand 
 
-type prefix = Not
+type prefix = Not | Reg
 
 type const =
     | Cbool of bool

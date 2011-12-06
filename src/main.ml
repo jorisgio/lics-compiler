@@ -79,9 +79,8 @@ let igraph =
 
 
 (* Suppression des registres *)
-   (*  not implemented  *)
 let combinatoire =
-  { cgraph = igraph.igraph; cinputs = igraph.iinputs; coutputs = igraph.ioutputs; cinregs = []; coutregs = []}
+  Cycles.processRegs igraph 
   
 (* Tri Topologique et production du code *)
 let seqlist = 

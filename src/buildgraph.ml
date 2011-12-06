@@ -53,6 +53,7 @@ module Noeud = struct
 
   let lp_to_label   = function
     | Ast.Not -> Not
+    | Ast.Reg -> Reg
       
   let bool_to_label = function
     | Ast.Cbool(true) -> True

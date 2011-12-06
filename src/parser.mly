@@ -12,13 +12,13 @@ let inputToWire b li =
 %token <string> IDENT UIDENT
 %token START DEF END RAM ROM
 %token LPAREN RPAREN LBRACKET RBRACKET IN OUT
-%token AND OR XOR NAND NOT PLUS MINUS TIMES DIV MUX
+%token AND OR XOR NAND NOT REG PLUS MINUS TIMES DIV MUX
 %token COMMA SEMICOLON DOTDOT DOT
 %token EQUAL LOWER GREATER EOF 
 
-%nonassoc NOT MUX
+%nonassoc NOT REG
 %left OR XOR
-%left AND NAND
+%left AND NAND 
 %left TIMES DIV
 %left PLUS MINUS
 
@@ -70,6 +70,7 @@ logical_expr:
 
 %inline prefix:
 	| NOT 	{Not}
+	| REG   {Reg}
 ;
 
 (* une constante est soit un tableau de booléens, soit un booléen *)
