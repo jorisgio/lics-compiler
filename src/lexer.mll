@@ -6,8 +6,7 @@ exception Lexer_error of string
 
 (* attention, tout les mots clés sont en minuscule ! *)
 let kwd_tbl = 
-        ["start", START; "def", DEF; "end", END;
-               "ram", RAM; "rom", ROM;
+        [ "def", DEF; "end", END;
                "and", AND; "nand", NAND; "or", OR; "xor", XOR; "not", NOT;
 	       "mux", MUX; "reg", REG;
                ]

@@ -24,6 +24,7 @@ type logical_expr =
     | Bconst of const
     | Bbinop of lop * logical_expr * logical_expr
     | Bvar of string
+    | Barray of string array
     | Bprefix of prefix * logical_expr
     | Bmux of logical_expr * logical_expr * logical_expr
     | Bcall of call

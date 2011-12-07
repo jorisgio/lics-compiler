@@ -80,7 +80,12 @@ let igraph =
 
 (* Suppression des registres *)
 let combinatoire =
-  Cycles.processRegs igraph 
+	let g = 		
+  Cycles.processRegs igraph in 
+  let f = open_out "graph2.debug" in	
+  	Graphe.drawGraph g.cgraph f;
+	close_out f ;
+	g
   
 (* Tri Topologique et production du code *)
 let seqlist = 

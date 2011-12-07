@@ -10,7 +10,7 @@ let inputToWire b li =
 %token <int> INT
 %token <bool> BOOL
 %token <string> IDENT UIDENT
-%token START DEF END RAM ROM
+%token DEF END LW RW
 %token LPAREN RPAREN LBRACKET RBRACKET IN OUT
 %token AND OR XOR NAND NOT REG PLUS MINUS TIMES DIV MUX
 %token COMMA SEMICOLON DOTDOT DOT
