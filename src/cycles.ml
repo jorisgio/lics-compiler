@@ -8,9 +8,9 @@ let processRegs igraph =
       if (Vertex.getLabel v) =  Noeud.Reg then
 	let graph = Graphe.setLabel graph k Noeud.Inreg in
 	let graph = Graphe.removeEdge graph key k in
-	(graph,(key::outlist),(k::inlist))
+	(graph,(k::inlist),(key::outlist))
       else
-	(graph,outlist,inlist)
+	(graph,inlist,outlist)
     in
     Vertex.foldSucc sucks value (graph,inlist,outlist)    
   in
