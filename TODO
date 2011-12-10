@@ -1,14 +1,11 @@
 * FINIR LE PARSER : Joris
- -ajouter la gestion des portes inductives
+ -ajouter la gestion des portes inductives / des for
  -ajouter la gestion des blocks
 
 * TESTS DE CORRECTION Joris
  -vérification de l'induction
  -vérification de type
 
-* CONSTRUCTION DU GRAPHE Leon
+* AJOUT DES SYSCALL / GESTION DE LA RAM
 
-* TRI TOPOLOGIQUE
-
-* PRODUCTION DE CODE
-
+* FAIRE DE NOMBREUX TESTS (cf sujet du projet)

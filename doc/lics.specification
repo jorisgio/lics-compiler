@@ -52,27 +52,21 @@ brouillon 0.1
       Attention ! 
       	l'ordre des instructions d'entrée/sortie est important.
 
-   2.3. Mot-clé
-        le mot clé onetime signifie que l'assertion peut n'être calculée
-        qu'a pas la premiere passe.
-        
-        Exemple :
-                1 = input
-                2 = input
-                onetime  3 = and 1 2  
+   2.3. Syntaxe
 
-   2.4. Syntaxe
-
-   	Une assertion est la donnée d'une variable, d'une fonction et de ses arguments, l'opérateur d'assigement est '='.
-	Notons que la syntaxe 2 = output est maladroite, mais peut être simplifiera le parsage. À voir…
+   	Une assertion est la donnée d'une variable, d'une fonction et de
+        ses arguments, l'opérateur d'assigement est '='.
+	Notons que la syntaxe 2 = output est maladroite, mais peut être
+        simplifiera le parsage. À voir…
+        Il n'y a pas de parsage, on communique par fichier binaire, pas
+        besoin de se poser la question, donc.
 	
 3. Structure
 
    Un programme commence par la definitions des entrées.
-   Le corps du programme est divisé en blocs indépendants, partageant un unique
-   espace de nom pour les variables. Chaque bloc peut être executé en
-   parallèle. Un bloc est délimité par les mots clés "begin" "end"
    Un programme finit par la définition des sorties.
+   En fait, cet ordre n'est pas nécessaire. L'important est de n'utiliser
+   que des variables précédemment définies.
 
    Exemple
         # entrées :
@@ -81,15 +75,10 @@ brouillon 0.1
         3 = inputreg
         
         # Corps
-        begin
         4 = or 1 2
         5 = and 4 1
-        end
-        
-        begin        
         6 = xor 1 3
         7 = not 6
-        end
         
         # sorties
         7 = output
@@ -97,31 +86,5 @@ brouillon 0.1
 
 3. Grammaire
 
-type  programme = assertion list
-type variable
-type assertion = variable * expression
-
-type expression = 
-     True
-     |False
-     |fonction
-
-type fonction = const |unaire | binaire
-
-type const = 
-     input 
-     |inputreg
-     |output
-     |outputreg
-
-type  unaire = Not of variable
-
-type binaire = 
-     Or of variable * variable
-     |And of variable*variable
-     |Xor of variable*variable
-
-
-
-
+cf lics-lib (sur dépôt github/Zimmi48)
 
