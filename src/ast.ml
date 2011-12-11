@@ -12,7 +12,7 @@ module Smap = Map.Make(String)
 
 module Past = struct 
 (* expressions entières *) 
-  type infix = Add | Sub | Mul  | Di   v |  And | Or | Xor
+  type infix = Add | Sub | Mul  | Div | And | Or | Xor
 
   type prefix = Not | Reg | Minus
    
