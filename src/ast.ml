@@ -115,8 +115,7 @@ module Sast = struct
 
 (* circuit *)
   type circuit = {
-    gates : gate list ;
-    start : block ;
+    gates : gate Smap.t ;
     blocks : block list ;
 }
 
