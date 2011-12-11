@@ -133,14 +133,43 @@ module Gates = struct
 
 
   let pGate gate =
-    let checkIO acc expr =
-      let expr,undef = pExpr acc Sset.empty expr in
+    let checkI (acclist,accenv) expr =
+      let expr,undef = pExpr accenv Sset.empty expr in
       if not (Sset.is_empty undef) then  (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value")));
-      if expr.t != String or expr.t != Array(_) 
-Smap.mem expr.
+      let identi =
+	match expr.e with
+	  | EVar i -> i
+	  | EArray_r(i,b,e) -> i
+	  |_ -> (raise (Error(expr.p,"42")))
+      in
+      if Smap.mem identi accenv then (raise (Error(expr.p,"Argument non unique")));
+      (expr::acclist),(Smap.add identi.id identi accenv) 
+    in
+    let checkO env acclist expr =
+      let expr,undef = pExpr env Sset.empty expr in
+      if not (Sset.is_empty undef) then  (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value")));
+      let identi =
+	match expr.e with
+	  | EVar i -> i
+	  | EArray_r(i,b,e) -> i
+	  |_ -> (raise (Error(expr.p,"42")))
+      in
+      if not (Smap.mem identi.id env) then (raise (Error(expr.p,"Sortie non définie"))); 
+      (identi::acclist)
+    in
+    let inpList,env = List.fold_left checkI ([],Smap.empty) gate.ginputs in
+    let outList = List.fold_left checkO [] gate.goutputs in
+    let inpList = List.rev inpList in
+    let outList = List.rev outList in
+    let instrs,undef,env = pInstrList env Sset.empty [] gate.gbody in
+    if not (Sset.is_empty undef) then (raise (Undefined));
+    { gname = gate.gname; genv =env; ginputs = inpList;
+      goutputs = outList gbody = instrs }
     
-	    
-	    
+  let gAnalysis cir = 
+    let gList = List.map pGate cir.gates in
+    {blocks = cir.blocks; buildMap Smap.empty gList}
       
  end
   
+
