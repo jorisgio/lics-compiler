@@ -110,7 +110,7 @@ module Sast = struct
   type block = {
     bname : string; 
     bgate_type : string; (* type de la porte *)
-    binputs : expr;
+    binputs : expr list;
 }
 
 (* circuit *)
@@ -120,6 +120,28 @@ module Sast = struct
 }
 
 end
+
+(* Ast partiel obtenu après première passe et traitement des blocs *)
+
+module Bast = struct
+
+  open Sast
+    
+  type b_block = {
+    b_bname : string ;
+    b_bgate_type : string ;
+    b_binputs : expr list;
+    b_bvertices : Graphe.Noeud Smap;
+  }
+
+  type b_circuit = {
+    b_gates : gate Smap.t ;
+    b_blocks : b_block list ;
+    b_graphe : Graphe.Graphe ;
+(* Graphe ne comportant que des noeuds et pas encore les fils qui les relient *)
+  }
+end
+    
       
   (* fils entre les instances de block, on garde le point de départ (nom du block et numéro de la sortie *)
   type wire = { block_id : string ; out_id : int }
