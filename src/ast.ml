@@ -1,65 +1,126 @@
-(* expressions entières *)
-type iop = Add | Sub | Mul  | Div 
 
-type int_expr =
-    | Econst of int 
-    | Evar of string
-    | Ebinop of iop * int_expr * int_expr
-    
+module Int = struct
+  type t = int
+  let compare = Pervasives.compare
+end
+  
+module Imap = Map.Make(Int)
 
-(* expressions booléenes *)    
-type lop = And | Or | Xor | Nand 
 
-type prefix = Not | Reg
+module Sset = Set.Make(String)
+module Smap = Map.Make(String)
 
-type const =
-    | Cbool of bool
-    | Carray of bool array
+module Past = struct 
+(* expressions entières *) 
+  type infix = Add | Sub | Mul  | Di   v |  And | Or | Xor
 
-type call =
-    | Aindex of string * int_expr        (* renvoit l'élement du tableau à l'index donné *)
-    | Arange of string * int_expr * int_expr  (* renvoit un sous tableau du tableau *)
-    
-type logical_expr =
-    | Bconst of const
-    | Bbinop of lop * logical_expr * logical_expr
-    | Bvar of string
-    | Barray of string array
-    | Bprefix of prefix * logical_expr
-    | Bmux of logical_expr * logical_expr * logical_expr
-    | Bcall of call
-    
-(* assertions logiques *)
+  type prefix = Not | Reg | Minus
+   
+  type pos = { line : int; char_b : int; char_e : int}
 
-type logical_stmt =
-    | Lassign of string * logical_expr
-    | Lrcall of string * int                 (* appel recursif *)
-    
-(* pdeorte *)
+  type types = Int | Array of int
+      
+  type ident = { id : string; typ : types }
 
-type gate = {
+  type expression = 
+    | EBconst of bool
+    | EIconst of int
+    | EArray_i of ident * int
+    | EArray_r of ident * int * int
+    | EVar of ident
+    | EPrefix of prefix * expr
+    | EInfix of infix * expr * expr
+    | EMux of expr * expr * expr
+	
+  and expr = { p : pos; e : expression }
+	
+  type instruction = 
+    | Assign of ident * expr
+    | For of instr * expr * expr * instr list 
+    | Decl of ident * expr option
+    | Envir of instr list
+
+  and  instr =  { posi : pos; i : instruction }
+      
+  
+      
+  type gate = {
     gname : string ;
-    ginputs : string list ;
-    gparam : int_expr option ;
-    gbody : logical_stmt list ;
-    goutputs : string list ;
-    }
- 
-(* fils entre les instances de block, on garde le point de départ (nom du block et numéro de la sortie *)
-type wire = { block_id : string ; out_id : int }
+    ginputs : expr list ;
+    gbody : instr list ;
+    goutputs : expr list;
+  }
     
-(* block ( instance ) *)    
-type block = {
-  bname : string; 
-  bgate_type : string; (* type de la porte *)
-  bparam : int option;
-  binputs : wire list;
+  type block = {
+    bname : string; 
+    bgate_type : string; (* type de la porte *)
+    binputs : expr;
 }
 
 (* circuit *)
-type circuit = {
+  type circuit = {
     gates : gate list ;
     start : block ;
     blocks : block list ;
 }
- 
+
+end
+
+module Sast = struct 
+(* expressions entières *) 
+  type infix = Add | Sub | Mul  | Div |  And | Or | Xor
+
+  type prefix = Not | Reg | Minus
+   
+  type pos = { line : int; char_b : int; char_e : int}
+  
+  type types = Bool | Int | Array of int
+
+  type ident = { id : string; typ : types; va : expr}
+
+  and  expression = 
+    | EBconst of bool
+    | EIconst of int
+    | EArray_i of ident * int
+    | EArray_r of ident * int * int
+    | EVar of ident
+    | EPrefix of prefix * exp
+    | EInfix of infix * expr * expr
+    | EMux of expr * expr * expr
+	
+  and expr = { p : pos; e : expression ; t : types }
+	
+  type instruction = 
+    | Assign of ident * expr
+    | For of ident * expr * expr * instr List 
+    | Decl of ident * expr option
+    | Envir of instr List
+  
+  and  instr =  { posi : pos; i : instruction }
+
+      
+  type gate = {
+    gname : string ;
+    genv : ident Smap.t
+    ginputs : string list;
+    gbody : instr List ;
+    goutputs : string list;
+  }
+    
+  type block = {
+    bname : string; 
+    bgate_type : string; (* type de la porte *)
+    binputs : expr;
+}
+
+(* circuit *)
+  type circuit = {
+    gates : gate list ;
+    start : block ;
+    blocks : block list ;
+}
+
+end
+      
+  (* fils entre les instances de block, on garde le point de départ (nom du block et numéro de la sortie *)
+  type wire = { block_id : string ; out_id : int }
