@@ -235,7 +235,7 @@ module GatesToSast = struct
       Renvoit l'env des variables locales. *)
     let body,undefSet,env = pInstrList  env Sset.empty  gate.gbody in
     if not (Sset.is_empty undefSet ) then (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value"))) ;
-    { gname = gate.gname; genv = env ; ginputs = inputs ; gbody = body; goutputs = outputs ; goutputsize = size  }
+    { gname = gate.gname; genv = env ; ginputs = inputs ; gbody = body; goutputs = outputs ; goutputsize = size ; ginputsize = !inputsize }
 
 
     

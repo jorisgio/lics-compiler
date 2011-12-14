@@ -3,6 +3,7 @@
 open Ast
 open Bast
 open Graphe
+open Semantic.Exceptions
 
 module Noeud = struct
   include (Noeud)
@@ -81,7 +82,56 @@ let processBExpr gcur env vertex expr =
 let processInstr gcur env = function
   | Assign(ident, exp) -> 
     let cur = Smap.find ident.id env in
-    
-    
-    
-    
+    processBExpr gcur env cur exp
+  | _ -> failwith "Not implemented"
+
+let processBlock gcur circuit blocks =
+  let gate = Smap.find blocks.b_gate_type circuit.b_gates in
+  (* crée un tableau pour les entrées élémentaires du bloc *)
+  let entrees_blocs = Array.make gate.ginputsize (-1) in
+  let i = ref 0 in
+  let rajoute_entree_bloc x = match x.e with
+    | EArray_i (name,index) ->
+        entrees_blocs.(!i) <-
+          Smap.find name circuit.b_blocsOutput.(index) ;
+        incr i
+    | EArray_r (name,min,max) ->
+        for k = min to max do
+          entrees_blocs.(!i) <-
+            Smap.find name circuit.b_blocsOutput.(k) ;
+          incr i
+        done
+    | _ -> raise (Error (x.pos,"mauvaise entrée")) 
+  in
+  try List.iter rajoute_entree_bloc blocks.b_inputs
+  with Invalid_argument _ ->
+    raise (Error ({line = 42; char_b = 42; char_e = 42},
+    "Pas le bon nombre d'entrée pour le bloc " ^ blocks.b_bname));
+    if !i < gate.ginputsize then
+      raise (Error ({line = 42; char_b = 42; char_e = 42},
+      "Pas le bon nombre d'entrée pour le bloc " ^ blocks.b_bname));
+  i := 0 ;
+  (* ajout à l'environnement b_bvertices de tableau de noeuds pour chaque entrée de la porte *)
+  let ajoute_tab entree vertices = match entree.typ with
+    | Bool -> let t = Array.make 1 entrees_blocs.(!i) in
+      incr i ;
+      Smap.add entree.id t vertices
+    | Array n -> let t = Array.make n (-1) in
+      for k = 0 to n - 1 do
+        t.(k) <- entrees_blocs.(!i);
+        incr i
+      done;
+      Smap.add entree.id t vertices
+    | _ -> raise (WrongType ({line = 42; char_b = 42; char_e = 42},Int,Bool))
+  in
+  let env =
+    List.fold_left ajoute_tab gate.ginputs blocks.b_bvertices in
+  List.fold_left
+    (fun instr gcur -> processInstr gcur env instr)
+    gate.gbody
+    gcur
+
+let process circuit =
+  List.fold_left (fun bloc gcur -> processBlock gcur circuit bloc)
+    circuit.b_blocks
+    circuit.b_graphe
