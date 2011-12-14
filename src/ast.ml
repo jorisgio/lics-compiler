@@ -140,7 +140,7 @@ end
 (* Ast partiel obtenu après première passe et traitement des blocs *)
 
 module Bast = struct
-  include Sast
+  include(Sast)
   type b_block = {
     b_bname : string ;
     b_bgate_type : string ;
