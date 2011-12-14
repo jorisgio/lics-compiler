@@ -13,7 +13,8 @@ let pBloc circuit =
   (* Transfore un bloc. 
      Rnvoit un graphe * env * wirEnv *)
   let blocRec bloc (accList,graph,wirEnv) = 
-    let gate = Smap.find bloc.bgate_type gatEnv in 
+    let gate = Smap.find bloc.bgate_type circuit.gates in 
+    let index = ref 0 in
     (* crée un noeud pour chaque variable, excepté les entrées. 
        Construit une Map qui à chaque identifiant associe un tableau de noeuds *)
     let createNodes name ident (env,graph) =
@@ -21,17 +22,17 @@ let pBloc circuit =
 	begin
 	  match ident.typ with
 	    | Bool -> begin
-	      let graph = Graphe.addVertex2 graph in
+	      let graph = Graphe.addVertex graph in
 	      let ar = Array.make 1 0 in
-	      ar.(0) <- !(Graphe.index) ;
+	      ar.(0) <- !index ;
 	      ((Smap.add name  ar env),graph)
 	    end
 	    | Array s -> begin
 	      let ar = Array.make s 0 in
 	      let gr = ref graph in
 	      for i = 0 to (s - 1) do
-	        gr := Graphe.addVertex2 !gr ;
-		ar.(i) <- !(Graphe.index) ;
+	        gr := Graphe.addVertex !gr !index ;
+		ar.(i) <- !index ;
 	      done ;
 	      ((Smap.add name ar env), !gr)
 	    end
@@ -39,7 +40,6 @@ let pBloc circuit =
 	end
     in
     (* on définit l'environnement *)
-    let index = ref 0 in
     let graph = Graphe.addVertex Graphe.empty !index in
     let graph = Graphe.setLabel graph !index Noeud.True in
     incr index;
