@@ -1,7 +1,13 @@
-(* Analyse sémantique de la syntaxe abstraite *)
+(* Analyse sémantique de la syntaxe abstraite 
+   On réalise le typage des expressions, et on vérifie que tout les id sont bien définis
+   On type ensuite les instructions
+   En sortie, on obtient une syntaxe abstraite telle que définie par Sast.*)
+
+
 open Ast
 
 module Exceptions = struct
+  open Sast
   exception Undefined
   exception Error of pos * string
   exception WrongType of pos * types * types 
@@ -11,87 +17,117 @@ end
 (* affiche un warning *)
 let pWarning = () 
   
-module Gates = struct
-    
-  open Sast
+  
+
+(* On type les expressions et les instructions *)
+module InstrToSast = struct
+  open Past
   open Exceptions
     
-  (* construit une map de toutes les portes *)
-  let rec buildMap gMap = function
-    | [] -> gMap
-    | a::q -> begin
-      if Smap.mem a.gname gMap then pWarning ;
-      buildMap (Smap.add a.gname a gMap) q
-    end
-
-  (* TODO : remplacer undefSet par une map qui contient des infos de position *)    
+  (* Renvoit un type de type Sast *)
+  let typToSast = function
+    | Bool -> Sast.Bool
+    | Int -> Sast.Int
+    | Array s-> Sast.Array(s) 
+      
+  (* renvoit un id de type Sast *)
+  let idToSast id = 
+    { Sast.id = id.id ; Sast.typ = typToSast id.typ}
+      
+      
+  (* TODO : remplacer undefSet par une map qui contient des infos de position *) 
+  (* Type les expressions. 
+    Prend :
+     env : l'environnement des variables locales déjà définies
+     undefSet : l'ensemble des variables utilisées mais non définies
+     exp : l'expression
+     Renvoit : une expression typée  * l'ensemble des identifiant non définis 
+  *)
   let rec pExpr env undefSet exp = 
     match exp.e with 
-      | Past.EBoncst b ->  ({ p = exp.p ; e = EBconst(b) ; t = Bool },undefSet)
-      | Past.EIconst i -> ({ p = exp.p ; e = EIconst(i); t = Int},undefSet)
-      | Past.EString s -> ({ p = exp.p ; e = EString(s); t = String},undefSet)
-      | Past.EArray_i(id,index) -> ({  p = exp.p ; e = EArray_i(id,index); t = Bool},undefSet)    
-      | Past.EArray_r(id,i_beg,i_end) ->
-	if i_beg < 0 or i_end < 0 or i_end < i_beg then
+      | EBoncst b ->
+	({ Sast.p = exp.p ; Sast.e = Sast.EBconst(b) ; Sast.t = Sast.Bool },undefSet)
+      | EIconst i -> 
+	({ Sast.p = exp.p ; Sast.e = Sast.EIconst(i); Sast.t = Sast.Int},undefSet)
+      | EString s -> 
+	({ Sast.p = Sast.exp.p ; Sast.e = Sast.EString(s); Sast.t = Sast.String},undefSet)
+      | EArray_i(id,index) -> 
+	({ Sast.p = exp.p ; Sast.e = Sast.EArray_i(id,index); Sast.t = Bool},undefSet)
+      | EArray_r(id,i_beg,i_end) ->
+	let Array(size) = id.typ in
+	if i_beg < 0 or i_end < 0 or i_end < i_beg or i_end >= size then
 	  (raise (Error(exp.p,"Bad index"))) 
 	else
-	  ({ p = exp.p; e = EArray_r(id,i_beg,i_end); t = Array(i_end - i_beg)},undefSet)
-      | Past.EVar(id) ->
+	  ({ Sast.p = exp.p; Sast.e = Sast.EArray_r(id,i_beg,i_end); Sast.t = Sast.Array(i_end - i_beg)},undefSet)
+      | EVar(id) ->     
 	let var,set = 
 	  try 
-	    (Smap.find id env,undefSet)
-	  with Not_found -> ({id = foo; t = Bool},(Sset.add id undefSet))
+	  (Smap.find id env,undefSet)
+	  with Not_found -> ({Sast.id = id; Sast.t = Bool},(Sset.add id undefSet))
 	in
-	({p = exp.p; e = EVar(id) ; t = var.t},set)
-      | Past.EPrefix(p,ex) -> 
+	({Sast.p = exp.p; Sast.e = Sast.EVar(id) ; Sast.t = var.typ},set)
+	  
+      | EPrefix(p,ex) -> 
 	let e,set = pExpr env undefSet ex in
 	let ty,sp =
 	  match p with
-	    | Past.Minus -> if e.t != Int then 
-		(raise (WrongType(e.p,e.t,Int)))
+	    | Minus -> if e.t != Sast.Int then 
+		(raise (WrongType(e.p,e.t,Sast.Int)))
 	      else 
-		Int,Minus
-	    | Past.Not  -> if e.t != Bool then 
-		(raise (WrongType(e.p,e.t,Bool)))
+		Sast.Int,Sast.Minus
+	    |  Not  -> if e.t != Sast.Bool then 
+		(raise (WrongType(e.p,e.t,Sast.Bool)))
 	      else
-		Bool,Not
-	    | Past.Reg -> if e.t != Bool then
-		(raise (WrongType(e.p,e.t,Bool)))
+		Sast.Bool,Sast.Not
+	    | Reg -> if e.t != Sast.Bool then
+		(raise (WrongType(e.p,e.t,Sast.Bool)))
 	      else
-		Bool,Reg
+		Sast.Bool,Sast.Reg
 	in
 	({ p = exp.p ; e = EPrefix(p,e); t = ty},set)
-      | Past.EInfix(i,ex1,ex2) -> 
+      | EInfix(i,ex1,ex2) -> 
 	let e1,s1 = pExpr env undefSet ex1 in
 	let e2,s2 = pExpr env undefSet ex2 in
 	let ty,si =
 	  match i with 
-	       | Past.Add -> Int,Add
-	       | Past.Sub -> Int,Sub
-	       | Past.Mul -> Int,Mul
-	       | Past.Div -> Int,Div
-	       | Past.And -> Bool,And
-	       | Past.Or -> Bool,Or
-	       | Past.Xor -> Bool,Xor
+	    | Add -> Sast.Int,Sast.Add
+	    | Sub -> Sast.Int,Sast.Sub
+	    | Mul -> Sast.Int,Sast.Mul
+	    | Div -> Sast.Int,Sast.Div
+	    | And -> Sast.Bool,Sast.And
+	    | Or -> Sast.Bool,Sast.Or
+	    | Xor -> Sast.Bool,Sast.Xor
 	in
 	if e1.t != ty or e2.t != ty then
 	  (raise (WrongType(e.p,e.t,ty)))
 	else
-	  ({p = exp.p ; e = EInfix(si,e1,e2); t = ty},(Sset.union s1 s2)}
+	  ({Sast.p = exp.p ; Sast.e = Sast.EInfix(si,e1,e2); Sast.t = ty},(Sset.union s1 s2)}
       | EMux(_,_,_) -> failwith "Not implemented"
-	
+
+
+
+
+  (* Typage des Instructions 
+     Prend :
+     env : l'environnement des variables locales déjà définies 
+     undefSet : l'ensemble des variables locales utilisées mais non définies 
+     inst : l'instruction à traiter
+     Renvoit : 
+     une instruction typée * le nouvel ensemble non-déf * le nouvel env 
+  *)
   let rec pInstr env undefSet inst = 
     match inst.i with 
-      | Past.Assign(id,exp) -> 
-	let e,undefSet = pExp  r env undefSet exp in
+      | Assign(id,exp) -> 
+	let e,undefSet = pExp r env undefSet exp in
+	let id = idToSast id in
 	if id.typ != e.t then
 	  (raise   (WrongType(e.pos,e.t,id.typ)))
 	else 
-	  ({posi = inst.posi; i = Assign(id,e)},(Sset.remove id.id undefSet),(Smap.add id.id {id = id.id; typ = id.typ; va = None} env ))
-      | Past.For(i,ex1,ex2,li) ->
+	  ({Sast.posi = inst.posi; Sast.i = Assign(id,e)},(Sset.remove id.id undefSet),(Smap.add id.id {Sast.id = id.id; Sast.typ = id.typ} env ))
+      | For(i,ex1,ex2,li) ->
 	let inst2,undefSet,tmpEnv =
 	  match i with
-	    | Past.Assign(id,e) -> if id.typ != Int then
+	    | Assign(id,e) -> if id.typ != Int then
 		(raise   (WrongType(e.pos,id.typ,Int)))
 	      else
 		pInstr env undefSet i 
@@ -99,77 +135,103 @@ module Gates = struct
 	in
 	let e1,_ = pExpr env undefSet ex1 in
 	let e2,_ =  pExpr env undefSet ex2 in
-	if e1.t != Int then (raise   (WrongType(e1.pos,e1.t,Int))) ;
-	if e2.t != Int then (raise   (WrongType(e2.pos,e2.t,Int))) ;
-	let li,undef,env = pInstrList env undefSet []  li  in
+	if e1.t != Sast.Int then (raise (WrongType(e1.pos,e1.t,Sast.Int))) ;
+	if e2.t != Sast.Int then (raise (WrongType(e2.pos,e2.t,Sast.Int))) ;
+	let li,undef,env = pInstrList env undefSet [] li  in
 	if not (Sset.subset undef undefSet) then
-	  (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value")))
+	  (raise (Error({Sast.line = 0; Sast.char_b = 0; Sast.char_e = 0},"Use of unitialised value")))
 	else
-	  ({posi = inst.posi; i = For(inst2,e1,e2,li) },undef,env)
-      | Past.Decl(id,exo) -> 
+	  ({Sast.posi = inst.posi; Sast.i = Sast.For(inst2,e1,e2,li) },undef,env)
+      | Decl(id,exo) -> 
 	let ret =
 	  match exo with
 	    | None -> ({posi = inst.posi; i = Decl(id, None)},(Smap.add id.id {id = id.id ; typ = id.typ; va = None} env),undefSet)
 	    | Some e -> 
-	    let e,undefSet = pExpr env undefSet e in
-	    if e.t != id.typ then 
-	      (raise (WrongType(e.p,e.t,id.typ)))
-	    else
-	      ({posi = inst.posi; i = Decl(id, Some e)},undefSet,(Smap.add id.id { id = id.id; va = Some e} env))
+	      let e,undefSet = pExpr env undefSet e in
+	      if e.t != id.typ then 
+		(raise (WrongType(e.p,e.t,id.typ)))
+	      else
+		({posi = inst.posi; i = Decl(id, Some e)},undefSet,(Smap.add id.id { id = id.id; va = Some e} env))
 	in
 	ret
       | Past.Envir(li) -> 
 	let li,undef,env = pInstrList env undefSet [] li in
 	if not (Sset.subset undef undefSet) then
-	   (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value")))
-	else
+	  (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value")))
+      else
 	  ({posi = inst.posi; i = Envir(li)},undef,env)
-
+	    
   and pInstrList env undefSet acc = function
-    | [] -> (List.rev acc),undefSet,env
-    | i::q -> 
-      let inst,set,ev = pInstr env undefSet i in
-      pIntrList ev set (inst::acc) 
-
-
-  let pGate gate =
-    let checkI (acclist,accenv) expr =
-      let expr,undef = pExpr accenv Sset.empty expr in
-      if not (Sset.is_empty undef) then  (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value")));
-      let identi =
-	match expr.e with
-	  | EVar i -> i
-	  | EArray_r(i,b,e) -> i
-	  |_ -> (raise (Error(expr.p,"42")))
-      in
-      if Smap.mem identi accenv then (raise (Error(expr.p,"Argument non unique")));
-      (expr::acclist),(Smap.add identi.id identi accenv) 
-    in
-    let checkO env acclist expr =
-      let expr,undef = pExpr env Sset.empty expr in
-      if not (Sset.is_empty undef) then  (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value")));
-      let identi =
-	match expr.e with
-	  | EVar i -> i
-	  | EArray_r(i,b,e) -> i
-	  |_ -> (raise (Error(expr.p,"42")))
-      in
-      if not (Smap.mem identi.id env) then (raise (Error(expr.p,"Sortie non définie"))); 
-      (identi::acclist)
-    in
-    let inpList,env = List.fold_left checkI ([],Smap.empty) gate.ginputs in
-    let outList = List.fold_left checkO [] gate.goutputs in
-    let inpList = List.rev inpList in
-    let outList = List.rev outList in
-    let instrs,undef,env = pInstrList env Sset.empty [] gate.gbody in
-    if not (Sset.is_empty undef) then (raise (Undefined));
-    { gname = gate.gname; genv =env; ginputs = inpList;
-      goutputs = outList gbody = instrs }
-    
-  let gAnalysis cir = 
-    let gList = List.map pGate cir.gates in
-    {blocks = cir.blocks; buildMap Smap.empty gList}
+  | [] -> (List.rev acc),undefSet,env
+  | i::q -> 
+    let inst,set,ev = pInstr env undefSet i in
+    pIntrList ev set (inst::acc) 
       
- end
+
+end
+
   
+
+(* Vérifie la sémantique des portes etconstruit une map les contenant toutes *)
+module GatesToSast = struct 
+  open Sast 
+
+  (* Vérfie une porte 
+     prend :
+     gate : un porte Past
+     renvoit :
+     une porte Sast *)
+  let pGate (gate : Past.gate) =
+    
+    (* Traduit la liste des entrées 
+       en vérifiant qu'il n'y a que des valeurs gauches 
+       On garde simplement une liste de valeurs gauches :
+       pas besoin d'expressions *)
+    let checkInputs expr =
+      match expr.e with
+	| Past.EVar(ident) -> identToSast ident
+	| _ -> raise (Error(expr.p, "Not a left value"))
+    in
+    let inputs = List.map checkInputs gate.ginputs in
+    
+    (* Traduit la liste des sorties 
+       Une expression de sortie peut être :
+       une valeur gauche
+       un sous tableau 
+       un element d'un tableau 
+       Prend : 
+       accList : la liste en court de construction
+       accSize : la "taille" réelle du tableau de sortie 
+       expr : l'expression 
+       Renvoit :
+       accList * accSize*)
+    let checkOutputs (accList,accSize) (expr : Past.expr) =
+      let expr = pExpr Smap.empty Sset.empty expr in
+      match expr.e with
+	| EVar(ident) -> 
+	  let incr = match ident.typ with
+	    | Int -> (raise (WrongType(expr.p,Int,Bool)))
+	    | Bool -> 1
+	    | Array s -> s
+	  in
+	  ((expr::accList),(size + incr))
+	| EArray_r(ident,i1,i2) -> 
+	  (expr::accList,(size + (i2 -i1 )))
+	| Earray_i(ident,i) ->
+	  (expr::accList,(size + 1))
+	| _ -> (raise  (Error(expr.p,"Not a left value")))
+    in
+				     
+				     
+      
+  (* construit une map de toutes les portes *)
+  let rec buildMap gMap = function
+    | [] -> gMap
+    | a::q -> begin
+	if Smap.mem a.gname gMap then pWarning ;
+      buildMap (Smap.add a.gname a gMap) q
+    end
+      
+end 
+    
 
