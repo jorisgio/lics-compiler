@@ -34,6 +34,13 @@ module InstrToSast = struct
   let idToSast id = 
     { Sast.id = id.id ; Sast.typ = typToSast id.typ}
       
+  let posToSast pos = 
+    { Sast.line = pos.line; Sast.char_b = pos.char_b ; Sast.char_e = pos.char_e }
+
+  let typesToSast = function
+    | Int -> Sast.Int
+    | Bool -> Sast.Bool
+    | Array s -> Sast.Array s
       
   (* TODO : remplacer undefSet par une map qui contient des infos de position *) 
   (* Type les expressions. 
@@ -45,27 +52,25 @@ module InstrToSast = struct
   *)
   let rec pExpr env undefSet exp = 
     match exp.e with 
-      | EBoncst b ->
-	({ Sast.p = exp.p ; Sast.e = Sast.EBconst(b) ; Sast.t = Sast.Bool },undefSet)
+      | EBconst b ->
+	({ Sast.p = posToSast exp.p ; Sast.e = Sast.EBconst(b) ; Sast.t = Sast.Bool },undefSet)
       | EIconst i -> 
-	({ Sast.p = exp.p ; Sast.e = Sast.EIconst(i); Sast.t = Sast.Int},undefSet)
-      | EString s -> 
-	({ Sast.p = Sast.exp.p ; Sast.e = Sast.EString(s); Sast.t = Sast.String},undefSet)
+	({ Sast.p = posToSast exp.p ; Sast.e = Sast.EIconst(i); Sast.t = Sast.Int},undefSet)
       | EArray_i(id,index) -> 
-	({ Sast.p = exp.p ; Sast.e = Sast.EArray_i(id,index); Sast.t = Bool},undefSet)
+	({ Sast.p = posToSast exp.p ; Sast.e = Sast.EArray_i(idToSast id,index); Sast.t = Sast.Bool},undefSet)
       | EArray_r(id,i_beg,i_end) ->
 	let Array(size) = id.typ in
 	if i_beg < 0 or i_end < 0 or i_end < i_beg or i_end >= size then
-	  (raise (Error(exp.p,"Bad index"))) 
+	  (raise (Error(posToSast exp.p,"Bad index"))) 
 	else
-	  ({ Sast.p = exp.p; Sast.e = Sast.EArray_r(id,i_beg,i_end); Sast.t = Sast.Array(i_end - i_beg)},undefSet)
+	  ({ Sast.p = posToSast exp.p; Sast.e = Sast.EArray_r(idToSast id,i_beg,i_end); Sast.t = Sast.Array(i_end - i_beg)},undefSet)
       | EVar(id) ->     
 	let var,set = 
 	  try 
-	  (Smap.find id env,undefSet)
-	  with Not_found -> ({Sast.id = id; Sast.t = Bool},(Sset.add id undefSet))
+	  ((Smap.find (id.id) env),undefSet)
+	  with Not_found -> ({id = id.id; typ = Bool},(Sset.add id.id undefSet))
 	in
-	({Sast.p = exp.p; Sast.e = Sast.EVar(id) ; Sast.t = var.typ},set)
+	(({Sast.p = posToSast exp.p; Sast.e = Sast.EVar(idToSast id) ; Sast.t = var.typ}),set)
 	  
       | EPrefix(p,ex) -> 
 	let e,set = pExpr env undefSet ex in
@@ -101,7 +106,7 @@ module InstrToSast = struct
 	if e1.t != ty or e2.t != ty then
 	  (raise (WrongType(e.p,e.t,ty)))
 	else
-	  ({Sast.p = exp.p ; Sast.e = Sast.EInfix(si,e1,e2); Sast.t = ty},(Sset.union s1 s2)}
+	  ({Sast.p = exp.p ; Sast.e = Sast.EInfix(si,e1,e2); Sast.t = ty},(Sset.union s1 s2))
       | EMux(_,_,_) -> failwith "Not implemented"
 
 
