@@ -12,7 +12,7 @@ open Bast
 let pBloc circuit =
   (* Transfore un bloc. 
      Rnvoit un graphe * env * wirEnv *)
-  let blocRec bloc (accList,graph,wirEnv) = 
+  let blocRec (accList,graph,wirEnv)  bloc= 
     let gate = Smap.find bloc.bgate_type circuit.gates in 
     let index = ref 0 in
     (* crée un noeud pour chaque variable, excepté les entrées. 
@@ -22,7 +22,7 @@ let pBloc circuit =
 	begin
 	  match ident.typ with
 	    | Bool -> begin
-	      let graph = Graphe.addVertex graph in
+	      let graph = Graphe.addVertex graph !index in
 	      let ar = Array.make 1 0 in
 	      ar.(0) <- !index ;
 	      ((Smap.add name  ar env),graph)
@@ -44,11 +44,11 @@ let pBloc circuit =
     let graph = Graphe.setLabel graph !index Noeud.True in
     incr index;
     let graph = Graphe.addVertex graph !index  in
-    let graph = Graphe.setLabel2 graph !index Noeud.False in
+    let graph = Graphe.setLabel graph !index Noeud.False in
     incr index;
-    let env = Smap.add "True" [|0|] gate.genv in
+    let env = Smap.add "True" [|0|] Smap.empty in
     let env = Smap.add "False" [|1|] env in
-    let env,graph = Smap.fold createNodes (env,graph) in
+    let env,graph = Smap.fold createNodes gate.genv (env,graph)  in
     
     
     (* on transforme la liste d'expression en sortie d'un bloc en un tableau de noeuds 
@@ -62,20 +62,20 @@ let pBloc circuit =
     let buildArray index expr = 
       let ind = ref index in
       match expr.e with
-	| Evar(ident) -> 
+	| EVar(ident) -> 
 	  let ar = Smap.find ident.id env in
 	  for i = 0 to (Array.length ar) - 1 do 
-            ouptutsArray.(!ind) <- ar.(i);
+            outputsArray.(!ind) <- ar.(i);
 	    incr ind;
 	  done;
 	  !ind
 	| EArray_i(id,i) -> 
-	  let ar = Smap.find ident.id env in
+	  let ar = Smap.find id.id env in
 	  outputsArray.(!ind) <- ar.(i) ;
 	  incr ind;
 	  !ind
 	| EArray_r(id,i1,i2) ->
-	  let ar = Smap.find ident.id env in
+	  let ar = Smap.find id.id env in
 	  for i = i1 to i2 do 
 	    outputsArray.(!ind) <- ar.(i);
 	    incr ind;
@@ -84,10 +84,10 @@ let pBloc circuit =
     in
     let _ = List.fold_left buildArray 0 gate.goutputs in 
     
-    ((({b_bname = bloc.bname; b_bgate_type = bloc.bgate_type; b_binputs = bloc.binputs ; b_bvertices = env })::acclist),graph,(Smap.add b.bname outputsArray wirEnv)) 
+    ((({b_bname = bloc.bname; b_bgate_type = bloc.bgate_type; b_binputs = bloc.binputs ; b_bvertices = env })::accList),graph,(Smap.add bloc.bname outputsArray wirEnv)) 
   in
   (* On traite tout les blocs du circuit *)
-  let blockList,graph,wirEnv = List.fold blocRec ([],Graphe.empty,Smap.empty) circuit.blocks in
+  let blockList,graph,wirEnv = List.fold_left blocRec ([],(Graphe.empty),(Smap.empty)) circuit.blocks in
   { b_gates = circuit.gates; b_blocks = blockList; b_graphe = graph; b_blocsOutput = wirEnv }
 	   
 
