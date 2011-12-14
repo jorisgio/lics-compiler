@@ -18,26 +18,37 @@ module Past = struct
    
   type pos = { line : int; char_b : int; char_e : int}
 
-  type types = Int | Array of int
+  type types = Int | Array of int | Bool
       
   type ident = { id : string; typ : types }
 
   type expression = 
+    (* constantes *)
     | EBconst of bool
     | EIconst of int
+    (* Élément i du tableau ident *)
     | EArray_i of ident * int
+    (* Sous tableau du tableau ident *)
     | EArray_r of ident * int * int
+    (* valeur gauche *)
     | EVar of ident
+    (* opérateur préfixe *)
     | EPrefix of prefix * expr
+    (* opérateur infixe *)
     | EInfix of infix * expr * expr
+    (* Mux *)
     | EMux of expr * expr * expr
 	
   and expr = { p : pos; e : expression }
-	
+      
   type instruction = 
+    (* Assigne expr à la valeur gauche ident *)
     | Assign of ident * expr
+    (* Boucle For *)
     | For of instr * expr * expr * instr list 
+    (* Déclare un tabeleau ou un entier *)
     | Decl of ident * expr option
+    (* Sous bloc *)
     | Envir of instr list
 
   and  instr =  { posi : pos; i : instruction }
@@ -76,7 +87,7 @@ module Sast = struct
   
   type types = Bool | Int | Array of int
 
-  type ident = { id : string; typ : types; va : expr}
+  type ident = { id : string; typ : types }
 
   and  expression = 
     | EBconst of bool
@@ -101,10 +112,12 @@ module Sast = struct
       
   type gate = {
     gname : string ;
-    genv : ident Smap.t
-    ginputs : string list;
+    genv : ident Smap.t;
+    ginputs : ident list;
     gbody : instr List ;
-    goutputs : string list;
+    goutputs : expr list;
+    (* longeur réelle de la liste des sorties *)
+    goutputsize : int;
   }
     
   type block = {
@@ -131,13 +144,14 @@ module Bast = struct
     b_bname : string ;
     b_bgate_type : string ;
     b_binputs : expr list;
-    b_bvertices : Graphe.Noeud Smap;
+    b_bvertices : Graphe.Noeud.t Smap.t;
   }
 
   type b_circuit = {
     b_gates : gate Smap.t ;
     b_blocks : b_block list ;
-    b_graphe : Graphe.Graphe ;
+    b_blocsOutput : (Graphe.Noeud.t array) Smap.t
+    b_graphe : Graphe.Graphe.t ;
 (* Graphe ne comportant que des noeuds et pas encore les fils qui les relient *)
   }
 end
