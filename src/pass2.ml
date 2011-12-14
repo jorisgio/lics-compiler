@@ -74,11 +74,11 @@ let processBExpr gcur env vertex expr =
    Prend :
    gcur : le graphe courant
    env : une map qui à chaque ident associe un tableau des noeuds du graphe
-   stmt : l'instruction
+   instr : l'instruction
    Renvoit :
    le nouveau graphe 
 *)
-let processStmt gcur env = function
+let processInstr gcur env = function
   | Assign(ident, exp) -> 
     let cur = Smap.find ident.id env in
     
