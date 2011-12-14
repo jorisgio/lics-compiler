@@ -141,20 +141,22 @@ end
 module Bast = struct
 
   open Sast
-    
   type b_block = {
     b_bname : string ;
     b_bgate_type : string ;
     b_binputs : expr list;
-    b_bvertices : Graphe.Noeud.t Smap.t;
+    (* map qui à chaque ident associe un tableau de noeuds *)
+    b_bvertices : (int array) Smap.t;
   }
 
   type b_circuit = {
     b_gates : gate Smap.t ;
-    b_blocks : b_block list ;
-    b_blocsOutput : (Graphe.Noeud.t array) Smap.t;
+    b_blocks : b_block list;
+    (* map qui à chaque nom de bloc associe un tableau de noeuds 
+       l'élément d'index i de ce tableau est le noeud associè  à la iéme sortie du block *)
+    b_blocsOutput : (int  array) Smap.t ;
     b_graphe : Graphe.Graphe.t ;
-(* Graphe ne comportant que des noeuds et pas encore les fils qui les relient *)
+  (* Graphe ne comportant que des noeuds et pas encore les fils qui les relient *)
   }
 end
     
