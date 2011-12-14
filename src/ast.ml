@@ -120,6 +120,7 @@ module Sast = struct
     goutputs : expr list;
     (* longeur réelle de la liste des sorties *)
     goutputsize : int;
+    ginputsize : int;
   }
     
   type block = {
