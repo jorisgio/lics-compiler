@@ -187,9 +187,16 @@ module GatesToSast = struct
        en vérifiant qu'il n'y a que des valeurs gauches 
        On garde simplement une liste de valeurs gauches :
        pas besoin d'expressions *)
+    let inputsize = ref 0 in
     let checkInputs expr =
       match expr.e with
-	| Past.EVar(ident) -> identToSast ident
+	| Past.EVar(ident) -> begin
+            match ident.typ with
+              | Bool -> incr inputsize
+              | Array n -> inputsize := !inputsize + n
+              | Int -> raise (WrongType (expr.pos,Int,Bool))
+          end;
+            identToSast ident
 	| _ -> raise (Error(expr.p, "Not a left value"))
     in
     let inputs = List.map checkInputs gate.ginputs in
@@ -221,7 +228,7 @@ module GatesToSast = struct
 	  (expr::accList,(size + 1))
 	| _ -> (raise  (Error(expr.p,"Not a left value")))
     in
-				     
+			     
 				     
       
   (* construit une map de toutes les portes *)
