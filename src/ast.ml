@@ -44,6 +44,8 @@ module Past = struct
   type instruction = 
     (* Assigne expr à la valeur gauche ident *)
     | Assign of ident * expr
+    (* Assigne expr à la case int du tableau string *)
+    | Assign_i of string * int * expr      
     (* Boucle For *)
     | For of instr * expr * expr * instr list 
     (* Déclare un tabeleau ou un entier *)
@@ -95,7 +97,7 @@ module Sast = struct
     | EArray_i of ident * int
     | EArray_r of ident * int * int
     | EVar of ident
-    | EPrefix of prefix * exp
+    | EPrefix of prefix * expr
     | EInfix of infix * expr * expr
     | EMux of expr * expr * expr
 	
@@ -103,9 +105,9 @@ module Sast = struct
 	
   type instruction = 
     | Assign of ident * expr
-    | For of ident * expr * expr * instr List 
+    | For of ident * expr * expr * instr list 
     | Decl of ident * expr option
-    | Envir of instr List
+    | Envir of instr list
   
   and  instr =  { posi : pos; i : instruction }
 
@@ -114,7 +116,7 @@ module Sast = struct
     gname : string ;
     genv : ident Smap.t;
     ginputs : ident list;
-    gbody : instr List ;
+    gbody : instr list ;
     goutputs : expr list;
     (* longeur réelle de la liste des sorties *)
     goutputsize : int;
@@ -150,7 +152,7 @@ module Bast = struct
   type b_circuit = {
     b_gates : gate Smap.t ;
     b_blocks : b_block list ;
-    b_blocsOutput : (Graphe.Noeud.t array) Smap.t
+    b_blocsOutput : (Graphe.Noeud.t array) Smap.t;
     b_graphe : Graphe.Graphe.t ;
 (* Graphe ne comportant que des noeuds et pas encore les fils qui les relient *)
   }
