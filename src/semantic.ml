@@ -221,9 +221,17 @@ module GatesToSast = struct
 	  (expr::accList,(size + 1))
 	| _ -> (raise  (Error(expr.p,"Not a left value")))
     in
-				     
-				     
-      
+    let outputs,size = List.fold_left checkOutputs ([],0) gate.goutputs in
+    (* création d'un env contenant toutes les entrées *)
+    let env = List.fold_left (fun acc id -> Smap.add id.id id env) inputs Smap.empty in
+    (*Typage du corps, vérifit que toutes les variables utilisées sont définies.
+      Renvoit l'env des variables locales. *)
+    let body,undefSet,env = pInstrList  env Sset.empty  gate.gbody in
+    if not (Sset.is_empty undefSet ) then (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value"))) ;
+    { gname = gate.gname; genv = env ; ginputs = inputs ; gbody = body; goutputs = outputs ; goutputsize = size  }
+
+
+    
   (* construit une map de toutes les portes *)
   let rec buildMap gMap = function
     | [] -> gMap
