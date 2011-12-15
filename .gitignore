@@ -28,7 +28,5 @@ lib/
 #ignore ocamlbuild
 _build/
 
-#ignore scd
-*.scd
 *.graph
 *.gv
