@@ -256,12 +256,14 @@ module GatesToSast = struct
 
     
   (* construit une map de toutes les portes *)
-  let rec buildMap gMap = function
+  let rec buildMap_aux gMap = function
     | [] -> gMap
     | a::q -> begin
 	if Smap.mem a.gname gMap then pWarning ;
-      buildMap (Smap.add a.gname a gMap) q
+      buildMap_aux (Smap.add a.gname a gMap) q
     end
+
+  let buildMap = buildMap_aux Smap.empty
       
 end 
     

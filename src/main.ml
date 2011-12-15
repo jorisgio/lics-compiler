@@ -40,7 +40,7 @@ let circuit =
   deb "Création du tampon d'Analyse lexicale…\n";
   let f = open_in !ifile in
   let buf = Lexing.from_channel f in
-  deb "Done.\n" ;
+  (*deb "Done.\n" ;*)
   
   (* Analyse Syntaxique *)      
   try
@@ -60,8 +60,16 @@ let circuit =
 let () = if !parse_only then (deb "Parsage effectué\n" ; exit 0)
     
 (* Analyse sémantique *)
-let () = if not (Semantic.analyse circuit) then exit 1 ;
-  ()
+let s_gates =
+  try
+    deb "Analyse sémantique : construction de la liste des portes...\n";
+    let s_gates = Semantic.GatesToSast.buildMap cir.Ast.Past.gates in
+    deb "Done\n";
+    s_gates
+  with
+    | e -> eprintf "Erreur dans l'analyse sémantique" ; exit 1
+      (* A DETAILLER *)
+      
     
   (* Construction du graphe *)
 let igraph =
