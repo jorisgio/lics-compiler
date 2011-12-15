@@ -26,6 +26,7 @@ let pBloc circuit =
 	      let graph = Graphe.addVertex graph !index in
 	      let ar = Array.make 1 0 in
 	      ar.(0) <- !index ;
+              incr index ;
 	      ((Smap.add name  ar env),graph)
 	    end
 	    | Array s -> begin
@@ -34,6 +35,7 @@ let pBloc circuit =
 	      for i = 0 to (s - 1) do
 	        gr := Graphe.addVertex !gr !index ;
 		ar.(i) <- !index ;
+                incr index ;
 	      done ;
 	      ((Smap.add name ar env), !gr)
 	    end
