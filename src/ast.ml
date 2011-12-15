@@ -86,8 +86,8 @@ module Sast = struct
    
   type pos = { line : int; char_b : int; char_e : int}
   
-  type types = Bool | Int | Array of int
-
+  type types = Bool | Int | Array of int | Wire
+	   
   type ident = { id : string; typ : types }
 
   and  expression = 

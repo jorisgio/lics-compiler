@@ -316,6 +316,16 @@ module GatesToSast = struct
 end 
     
 module CircuitToSast = struct
+
+  (* check les expressions en entrée des blocs *)
+  let pBlockInputs  expr = 
+    match expr.Past.e with
+      | Past.EArray_r(name,i1,i2) -> { Sast.p = InstrToSast.posToSast expr.Past.p ; Sast.e =
+	  Sast.EArray_r({Sast.id = name; Sast.typ = Sast.Wire },i1,i2) ; Sast.t = Sast.Array (i2 -i1) }
+      | Past.EArray_i(name,index) -> {Sast.p = InstrToSast.posToSast expr.Past.p ; Sast.e =
+	Sast.EArray_i({Sast.id = name; Sast.typ = Sast.Wire },index) ;  Sast.t = Sast.Bool }
+      | _ -> failwith "WrongType" 
+	
   let pBlock {Past.bname = name ; bgate_type = typ ; binputs = inputs} =
     {Sast.bname = name ;
      bgate_type = typ ;
