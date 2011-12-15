@@ -61,10 +61,12 @@ module InstrToSast = struct
 
       | EArray_i(name,index) -> 
 	(* on cherche le tableau dans l'env, forcément déclaré *)
+        assert (Smap.mem name env) ;
 	let id = Smap.find name env in
 	let Sast.Array(size) = id.Sast.typ in
 	if index >= size then (raise (Error(posToSast exp.p,"Bad index"))) ;
 	(* on vérifie que l'index est défini, sinon on le marque undef *)
+        assert (Smap.mem name undefMap);
 	let ar = Smap.find name undefMap in
 	let undefMap = 
 	  if ar.(index) = 1 then 
@@ -76,12 +78,14 @@ module InstrToSast = struct
 	({ Sast.p = posToSast exp.p ; Sast.e = Sast.EArray_i(id,index); Sast.t = Sast.Bool},undefMap)
 	  
       | EArray_r(name,i_beg,i_end) ->
+        assert (Smap.mem name env);
 	let id = Smap.find name env in 
 	let Sast.Array(size) = id.Sast.typ in
 	(* on vérfie que l'index est correct *)
 	if i_beg < 0 or i_end < 0 or i_end < i_beg or i_end >= size then (raise (Error(posToSast exp.p,"Bad index")));
 	
 	(* on vérfie que les index utilisés sont définis *)
+        assert (Smap.mem name undefMap);
 	let ar = Smap.find name undefMap in
 	for i = i_beg to i_end do
 	  if not (ar.(i) = 1) then 
@@ -183,7 +187,9 @@ module InstrToSast = struct
 	ret
       | Assign_i(name, index, exp) -> 
 	let e,undefMap = pExpr env undefMap exp in
+        assert (Smap.mem name env);
 	let id = Smap.find name env in
+        assert (Smap.mem name undefMap);
 	let ar = Smap.find name undefMap in
 	ar.(index) <- 1 ;
 	if e.Sast.t != Sast.Bool then
