@@ -175,11 +175,12 @@ end
 module GatesToSast = struct 
 
   open Sast 
-
+  open Exceptions
   exception PError of Past.pos * string
   exception PWrongType of Past.pos * Past.types * Past.types
 
-
+ let posToSast pos = 
+    { Sast.line = pos.line; Sast.char_b = pos.char_b ; Sast.char_e = pos.char_e }
     
   (* Renvoit un type de type Sast *)
   let typToSast = function
@@ -227,28 +228,28 @@ module GatesToSast = struct
        expr : l'expression 
        Renvoit :
        accList * accSize*)
-    let checkOutputs (accList,accSize) (expr : Past.expr) =
-      let expr = InstrToSast.pExpr Smap.empty Sset.empty expr in
+    let checkOutputs (accList,size) (expr : Past.expr) =
+      let expr,_ = InstrToSast.pExpr Smap.empty Sset.empty expr in
       match expr.e with
 	| EVar(ident) -> 
 	  let incr = match ident.typ with
-	    | Int -> (raise (WrongType(expr.p,Int,Bool)))
+	    | Int -> (raise (Exceptions.WrongType(posToSast expr.p,Int,Bool)))
 	    | Bool -> 1
 	    | Array s -> s
 	  in
 	  ((expr::accList),(size + incr))
 	| EArray_r(ident,i1,i2) -> 
 	  (expr::accList,(size + (i2 -i1 )))
-	| Earray_i(ident,i) ->
+	| EArray_i(ident,i) ->
 	  (expr::accList,(size + 1))
 	| _ -> (raise  (Error(expr.p,"Not a left value")))
     in
-    let outputs,size = List.fold_left checkOutputs ([],0) gate.goutputs in
+    let outputs,size = List.fold_left checkOutputs ([],0) gate.Past.goutputs in
     (* création d'un env contenant toutes les entrées *)
-    let env = List.fold_left (fun acc id -> Smap.add id.id id env) inputs Smap.empty in
+    let env = List.fold_left (fun env id -> Smap.add id.id id env)  Smap.empty  inputs in
     (*Typage du corps, vérifit que toutes les variables utilisées sont définies.
       Renvoit l'env des variables locales. *)
-    let body,undefSet,env = pInstrList  env Sset.empty  gate.gbody in
+    let body,undefSet,env = InstrToSast.pInstrList env Sset.empty gate.gbody in
     if not (Sset.is_empty undefSet ) then (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value"))) ;
     { gname = gate.gname; genv = env ; ginputs = inputs ; gbody = body; goutputs = outputs ; goutputsize = size ; ginputsize = !inputsize }
 

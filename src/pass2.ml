@@ -108,7 +108,8 @@ let processBlock gcur circuit blocks =
         done
     | _ -> raise (Error (x.p,"mauvaise entrée")) 
   in
-  try List.iter rajoute_entree_bloc blocks.b_binputs
+  try 
+    List.iter rajoute_entree_bloc blocks.b_binputs
   with Invalid_argument _ ->
     raise (Error ({line = 42; char_b = 42; char_e = 42},
     "Pas le bon nombre d'entrée pour le bloc " ^ blocks.b_bname));
