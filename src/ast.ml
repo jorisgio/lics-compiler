@@ -49,7 +49,7 @@ module Past = struct
     (* Boucle For *)
     | For of instr * expr * expr * instr list 
     (* Déclare un tabeleau ou un entier *)
-    | Decl of ident * expr option
+    | Decl of ident
     (* Sous bloc *)
     | Envir of instr list
 
@@ -106,7 +106,7 @@ module Sast = struct
   type instruction = 
     | Assign of ident * expr
     | For of ident * expr * expr * instr list 
-    | Decl of ident * expr option
+    | Decl of ident
     | Envir of instr list
   
   and  instr =  { posi : pos; i : instruction }
