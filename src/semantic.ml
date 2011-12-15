@@ -249,9 +249,9 @@ module GatesToSast = struct
     let env = List.fold_left (fun env id -> Smap.add id.id id env)  Smap.empty  inputs in
     (*Typage du corps, vérifit que toutes les variables utilisées sont définies.
       Renvoit l'env des variables locales. *)
-    let body,undefSet,env = InstrToSast.pInstrList env Sset.empty gate.gbody in
+    let body,undefSet,env = InstrToSast.pInstrList env Sset.empty [] gate.Past.gbody in
     if not (Sset.is_empty undefSet ) then (raise (Error({line = 0; char_b = 0; char_e = 0},"Use of unitialised value"))) ;
-    { gname = gate.gname; genv = env ; ginputs = inputs ; gbody = body; goutputs = outputs ; goutputsize = size ; ginputsize = !inputsize }
+    { gname = gate.Past.gname; genv = env ; ginputs = inputs ; gbody = body; goutputs = outputs ; goutputsize = size ; ginputsize = !inputsize }
 
 
     
