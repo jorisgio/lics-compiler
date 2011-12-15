@@ -35,9 +35,8 @@ end
    expr : l'expression
    Renvoit :
    le nouveau graphe *)
-let processBExpr gcur env vertex expr = 
-  let index = ref 0 in
-  
+let processBExpr gcur ind env vertex expr  =
+  let index = ref ind in
   let rec  processRec gcur vertex expr = 
     match expr.e with
     | EBconst cst -> let cur = Smap.find (string_of_bool cst) env in
@@ -62,16 +61,19 @@ let processBExpr gcur env vertex expr =
     | EMux(_,_,_) -> failwith "not implemented"
 
   in
-  match expr.e with
-    | EBconst cst -> Graphe.setLabel gcur vertex (Noeud.bool_to_label (Sast.EBconst(cst))) 
-    | EPrefix(oper, exp) -> 
-      let gcur = Graphe.setLabel gcur vertex (Noeud.lp_to_label oper) in
-      processRec gcur vertex exp 
-    | EInfix(oper, exp1,exp2) -> 
-      let gcur = Graphe.setLabel gcur vertex (Noeud.lop_to_label oper) in
-      let gcur = processRec gcur vertex exp1 in
-      processRec gcur vertex exp2
-    | _ -> failwith "You cannot assign a left value to a left value"
+  let g = 
+    match expr.e with
+      | EBconst cst -> Graphe.setLabel gcur vertex (Noeud.bool_to_label (Sast.EBconst(cst))) 
+      | EPrefix(oper, exp) -> 
+	let gcur = Graphe.setLabel gcur vertex (Noeud.lp_to_label oper) in
+	processRec gcur vertex exp 
+      | EInfix(oper, exp1,exp2) -> 
+	let gcur = Graphe.setLabel gcur vertex (Noeud.lop_to_label oper) in
+	let gcur = processRec gcur vertex exp1 in
+	processRec gcur vertex exp2
+      | _ -> failwith "You cannot assign a left value to a left value"
+  in
+  (g,!index)
       
 
 (* TODO : traiter les tableaux comme des valeurs gauches *)
@@ -84,10 +86,10 @@ let processBExpr gcur env vertex expr =
    le nouveau graphe 
 *)
 (* TODO : assign_i pour assigner  une valeur à un index d'un tableau  *)
-let processInstr gcur env = function
+let processInstr gcur index env = function
   | Assign(ident, exp) -> 
     let cur = Smap.find ident.id env in
-    processBExpr gcur env cur.(0) exp
+    processBExpr gcur index env cur.(0) exp
   | _ -> failwith "Not implemented"
 
 let processBlock gcur circuit blocks =
@@ -132,12 +134,13 @@ let processBlock gcur circuit blocks =
       Smap.add entree.id t vertices
     | _ -> raise (WrongType ({line = 42; char_b = 42; char_e = 42},Int,Bool))
   in
+  let index = (Graphe.size gcur) in
   let env =
     List.fold_left ajoute_tab blocks.b_bvertices gate.ginputs in
-  (List.fold_left
-    (fun gcur instr -> processInstr gcur env instr.i)
-    gcur
-    gate.gbody)
+  (fst (List.fold_left
+     (fun (gcur,index) instr -> processInstr gcur index env  instr.i)
+     (gcur,index)
+    gate.gbody))
 
 let processFirstBlock gcur circuit blocks =
   let gcur = ref gcur in
@@ -188,10 +191,10 @@ let processFirstBlock gcur circuit blocks =
   in
   let env =
     List.fold_left ajoute_tab blocks.b_bvertices gate.ginputs in
-  (List.fold_left
-     (fun gcur instr -> processInstr gcur env instr.i)
-     !gcur
-     gate.gbody)
+  (fst (List.fold_left
+     (fun (gcur,index) instr -> processInstr gcur index env instr.i)
+     (!gcur,!taille)
+     gate.gbody) )
     ,
   !inputs
 
