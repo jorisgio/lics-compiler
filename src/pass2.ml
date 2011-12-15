@@ -205,14 +205,19 @@ let process circuit =
     | [a] -> a
     | h::t -> last_l t
   in
-  try
-    let h,t = hdAndTl_l circuit.b_blocks in (* les blocs sont au moins au nombre de 1 *)
-    let cir, inputs = processFirstBlock circuit.b_graphe circuit h in
+  let h,t =
+    try
+      hdAndTl_l circuit.b_blocks
+    with Not_found -> failwith "Pas de blocs trouvés" in
+  let cir, inputs = processFirstBlock circuit.b_graphe circuit h in
+  let last_bloc = 
+    try
+      last_l circuit.b_blocks 
+    with Not_found -> failwith "Pas de blocs trouvés" in
     { igraph =
         List.fold_left (fun gcur -> processBlock gcur circuit)
           cir
           t ;
       iinputs = inputs ;
-      ioutputs = Array.to_list (Smap.find (last_l circuit.b_blocks).b_bname circuit.b_blocsOutput)
+      ioutputs = Array.to_list (Smap.find last_bloc.b_bname circuit.b_blocsOutput)
     }
-  with Not_found -> failwith "Pas de blocs trouvés"

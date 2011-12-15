@@ -39,9 +39,8 @@ circuit:
 	DEF
 	gate_types = gate*
         END
-	start = block
 	blocks = block* EOF
-		{ { gates = gate_types ; start = start ; blocks = blocks } }
+		{ { gates = gate_types ; blocks = blocks } }
 
 (* une porte est un identifier, une liste d'entrées, une liste d'assignement et une liste de sorties *)
 gate:
