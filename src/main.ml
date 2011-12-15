@@ -40,7 +40,7 @@ let circuit =
   deb "Création du tampon d'Analyse lexicale…\n";
   let f = open_in !ifile in
   let buf = Lexing.from_channel f in
-  deb "Done.\n" ;
+  (*deb "Done.\n" ;*)
   
   (* Analyse Syntaxique *)      
   try
@@ -60,14 +60,28 @@ let circuit =
 let () = if !parse_only then (deb "Parsage effectué\n" ; exit 0)
     
 (* Analyse sémantique *)
-let () = if not (Semantic.analyse circuit) then exit 1 ;
-  ()
+let circuit =
+(*  try*)
+  deb "Analyse sémantique...\n";
+  let cir = Semantic.CircuitToSast.pCircuit circuit in
+  deb "Done\n";
+  cir
+(*  with
+    | e -> eprintf "Erreur dans l'analyse sémantique" ; exit 1
+      (* A DETAILLER *)*)
+      
     
   (* Construction du graphe *)
 let igraph =
   deb "Construction du graphe de circuit…\n";
-  let g = Buildgraph.buildgraph circuit in
+  deb "Première passe...\n";
+  let cir = Pass1.pBloc circuit in
   deb "Done.\n";
+  deb "Deuxième passe...\n";
+  let graphe = Pass2.process cir in
+  deb "Done.\n";
+  (* Attention : on devrait traiter différemment les entrées / sorties
+     afin d'obtenir un interm_graph g *)
   if !debug then
     begin
       deb "INFO : Enregistrement du graphe dans graphe.debug\n";
