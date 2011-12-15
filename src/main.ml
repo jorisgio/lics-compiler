@@ -114,6 +114,7 @@ let combinatoire =
   g
   
 let n = Graphe.size combinatoire.cgraph
+(*let () = printf "Max reg = %d\n" n*)
 (* Tri Topologique et production du code *)
 let seqlist = 
   deb "Tri topologique et production de LICS…\n";
@@ -138,12 +139,14 @@ let seqlist = if !o1 then
 let () =
   if !obj then
     if String.length !ofile > 0 then
-      LicsFileIO.write !ofile { LicsAst.numero_var_max = n ; nb_reg =
-          List.fold_left
-            (function n -> function LicsAst.Inputreg _ -> n + 1 | _ -> n)
-            0
-            seqlist ;
-                     programme = seqlist }
+      LicsFileIO.write !ofile
+        { LicsAst.numero_var_max = n ;
+          nb_reg =
+            List.fold_left
+              (function n -> function LicsAst.Inputreg _ -> n + 1 | _ -> n)
+              0
+              seqlist ;
+          programme = seqlist }
     else
       failwith "Fournissez un nom de fichier pour enregistrer le code binaire"
   else
