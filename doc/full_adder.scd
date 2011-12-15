@@ -15,8 +15,8 @@ Output <-(a,b)
 
 end
 
-Input inp <-(i.0,i.1,i.2)
+Input inp <-()
 
-Adder b <-(inp.0,inp.1,inp.2)
+Adder b <-(inp[0..2])
 
-Output out <-(b.0,b.1)
+Output out <-(b[0..1])
