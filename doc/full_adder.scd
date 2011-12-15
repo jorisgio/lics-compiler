@@ -10,4 +10,4 @@ Adder <-(a,b,c)
 
 end
 
-Adder b <-(inp[0..2])
+Adder b <-()

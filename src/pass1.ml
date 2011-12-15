@@ -60,25 +60,25 @@ let pBloc circuit =
        renvoit :
        unit
     *)
-    let outputsArray = Array.make gate.goutputsize 0 in 
+    let outputsArray = Array.make gate.goutputsize (-1) in 
     
-    let buildArray index expr = 
-      let ind = ref index in
+    let ind = ref 0 in
+    let buildArray expr = 
       match expr.e with
-	| EVar(ident) -> 
-          assert (Smap.mem ident.id env) ;
+	| EVar(ident) -> begin
+          try
 	  let ar = Smap.find ident.id env in
 	  for i = 0 to (Array.length ar) - 1 do 
             outputsArray.(!ind) <- ar.(i);
 	    incr ind;
 	  done;
-	  !ind
+          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : NOT IMPLEMENTED YET"
+        end
 	| EArray_i(id,i) -> 
           assert (Smap.mem id.id env) ;
 	  let ar = Smap.find id.id env in
 	  outputsArray.(!ind) <- ar.(i) ;
 	  incr ind;
-	  !ind
 	| EArray_r(id,i1,i2) ->
           assert (Smap.mem id.id env) ;
 	  let ar = Smap.find id.id env in
@@ -86,9 +86,8 @@ let pBloc circuit =
 	    outputsArray.(!ind) <- ar.(i);
 	    incr ind;
 	  done;
-	  !ind
     in
-    let _ = List.fold_left buildArray 0 gate.goutputs in 
+    let () = List.iter buildArray gate.goutputs in 
     
     ((({b_bname = bloc.bname; b_bgate_type = bloc.bgate_type; b_binputs = bloc.binputs ; b_bvertices = env })::accList),graph,(Smap.add bloc.bname outputsArray wirEnv)) 
   in
