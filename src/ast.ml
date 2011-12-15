@@ -18,7 +18,7 @@ module Past = struct
    
   type pos = { line : int; char_b : int; char_e : int}
 
-  type types = Int | Array of int | Bool
+  type types = Int | Array of int | Bool | Undef
       
   type ident = { id : string; typ : types }
 
@@ -27,9 +27,9 @@ module Past = struct
     | EBconst of bool
     | EIconst of int
     (* Élément i du tableau ident *)
-    | EArray_i of ident * int
+    | EArray_i of string * int
     (* Sous tableau du tableau ident *)
-    | EArray_r of ident * int * int
+    | EArray_r of string * int * int
     (* valeur gauche *)
     | EVar of ident
     (* opérateur préfixe *)
@@ -105,6 +105,7 @@ module Sast = struct
 	
   type instruction = 
     | Assign of ident * expr
+    | Assign_i of ident * int * expr
     | For of ident * expr * expr * instr list 
     | Decl of ident
     | Envir of instr list

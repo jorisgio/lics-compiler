@@ -34,10 +34,9 @@ module InstrToSast = struct
   let idToSast id = 
     { Sast.id = id.id ; Sast.typ = typToSast id.typ}
       
+  (* renvoit une pos de type Sast *)
   let posToSast pos = 
     { Sast.line = pos.line; Sast.char_b = pos.char_b ; Sast.char_e = pos.char_e }
-
-  let typesToSast = typToSast
 
   let prefixToSast = function
     | Not -> Sast.Not
@@ -58,9 +57,12 @@ module InstrToSast = struct
 	({ Sast.p = posToSast exp.p ; Sast.e = Sast.EBconst(b) ; Sast.t = Sast.Bool },undefSet)
       | EIconst i -> 
 	({ Sast.p = posToSast exp.p ; Sast.e = Sast.EIconst(i); Sast.t = Sast.Int},undefSet)
-      | EArray_i(id,index) -> 
-	({ Sast.p = posToSast exp.p ; Sast.e = Sast.EArray_i(idToSast id,index); Sast.t = Sast.Bool},undefSet)
-      | EArray_r(id,i_beg,i_end) ->
+      | EArray_i(name,index) -> 
+	(* on cherche le tableau dans l'env, forcément déclaré *)
+	let id = Smap.find name env in
+	({ Sast.p = posToSast exp.p ; Sast.e = Sast.EArray_i(id,index); Sast.t = Sast.Bool},undefSet)
+      | EArray_r(name,i_beg,i_end) ->
+	let id = Smap.find name env in 
 	let Array(size) = id.typ in
 	if i_beg < 0 or i_end < 0 or i_end < i_beg or i_end >= size then
 	  (raise (Error(posToSast exp.p,"Bad index"))) 
@@ -153,7 +155,14 @@ module InstrToSast = struct
 	let ret = ({Sast.posi = posToSast inst.posi; i = Sast.Decl(idToSast id)},undefSet,(Smap.add id.id {Sast.id = id.id ; typ = typToSast id.typ} env))
 	in
 	ret
-      | Past.Envir(li) -> 
+      | Assign_i(name, index, exp) -> 
+	let e,undefSet = pExpr env undefSet exp in
+	let id = Smap.find name env in
+	if id.Sast.typ != e.Sast.t then
+	  (raise   (WrongType(e.Sast.p,e.Sast.t,id.Sast.typ)))
+	else 
+	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.Assign(id,e)},(Sset.remove id.Sast.id undefSet),(Smap.add id.Sast.id {Sast.id = id.Sast.id; Sast.typ = id.Sast.typ} env ))
+      | Envir(li) -> 
 	let li,undef,env = pInstrList env undefSet [] li in
 	if not (Sset.subset undef undefSet) then
 	  (raise (Error({Sast.line = 0; char_b = 0; char_e = 0},"Use of unitialised value")))
