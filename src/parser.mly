@@ -1,9 +1,10 @@
 %{
 open Ast.Past
-
+open Lexing
+(* CODE MORT
 let inputToWire b li =
   List.map (fun i -> { out_id = int_of_string i ; block_id = b}) li
-
+*)
 let position startpos endpos =
     (* actuellement on se prive de certaines infos *)
     { line = startpos.pos_lnum ;
@@ -65,8 +66,9 @@ outvar:
     | id = IDENT LBRACKET i1 = INT DOTDOT i2 = INT RBRACKET { {p=position $startpos $endpos; e= EArray_r (id,i1,i2)} }
 
 statement:
-    | id = IDENT EQUAL  e =  expr SEMICOLON	{ Assign(id,e) } 	(* assigne une variable locale *)
-    | id = IDENT LBRACKET n = INT RBRACKET EQUAL e = expr SEMICOLON { Assign_i (id,n,e) } (* assigne dans un tableau *)
+    | id = IDENT EQUAL  e =  expr SEMICOLON	{ Assign({id = id;typ = Bool},e) } 	(* assigne une variable locale *)
+(*    | id = IDENT LBRACKET n = INT RBRACKET EQUAL e = expr SEMICOLON { Assign_i (id,n,e) } (* assigne dans un tableau *)
+NOT IMPLEMENTED YET *)
 	
 expr:
 	| c = const	{ EBconst c }
@@ -106,7 +108,8 @@ const:
 (* les blocks sont les instanciations des portes, pour construire réelement le circuit *)
 block:
     gtype = UIDENT id = IDENT IN 
-    LPAREN inp =separated_list(COMMA , wire)  RPAREN { { bname = id; bgate_type = gtype; binputs = inp } }
-    
+    LPAREN inp =separated_list(COMMA , expr)  RPAREN { { bname = id; bgate_type = gtype; binputs = inp } }
+(* CODE MORT
 wire:
     bid = IDENT DOT outid = INT 	{ {block_id = bid; out_id = outid}}
+*)

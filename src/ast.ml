@@ -67,7 +67,7 @@ module Past = struct
   type block = {
     bname : string; 
     bgate_type : string; (* type de la porte *)
-    binputs : expr;
+    binputs : expr list;
 }
 
 (* circuit *)
