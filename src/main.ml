@@ -113,9 +113,9 @@ let combinatoire =
   end ;
   g
   
+let n = Graphe.size combinatoire.cgraph
 (* Tri Topologique et production du code *)
 let seqlist = 
-  let n = Graphe.size combinatoire.cgraph in
   deb "Tri topologique et production de LICS…\n";
   let l = Translator.lics_of_combin_graph combinatoire (n+1) in
   deb "Done.\n";
@@ -136,15 +136,23 @@ let seqlist = if !o1 then
  
 (* écriture dans un fichier (par défaut, stdout) *)
 let () =
-  let f =
-    if String.length !ofile > 0 then
-      open_out !ofile 
-    else
-      Pervasives.stdout 
-  in
   if !obj then
-    output_value f seqlist 
+    if String.length !ofile > 0 then
+      LicsFileIO.write !ofile { LicsAst.numero_var_max = n ; nb_reg =
+          List.fold_left
+            (function n -> function LicsAst.Inputreg _ -> n + 1 | _ -> n)
+            0
+            seqlist ;
+                     programme = seqlist }
+    else
+      failwith "Fournissez un nom de fichier pour enregistrer le code binaire"
   else
+    let f =
+      if String.length !ofile > 0 then
+        open_out !ofile
+      else
+        Pervasives.stdout 
+    in
     List.iter (fun elt -> Printf.fprintf f  "%s" (Translator.stmt_to_string elt ) ) seqlist
-  ;
-  exit 0
+    ;
+    exit 0
