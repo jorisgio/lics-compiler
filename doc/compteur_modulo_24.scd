@@ -1,6 +1,4 @@
 def
-Input <-(a)
-->(a)
 
 Cm3 <-(a)
         t0 = a xor s;
@@ -17,14 +15,12 @@ Cm2 <-(a)
         r = a && s;
 ->(s,r)
 
-Output <-(a,b)
-->(a,b)
+Output <-(a,b,c,d,e,f)
+->(a,b,c,d,e,f)
 
 end
 
-Input inp <-(i.0)
-
-Cm2 b <-(inp.0)
+Cm2 b <-()
 
 Cm2 c <-(b.1)
 

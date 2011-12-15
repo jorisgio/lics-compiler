@@ -100,23 +100,24 @@ let igraph =
     end ;
   g
 
-
 (* Suppression des registres *)
 let combinatoire =
-	let g = 		
-  Cycles.processRegs igraph in 
-  let f = open_out "graph3.debug" in	
-  	Graphe.drawGraph g.cgraph f;
-	close_out f ;
-	g
+  deb "Suppression des registres...\n" ;
+  let g = Cycles.processRegs igraph in 
+  deb "Done.\n" ;
+  begin
+    deb "INFO : Enregistrement du graphe dans graph3.debug\n";
+    let f = open_out "graph3.debug" in
+    Graphe.drawGraph g.cgraph f;
+    close_out f
+  end ;
+  g
   
 (* Tri Topologique et production du code *)
 let seqlist = 
   let n = Graphe.size combinatoire.cgraph in
-  deb "Tri topologique…\n";
-  let l =
-    Translator.lics_of_combin_graph combinatoire (n+1) 
-  in
+  deb "Tri topologique et production de LICS…\n";
+  let l = Translator.lics_of_combin_graph combinatoire (n+1) in
   deb "Done.\n";
   l
 

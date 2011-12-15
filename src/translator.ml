@@ -32,8 +32,7 @@ let lics_of_combin_graph g n = (* n = max_clé + 1 *)
     | [] -> []
     | h::t ->
       let v = Vertex.getLabel (Graphe.find g.cgraph h) in
-      if v = Noeud.Inreg || v = Noeud.Outreg
-           || v = Noeud.Input || v = Noeud.Output 
+      if v = Noeud.Inreg || v = Noeud.Input
       then elimine t
       else h:: elimine t in
   let translate k =
@@ -67,9 +66,9 @@ nombre d'entrées incorrect pour un opérateur unaire"
         begin
           try let [i;j] = pred.(k) in
               Assign (k, Binaire (tr_op op, i, j))
-          with Match_failure _ -> failwith
+          with Match_failure _ -> failwith (
             "lics_of_combin_graph:
-nombre d'entrées incorrect pour un opérateur binaire"
+nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour " ^ (Noeud.string_of_label op) )
         end
       | Noeud.Mux (a,b,c) ->
         Assign (k, Ternaire (Mux, a, b, c))
@@ -84,23 +83,7 @@ nombre d'entrées incorrect pour un opérateur binaire"
         | "input" -> Input h
         | "inreg" -> Inputreg h
         | "output" -> Output h
-(* CODE MORT : version non compatible *)
-(*          begin
-          try let [i] = pred.(h) in (* c'est l'entrée qui donne l'argument *)
-              Output i
-          with Match_failure _ -> failwith
-            "lics_of_combin_graph:
-nombre d'entrées incorrect pour un output"
-          end*)
         | "outreg" -> Outputreg h
-(* CODE MORT : version non compatible *)
-(*          begin
-          try let [i] = pred.(h) in (* c'est l'entrée qui donne l'argument *)
-              Outputreg i
-          with Match_failure _ -> failwith
-            "lics_of_combin_graph:
-nombre d'entrées incorrect pour un outputreg"
-          end*)
         | _ -> failwith "lics_of_combin_graph: traite_cp"
       ):: traite_cp typ t
   in

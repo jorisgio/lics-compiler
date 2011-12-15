@@ -1,11 +1,8 @@
-* FINIR LE PARSER : Joris
- -ajouter la gestion des portes inductives / des for
- -ajouter la gestion des blocks
-
-* TESTS DE CORRECTION Joris
- -vérification de l'induction
- -vérification de type
-
+* AJOUT DES FOR
 * AJOUT DES SYSCALL / GESTION DE LA RAM
 
-* FAIRE DE NOMBREUX TESTS (cf sujet du projet)
+LE PLUS URGENT :
+
+- Gérer les gates qui ont des entrées en sorties (identité).
+
+- Ne pas passer en LICS les True et False qui ne servent à rien.

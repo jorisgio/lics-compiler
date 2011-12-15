@@ -148,34 +148,16 @@ let processFirstBlock gcur circuit blocks =
   let gate = Smap.find blocks.b_bgate_type circuit.b_gates in
   (* crée un tableau pour les entrées élémentaires du bloc (crée les noeuds qui sont des Inputs) *)
   let entrees_blocs = Array.make gate.ginputsize (-1) in
-  let i = ref 0 in
   let taille = ref (Graphe.size !gcur) in
-  let rajoute_entree_bloc x = match x.e with
-    | EArray_i (name,index) ->
-      gcur := Graphe.addVertex !gcur !taille ;
-      gcur := Graphe.setLabel !gcur !taille Noeud.Input;
-      entrees_blocs.(!i) <- !taille;
-      inputs := !taille :: !inputs;
-      incr taille;
-      incr i;
-    | EArray_r (name,min,max) ->
-        for k = min to max do
-          gcur := Graphe.addVertex !gcur !taille ;
-          gcur := Graphe.setLabel !gcur !taille Noeud.Input;
-          entrees_blocs.(!i) <- !taille;
-          incr taille;
-          incr i;
-        done
-    | _ -> raise (Error (x.p,"mauvaise entrée")) 
-  in
-  begin
-  try List.iter rajoute_entree_bloc blocks.b_binputs
-  with Invalid_argument _ ->
-    raise (Error ({line = 42; char_b = 42; char_e = 42},
-    "Pas le bon nombre d'entrée pour le bloc " ^ blocks.b_bname))
-  end;
+  for i = 0 to gate.ginputsize - 1 do
+    gcur := Graphe.addVertex !gcur !taille ;
+    gcur := Graphe.setLabel !gcur !taille Noeud.Input;
+    entrees_blocs.(i) <- !taille;
+    inputs := !taille :: !inputs;
+    incr taille;
+  done;
 
-  i := 0 ;
+  let i = ref 0 in
   (* ajout à l'environnement b_bvertices de tableau de noeuds pour chaque entrée de la porte *)
   let ajoute_tab vertices entree = match entree.typ with
     | Bool -> let t = Array.make 1 entrees_blocs.(!i) in
@@ -196,7 +178,7 @@ let processFirstBlock gcur circuit blocks =
      (!gcur,!taille)
      gate.gbody) )
     ,
-  !inputs
+  List.rev !inputs
 
 let process circuit =
   let hdAndTl_l = function
@@ -213,6 +195,7 @@ let process circuit =
       hdAndTl_l circuit.b_blocks
     with Not_found -> failwith "Pas de blocs trouvés" in
   let cir, inputs = processFirstBlock circuit.b_graphe circuit h in
+  (*Printf.printf "Nombre d'Inputs = %d\n" (List.length inputs) ;*)
   let last_bloc = 
     try
       last_l circuit.b_blocks 
