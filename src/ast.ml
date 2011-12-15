@@ -50,8 +50,7 @@ module Past = struct
     | For of instr * expr * expr * instr list 
     (* Déclare un tabeleau ou un entier *)
     | Decl of ident
-    (* Sous bloc *)
-    | Envir of instr list
+	
 
   and  instr =  { posi : pos; i : instruction }
       
@@ -108,7 +107,6 @@ module Sast = struct
     | Assign_i of ident * int * expr
     | For of ident * expr * expr * instr list 
     | Decl of ident
-    | Envir of instr list
   
   and  instr =  { posi : pos; i : instruction }
 
