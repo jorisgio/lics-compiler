@@ -139,7 +139,80 @@ let processBlock gcur circuit blocks =
     gcur
     gate.gbody)
 
+let processFirstBlock gcur circuit blocks =
+  let gcur = ref gcur in
+  let inputs = ref [] in
+  let gate = Smap.find blocks.b_bgate_type circuit.b_gates in
+  (* crée un tableau pour les entrées élémentaires du bloc (crée les noeuds qui sont des Inputs) *)
+  let entrees_blocs = Array.make gate.ginputsize (-1) in
+  let i = ref 0 in
+  let taille = ref (Graphe.size !gcur) in
+  let rajoute_entree_bloc x = match x.e with
+    | EArray_i (name,index) ->
+      gcur := Graphe.addVertex !gcur !taille ;
+      gcur := Graphe.setLabel !gcur !taille Noeud.Input;
+      entrees_blocs.(!i) <- !taille;
+      inputs := !taille :: !inputs;
+      incr taille;
+      incr i;
+    | EArray_r (name,min,max) ->
+        for k = min to max do
+          gcur := Graphe.addVertex !gcur !taille ;
+          gcur := Graphe.setLabel !gcur !taille Noeud.Input;
+          entrees_blocs.(!i) <- !taille;
+          incr taille;
+          incr i;
+        done
+    | _ -> raise (Error (x.p,"mauvaise entrée")) 
+  in
+  begin
+  try List.iter rajoute_entree_bloc blocks.b_binputs
+  with Invalid_argument _ ->
+    raise (Error ({line = 42; char_b = 42; char_e = 42},
+    "Pas le bon nombre d'entrée pour le bloc " ^ blocks.b_bname))
+  end;
+
+  i := 0 ;
+  (* ajout à l'environnement b_bvertices de tableau de noeuds pour chaque entrée de la porte *)
+  let ajoute_tab vertices entree = match entree.typ with
+    | Bool -> let t = Array.make 1 entrees_blocs.(!i) in
+      incr i ;
+      Smap.add entree.id t vertices
+    | Array n -> let t = Array.make n (-1) in
+      for k = 0 to n - 1 do
+        t.(k) <- entrees_blocs.(!i);
+        incr i
+      done;
+      Smap.add entree.id t vertices
+    | _ -> raise (WrongType ({line = 42; char_b = 42; char_e = 42},Int,Bool))
+  in
+  let env =
+    List.fold_left ajoute_tab blocks.b_bvertices gate.ginputs in
+  (List.fold_left
+     (fun gcur instr -> processInstr gcur env instr.i)
+     !gcur
+     gate.gbody)
+    ,
+  !inputs
+
 let process circuit =
-  List.fold_left (fun gcur -> processBlock gcur circuit)
-    circuit.b_graphe
-    circuit.b_blocks
+  let hdAndTl_l = function
+    | [] -> raise Not_found
+    | h::t -> h,t
+  in
+  let rec last_l = function
+    | [] -> raise Not_found
+    | [a] -> a
+    | h::t -> last_l t
+  in
+  try
+    let h,t = hdAndTl_l circuit.b_blocks in (* les blocs sont au moins au nombre de 1 *)
+    let cir, inputs = processFirstBlock circuit.b_graphe circuit h in
+    { igraph =
+        List.fold_left (fun gcur -> processBlock gcur circuit)
+          cir
+          t ;
+      iinputs = inputs ;
+      ioutputs = Array.to_list (Smap.find (last_l circuit.b_blocks).b_bname circuit.b_blocsOutput)
+    }
+  with Not_found -> failwith "Pas de blocs trouvés"

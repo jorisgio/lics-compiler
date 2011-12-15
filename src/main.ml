@@ -78,7 +78,7 @@ let igraph =
   let cir = Pass1.pBloc circuit in
   deb "Done.\n";
   deb "Deuxième passe...\n";
-  let graphe = Pass2.process cir in
+  let g = Pass2.process cir in
   deb "Done.\n";
   (* Attention : on devrait traiter différemment les entrées / sorties
      afin d'obtenir un interm_graph g *)
