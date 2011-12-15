@@ -13,6 +13,7 @@ let pBloc circuit =
   (* Transfore un bloc. 
      Rnvoit un graphe * env * wirEnv *)
   let blocRec (accList,graph,wirEnv)  bloc= 
+    assert (Smap.mem bloc.bgate_type circuit.gates) ;
     let gate = Smap.find bloc.bgate_type circuit.gates in 
     let index = ref 0 in
     (* crée un noeud pour chaque variable, excepté les entrées. 
@@ -63,6 +64,7 @@ let pBloc circuit =
       let ind = ref index in
       match expr.e with
 	| EVar(ident) -> 
+          assert (Smap.mem ident.id env) ;
 	  let ar = Smap.find ident.id env in
 	  for i = 0 to (Array.length ar) - 1 do 
             outputsArray.(!ind) <- ar.(i);
@@ -70,11 +72,13 @@ let pBloc circuit =
 	  done;
 	  !ind
 	| EArray_i(id,i) -> 
+          assert (Smap.mem id.id env) ;
 	  let ar = Smap.find id.id env in
 	  outputsArray.(!ind) <- ar.(i) ;
 	  incr ind;
 	  !ind
 	| EArray_r(id,i1,i2) ->
+          assert (Smap.mem id.id env) ;
 	  let ar = Smap.find id.id env in
 	  for i = i1 to i2 do 
 	    outputsArray.(!ind) <- ar.(i);

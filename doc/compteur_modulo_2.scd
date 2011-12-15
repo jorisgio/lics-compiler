@@ -17,4 +17,4 @@ Input inp <-(i.0)
 
 Cm2 b <-(inp.0)
 
-Output out <-(b.0,b.1)
+Output out <-(b[0..1])
