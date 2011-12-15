@@ -1,26 +1,30 @@
 (* on parcour les blocs et on crée les arrêtes *)
 
 open Ast
-open Bast
+open Ast.Bast
 open Graphe
-open Semantic.Exceptions
+(* open Semantic.Exceptions *)
 
+exception Undefined
+exception Error of pos * string
+exception WrongType of pos * types * types
+      
 module Noeud = struct
   include (Noeud)
     
   (* convertit un opérateur en étiquette *)
   let lop_to_label = function
-    | BAst.And -> And 
-    | BAst.Or -> Or 
-    | BAst.Xor -> Xor 
+    | Bast.And -> And 
+    | Bast.Or -> Or 
+    | Bast.Xor -> Xor 
 
   let lp_to_label   = function
-    | BAst.Not -> Not
-    | BAst.Reg -> Reg
+    | Bast.Not -> Not
+    | Bast.Reg -> Reg
       
   let bool_to_label = function
-    | BAst.EBconst(true) -> True
-    | BAst.EBconst(false) -> False
+    | Bast.EBconst(true) -> True
+    | Bast.EBconst(false) -> False
 end
 
 (* Traite une expression de type Bool récursivement en ajoutant les arrêtes aux graphe 
@@ -32,10 +36,12 @@ end
    Renvoit :
    le nouveau graphe *)
 let processBExpr gcur env vertex expr = 
-
-  let processRec gcur vertex = function
+  let index = ref 0 in
+  
+  let rec  processRec gcur vertex expr = 
+    match expr.e with
     | EBconst cst -> let cur = Smap.find (string_of_bool cst) env in
-		     let gcur = Graphe.setLabel gcur cur.(0) (Noeud.bool_to_label cst) in
+		     let gcur = Graphe.setLabel gcur cur.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) in
 		     Graphe.addEdge gcur cur.(0) vertex
 
     | EVar ident -> let cur = Smap.find ident.id env in
@@ -43,23 +49,21 @@ let processBExpr gcur env vertex expr =
     | EArray_i(ident,index) -> let cur = Smap.find ident.id env in
 			       Graphe.addEdge gcur cur.(index) vertex
     | EPrefix(oper,exp) -> 
-      let gcur = Graphe.addVertex2 gcur in
-      let gcur = Graphe.setLabel2 gcur (Noeud.lp_to_label oper) in
-      let cur = Graphe.curindex in
-      let gcur = Graphe.addEdge gcur cur vertex in
-      processRec gcur cur exp 
+      let gcur = incr index ; Graphe.addVertex gcur !index in
+      let gcur = Graphe.setLabel gcur !index  (Noeud.lp_to_label oper) in
+      let gcur = Graphe.addEdge gcur !index vertex in
+      processRec gcur !index  exp 
     | EInfix(oper, exp1, exp2) -> 
-      let gcur = Graphe.addVertex2 gcur in
-      let gcur = Graphe.setLabel2 gcur (Noeud.lop_to_label oper) in
-      let cur = Graphe.curindex in
-      let gcur = Graphe.addEdge gcur cur vertex in
-      let gcur = processRec gcur cur exp1 in
-      processRec gcur cur exp2
+      let gcur = incr index; Graphe.addVertex gcur !index in
+      let gcur = Graphe.setLabel gcur !index (Noeud.lop_to_label oper) in
+      let gcur = Graphe.addEdge gcur !index vertex in
+      let gcur = processRec gcur !index exp1 in
+      processRec gcur !index exp2
     | EMux(_,_,_) -> failwith "not implemented"
 
   in
   match expr.e with
-    | EBconst cst -> Graphe.setLabel gcur vertex (Noeud.bool_to_label cst) 
+    | EBconst cst -> Graphe.setLabel gcur vertex (Noeud.bool_to_label (Sast.EBconst(cst))) 
     | EPrefix(oper, exp) -> 
       let gcur = Graphe.setLabel gcur vertex (Noeud.lp_to_label oper) in
       processRec gcur vertex exp 
@@ -79,31 +83,32 @@ let processBExpr gcur env vertex expr =
    Renvoit :
    le nouveau graphe 
 *)
+(* TODO : assign_i pour assigner  une valeur à un index d'un tableau  *)
 let processInstr gcur env = function
   | Assign(ident, exp) -> 
     let cur = Smap.find ident.id env in
-    processBExpr gcur env cur exp
+    processBExpr gcur env cur.(0) exp
   | _ -> failwith "Not implemented"
 
 let processBlock gcur circuit blocks =
-  let gate = Smap.find blocks.b_gate_type circuit.b_gates in
+  let gate = Smap.find blocks.bgate_type circuit.b_gates in
   (* crée un tableau pour les entrées élémentaires du bloc *)
   let entrees_blocs = Array.make gate.ginputsize (-1) in
   let i = ref 0 in
   let rajoute_entree_bloc x = match x.e with
     | EArray_i (name,index) ->
         entrees_blocs.(!i) <-
-          Smap.find name circuit.b_blocsOutput.(index) ;
+          (Smap.find name.id circuit.b_blocsOutput).(index) ;
         incr i
     | EArray_r (name,min,max) ->
         for k = min to max do
           entrees_blocs.(!i) <-
-            Smap.find name circuit.b_blocsOutput.(k) ;
+            (Smap.find name.id circuit.b_blocsOutput).(k) ;
           incr i
         done
-    | _ -> raise (Error (x.pos,"mauvaise entrée")) 
+    | _ -> raise (Error (x.p,"mauvaise entrée")) 
   in
-  try List.iter rajoute_entree_bloc blocks.b_inputs
+  try List.iter rajoute_entree_bloc blocks.b_binputs
   with Invalid_argument _ ->
     raise (Error ({line = 42; char_b = 42; char_e = 42},
     "Pas le bon nombre d'entrée pour le bloc " ^ blocks.b_bname));
