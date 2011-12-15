@@ -74,9 +74,18 @@ let circuit =
   (* Construction du graphe *)
 let igraph =
   deb "Construction du graphe de circuit…\n";
+
   deb "Première passe...\n";
   let cir = Pass1.pBloc circuit in
   deb "Done.\n";
+  if !debug then
+    begin
+      deb "INFO : Enregistrement du graphe dans graph1.debug\n";
+      let f = open_out "graph1.debug" in
+      Graphe.drawGraph cir.Ast.Bast.b_graphe f;
+      close_out f
+    end ;
+
   deb "Deuxième passe...\n";
   let g = Pass2.process cir in
   deb "Done.\n";
@@ -84,8 +93,8 @@ let igraph =
      afin d'obtenir un interm_graph g *)
   if !debug then
     begin
-      deb "INFO : Enregistrement du graphe dans graphe.debug\n";
-      let f = open_out "graph.debug" in
+      deb "INFO : Enregistrement du graphe dans graph2.debug\n";
+      let f = open_out "graph2.debug" in
       Graphe.drawGraph g.igraph f;
       close_out f
     end ;
@@ -96,7 +105,7 @@ let igraph =
 let combinatoire =
 	let g = 		
   Cycles.processRegs igraph in 
-  let f = open_out "graph2.debug" in	
+  let f = open_out "graph3.debug" in	
   	Graphe.drawGraph g.cgraph f;
 	close_out f ;
 	g
