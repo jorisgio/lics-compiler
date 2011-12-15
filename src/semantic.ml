@@ -267,4 +267,12 @@ module GatesToSast = struct
       
 end 
     
-
+module CircuitToSast = struct
+  let pBlock {Past.bname = name ; bgate_type = typ ; binputs = inputs} =
+    {Sast.bname = name ;
+     bgate_type = typ ;
+     binputs = List.map (function expr -> fst (InstrToSast.pExpr Smap.empty Sset.empty expr)) inputs} (* Est-ce la bonne méthode ? *)
+  
+  let pCircuit {Past.gates = gates ; blocks = blocks} =
+    {Sast.gates = GatesToSast.buildMap (List.map GatesToSast.pGate gates) ; blocks = List.map pBlock blocks}
+end

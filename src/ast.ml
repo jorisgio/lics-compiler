@@ -73,7 +73,7 @@ module Past = struct
 (* circuit *)
   type circuit = {
     gates : gate list ;
-    start : block ;
+    start : block ; (* Inutile isn't it ? *)
     blocks : block list ;
 }
 
