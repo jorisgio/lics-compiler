@@ -1,6 +1,4 @@
 def
-Input <-(a,b,c)
-->(a,b,c)
 
 Adder <-(a,b,c)
 	t1 = a xor b;
@@ -10,13 +8,6 @@ Adder <-(a,b,c)
 	r = t2 || t3;
 ->(s,r)
 
-Output <-(a,b)
-->(a,b)
-
 end
 
-Input inp <-(i.0,i.1,i.2)
-
-Adder b <-(inp.0,inp.1,inp.2)
-
-Output out <-(b.0,b.1)
+Adder b <-()

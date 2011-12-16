@@ -23,38 +23,3 @@ let topoSort graph = (* graphe n'est pas coloré *)
   in
   fst (Graphe.foldVertex
     (fun x _ -> traiter x) graph ([] , ColoredGraph.colorGraph graph))
-
-
-(* Tests *)
-(*
-
-module Noeud = struct
-  type t = int
-  let compare = Pervasives.compare
-  type label = int
-  let empty = 0
-end
-
-module Couleur = struct
-  type t = bool
-  let empty = false
-end
-
-
-
-let rec construit taille acc count =
-  match count with
-  | k when k = taille -> acc
-  | n -> construit taille (Graphe.Graphe.addVertex acc n ) (n+1)
-
-let graphe = construit 5 ( Graphe.Graphe.empty ) 0
-
-let graphe = Graphe.Graphe.addEdge graphe 1 2
-let graphe = Graphe.Graphe.addEdge graphe 1 3
-let graphe = Graphe.Graphe.addEdge graphe 2 3
-let graphe = Graphe.Graphe.addEdge graphe 2 4
-let graphe = Graphe.Graphe.addEdge graphe 3 4
-
-let _ = topoSort graphe
-
-*)

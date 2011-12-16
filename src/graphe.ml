@@ -5,7 +5,7 @@ module Noeud = struct
 	type label =
           | Empty
           | True | False
-          | Reg | Input | Output | Inreg | Outreg
+          | Reg | Input | Inreg
           | Not
           | And | Or | Xor | Nand
           | Mux of int * int * int
@@ -23,9 +23,7 @@ module Noeud = struct
 	  | Empty -> "Empty"
 	  | Reg -> "Reg"
 	  | Input -> "Input"
-	  | Output -> "Output"
 	  | Inreg -> "Inreg"
-	  | Outreg -> "Outreg"
 	  | Not -> "Not"
 	  | And -> "And"
 	  | Or -> "Or"

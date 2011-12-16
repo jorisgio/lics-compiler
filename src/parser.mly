@@ -30,7 +30,7 @@ let position startpos endpos =
 %left PLUS MINUS
 
 %start circuit
-%type <Ast.circuit> circuit
+%type <Ast.Past.circuit> circuit
 
 
 %%
@@ -39,9 +39,8 @@ circuit:
 	DEF
 	gate_types = gate*
         END
-	start = block
 	blocks = block* EOF
-		{ { gates = gate_types ; start = start ; blocks = blocks } }
+		{ { gates = gate_types ; blocks = blocks } }
 
 (* une porte est un identifier, une liste d'entrées, une liste d'assignement et une liste de sorties *)
 gate:
@@ -61,24 +60,24 @@ out:
 	LPAREN l=separated_list(COMMA , outvar) RPAREN 	{l}
 
 outvar:
-    | id = IDENT { {p=position $startpos $endpos; e={id=EVar id;typ=Bool}} }
+    | id = IDENT { {p=position $startpos $endpos; e= EVar {id=id;typ=Bool}} }
     | id = IDENT LBRACKET n = INT RBRACKET { {p=position $startpos $endpos; e= EArray_i (id,n)} }
     | id = IDENT LBRACKET i1 = INT DOTDOT i2 = INT RBRACKET { {p=position $startpos $endpos; e= EArray_r (id,i1,i2)} }
 
 statement:
-    | id = IDENT EQUAL  e =  expr SEMICOLON	{ Assign({id = id;typ = Bool},e) } 	(* assigne une variable locale *)
+    | id = IDENT EQUAL  e =  expr SEMICOLON	{ {posi = position $startpos $endpos; i=Assign({id = id;typ = Bool},e) } } 	(* assigne une variable locale *)
 (*    | id = IDENT LBRACKET n = INT RBRACKET EQUAL e = expr SEMICOLON { Assign_i (id,n,e) } (* assigne dans un tableau *)
 NOT IMPLEMENTED YET *)
 	
 expr:
-	| c = const	{ EBconst c }
-	| id = IDENT	{ EVar {id=id;typ=Bool}  }
-	| e1 = expr o = lop e2 = expr 	{ EInfix (o,e1,e2) }
-	| p = prefix e1 = expr	{ EPrefix (p,e1) }
-	| MUX LPAREN e1 = expr COMMA e2 = expr COMMA e3 = expr RPAREN { EMux(e1,e2,e3) }
+	| c = const	{ {p=position $startpos $endpos; e=EBconst c} }
+	| id = IDENT	{ {p=position $startpos $endpos; e=EVar {id=id;typ=Bool}}  }
+	| e1 = expr o = lop e2 = expr 	{ {p=position $startpos $endpos;e=EInfix (o,e1,e2)} }
+	| p = prefix e1 = expr	{ {p=position $startpos $endpos;e=EPrefix (p,e1) } }
+	| MUX LPAREN e1 = expr COMMA e2 = expr COMMA e3 = expr RPAREN { {p=position $startpos $endpos;e=EMux(e1,e2,e3) }}
 	| LPAREN e1 = expr RPAREN 	{ e1 }
-	| v = IDENT LBRACKET idx=INT RBRACKET   { EArray_i(v,idx) } (* prend un index du tableau *)
-	| v = IDENT LBRACKET min=INT DOTDOT max=INT RBRACKET  { EArray_r(v,min,max)}(*donne un sous tableau *)
+	| v = IDENT LBRACKET idx=INT RBRACKET   { {p=position $startpos $endpos;e=EArray_i(v,idx) } } (* prend un index du tableau *)
+	| v = IDENT LBRACKET min=INT DOTDOT max=INT RBRACKET  { {p=position $startpos $endpos; e=EArray_r(v,min,max)} }(*donne un sous tableau *)
 ;
 
 
@@ -88,7 +87,7 @@ expr:
 	| AND   {And}
         | TIMES {Mul}
         | DIV   {Div}
-        | NAND  {Nand}
+(*        | NAND  {Nand} NOT IMPLEMENTED YET *)
         | PLUS  {Add}
         | MINUS {Sub}
 ;
@@ -101,8 +100,8 @@ expr:
 
 (* une constante est soit un tableau de booléens, soit un booléen *)
 const:
-	| b = BOOL 	{ Cbool b }
-	| LBRACKET l = separated_list(COMMA , BOOL) RBRACKET { Carray (Array.of_list l) }
+	| b = BOOL 	{ b }
+(*	| LBRACKET l = separated_list(COMMA , BOOL) RBRACKET { Carray (Array.of_list l) } *)
 ;
 
 (* les blocks sont les instanciations des portes, pour construire réelement le circuit *)

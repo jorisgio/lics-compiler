@@ -50,8 +50,7 @@ module Past = struct
     | For of instr * expr * expr * instr list 
     (* Déclare un tabeleau ou un entier *)
     | Decl of ident
-    (* Sous bloc *)
-    | Envir of instr list
+	
 
   and  instr =  { posi : pos; i : instruction }
       
@@ -73,7 +72,6 @@ module Past = struct
 (* circuit *)
   type circuit = {
     gates : gate list ;
-    start : block ; (* Inutile isn't it ? *)
     blocks : block list ;
 }
 
@@ -87,8 +85,8 @@ module Sast = struct
    
   type pos = { line : int; char_b : int; char_e : int}
   
-  type types = Bool | Int | Array of int
-
+  type types = Bool | Int | Array of int | Wire
+	   
   type ident = { id : string; typ : types }
 
   and  expression = 
@@ -108,7 +106,6 @@ module Sast = struct
     | Assign_i of ident * int * expr
     | For of ident * expr * expr * instr list 
     | Decl of ident
-    | Envir of instr list
   
   and  instr =  { posi : pos; i : instruction }
 

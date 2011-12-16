@@ -74,40 +74,51 @@ let circuit =
   (* Construction du graphe *)
 let igraph =
   deb "Construction du graphe de circuit…\n";
+
   deb "Première passe...\n";
   let cir = Pass1.pBloc circuit in
   deb "Done.\n";
+  if !debug then
+    begin
+      deb "INFO : Enregistrement du graphe dans graph1.debug\n";
+      let f = open_out "graph1.debug" in
+      Graphe.drawGraph cir.Ast.Bast.b_graphe f;
+      close_out f
+    end ;
+
   deb "Deuxième passe...\n";
-  let graphe = Pass2.process cir in
+  let g = Pass2.process cir in
   deb "Done.\n";
   (* Attention : on devrait traiter différemment les entrées / sorties
      afin d'obtenir un interm_graph g *)
   if !debug then
     begin
-      deb "INFO : Enregistrement du graphe dans graphe.debug\n";
-      let f = open_out "graph.debug" in
+      deb "INFO : Enregistrement du graphe dans graph2.debug\n";
+      let f = open_out "graph2.debug" in
       Graphe.drawGraph g.igraph f;
       close_out f
     end ;
   g
 
-
 (* Suppression des registres *)
 let combinatoire =
-	let g = 		
-  Cycles.processRegs igraph in 
-  let f = open_out "graph2.debug" in	
-  	Graphe.drawGraph g.cgraph f;
-	close_out f ;
-	g
+  deb "Suppression des registres...\n" ;
+  let g = Cycles.processRegs igraph in 
+  deb "Done.\n" ;
+  begin
+    deb "INFO : Enregistrement du graphe dans graph3.debug\n";
+    let f = open_out "graph3.debug" in
+    Graphe.drawGraph g.cgraph f;
+    close_out f
+  end ;
+  g
   
+let n = Graphe.size combinatoire.cgraph
+(*let () = printf "Max reg = %d\n" n*)
 (* Tri Topologique et production du code *)
 let seqlist = 
-  let n = Graphe.size combinatoire.cgraph in
-  deb "Tri topologique…\n";
-  let l =
-    Translator.lics_of_combin_graph combinatoire (n+1) 
-  in
+  deb "Tri topologique et production de LICS…\n";
+  let l = Translator.lics_of_combin_graph combinatoire (n+1) in
   deb "Done.\n";
   l
 
@@ -126,15 +137,25 @@ let seqlist = if !o1 then
  
 (* écriture dans un fichier (par défaut, stdout) *)
 let () =
-  let f =
-    if String.length !ofile > 0 then
-      open_out !ofile 
-    else
-      Pervasives.stdout 
-  in
   if !obj then
-    output_value f seqlist 
+    if String.length !ofile > 0 then
+      LicsFileIO.write !ofile
+        { LicsAst.numero_var_max = n ;
+          nb_reg =
+            List.fold_left
+              (function n -> function LicsAst.Inputreg _ -> n + 1 | _ -> n)
+              0
+              seqlist ;
+          programme = seqlist }
+    else
+      failwith "Fournissez un nom de fichier pour enregistrer le code binaire"
   else
+    let f =
+      if String.length !ofile > 0 then
+        open_out !ofile
+      else
+        Pervasives.stdout 
+    in
     List.iter (fun elt -> Printf.fprintf f  "%s" (Translator.stmt_to_string elt ) ) seqlist
-  ;
-  exit 0
+    ;
+    exit 0

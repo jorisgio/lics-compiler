@@ -1,4 +1,0 @@
-* écrire une fonction parse_gates qui construit une table à partir de la liste des portes
-* écrire une fonction pour vérifier la validité l'induction
-* écrire une fonction get_gate : gate -> gate qui prend une porte inductive et qui renvoit une porte bien définie sans paramètre.
-* écrire une fonction qui construit le graphe depuis la liste des blocks.

@@ -13,6 +13,7 @@ let pBloc circuit =
   (* Transfore un bloc. 
      Rnvoit un graphe * env * wirEnv *)
   let blocRec (accList,graph,wirEnv)  bloc= 
+    assert (Smap.mem bloc.bgate_type circuit.gates) ;
     let gate = Smap.find bloc.bgate_type circuit.gates in 
     let index = ref 0 in
     (* crée un noeud pour chaque variable, excepté les entrées. 
@@ -25,6 +26,7 @@ let pBloc circuit =
 	      let graph = Graphe.addVertex graph !index in
 	      let ar = Array.make 1 0 in
 	      ar.(0) <- !index ;
+              incr index ;
 	      ((Smap.add name  ar env),graph)
 	    end
 	    | Array s -> begin
@@ -33,6 +35,7 @@ let pBloc circuit =
 	      for i = 0 to (s - 1) do
 	        gr := Graphe.addVertex !gr !index ;
 		ar.(i) <- !index ;
+                incr index ;
 	      done ;
 	      ((Smap.add name ar env), !gr)
 	    end
@@ -57,32 +60,34 @@ let pBloc circuit =
        renvoit :
        unit
     *)
-    let outputsArray = Array.make gate.goutputsize 0 in 
+    let outputsArray = Array.make gate.goutputsize (-1) in 
     
-    let buildArray index expr = 
-      let ind = ref index in
+    let ind = ref 0 in
+    let buildArray expr = 
       match expr.e with
-	| EVar(ident) -> 
+	| EVar(ident) -> begin
+          try
 	  let ar = Smap.find ident.id env in
 	  for i = 0 to (Array.length ar) - 1 do 
             outputsArray.(!ind) <- ar.(i);
 	    incr ind;
 	  done;
-	  !ind
+          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : NOT IMPLEMENTED YET"
+        end
 	| EArray_i(id,i) -> 
+          assert (Smap.mem id.id env) ;
 	  let ar = Smap.find id.id env in
 	  outputsArray.(!ind) <- ar.(i) ;
 	  incr ind;
-	  !ind
 	| EArray_r(id,i1,i2) ->
+          assert (Smap.mem id.id env) ;
 	  let ar = Smap.find id.id env in
 	  for i = i1 to i2 do 
 	    outputsArray.(!ind) <- ar.(i);
 	    incr ind;
 	  done;
-	  !ind
     in
-    let _ = List.fold_left buildArray 0 gate.goutputs in 
+    let () = List.iter buildArray gate.goutputs in 
     
     ((({b_bname = bloc.bname; b_bgate_type = bloc.bgate_type; b_binputs = bloc.binputs ; b_bvertices = env })::accList),graph,(Smap.add bloc.bname outputsArray wirEnv)) 
   in
