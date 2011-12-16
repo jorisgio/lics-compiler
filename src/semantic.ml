@@ -267,7 +267,7 @@ module GatesToSast = struct
        expr : l'expression 
        Renvoit :
        accList * accSize*)
-    let checkOutputs (accList,size) (expr : Past.expr) =
+    let checkOutputs (expr : Past.expr) (accList,size) =
       let expr,_ = InstrToSast.pExpr Smap.empty Smap.empty expr in
       match expr.e with
 	| EVar(ident) -> 
@@ -283,7 +283,7 @@ module GatesToSast = struct
 	  (expr::accList,(size + 1))
 	| _ -> (raise  (Error(expr.p,"Not a left value")))
     in
-    let outputs,size = List.fold_left checkOutputs ([],0) gate.Past.goutputs in
+    let outputs,size = List.fold_right checkOutputs gate.Past.goutputs ([],0) in
     (* création d'un env contenant toutes les entrées *)
     let env = List.fold_left (fun env id -> Smap.add id.id id env)  Smap.empty  inputs in
     (* on ajoute  les entrées au undefMap *)
@@ -299,7 +299,7 @@ module GatesToSast = struct
       Renvoit l'env des variables locales. *)
     let body,undefMap,env = InstrToSast.pInstrList env undefMap [] gate.Past.gbody in
     (* On vérifie que tout ce qui est utilisé est défini *)
-    let _ = Smap.iter (fun name ar ->
+    let () = Smap.iter (fun name ar ->
       for i = 0 to (Array.length ar) -1 do
 	if ar.(i) > 1 then (raise (Undefined)) ;
       done ;
@@ -313,7 +313,7 @@ module GatesToSast = struct
   let rec buildMap_aux gMap = function
     | [] -> gMap
     | a::q -> begin
-	if Smap.mem a.gname gMap then pWarning ;
+      if Smap.mem a.gname gMap then pWarning ;
       buildMap_aux (Smap.add a.gname a gMap) q
     end
 
