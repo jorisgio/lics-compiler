@@ -1,8 +1,9 @@
-Il faut placer la lib ograph dans le répertoire lib/ (ignore par git)
+
+Il faut placer la lib ograph et licsLib dans le répertoire lib/ (ignore par git)
 
 Pour construire le projet, utiliser ocamlbuild.
 ocamlbuild src/main.native par exemple
-Pour ce qui préfèrent make, bah il y a un Makefile qui lance ocamlbuil :>
+Pour ceux qui préfèrent make, il y a un Makefile qui lance ocamlbuil
 
 pour compiler en natif :
 make native
@@ -12,3 +13,5 @@ en debug:
 make debug
 et pour clean les targets ci-dessus :
 make clean-{native,debug,bytecode}
+
+Pour savoir comment utiliser le compilateur : ./main.native -help
