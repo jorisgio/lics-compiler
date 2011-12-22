@@ -6,5 +6,3 @@ LE PLUS URGENT :
 - Gérer les gates qui ont des entrées en sorties (identité).
 
 - Ne pas passer en LICS les True et False qui ne servent à rien.
-
-- Ajout au tri topologique de la détection des cycles combinatoires.
