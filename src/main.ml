@@ -27,7 +27,7 @@ let options = [ "-parse-only", Arg.Set parse_only, "N'effectue que le parsage";
 let localisation pos =
   let l = pos.pos_lnum in
   let c = pos.pos_cnum - pos.pos_bol + 1 in
-  eprintf "File \"%s\", line %d, characters %d-%d:\n" !ifile l (c-1) c
+  Printf.eprintf "File \"%s\", line %d, characters %d-%d:\n" !ifile l (c-1) c
 
  
 (* Création d'un tampon d'Analyse Lexicale *)
@@ -35,7 +35,7 @@ let circuit =
   let usage = Printf.sprintf "Usage : %s [options] <file.scd>" Sys.argv.(0) in
   Arg.parse options (set_file ifile) usage;
   (* S'il n'y a pas d'entrée, on quitte *)
-  if !ifile="" then begin eprintf "Aucun fichier à compiler\n@?"; exit 1 end;
+  if !ifile="" then begin Printf.eprintf "Aucun fichier à compiler\n@?"; exit 1 end;
   (* Analyse lexicale *)
   deb "Création du tampon d'Analyse lexicale…\n";
   let f = open_in !ifile in
@@ -51,10 +51,10 @@ let circuit =
   with 
     | Parser.Error ->
       localisation (Lexing.lexeme_start_p buf);
-      eprintf "Erreur dans l'analyse syntaxique@."; exit 1 
+      Printf.eprintf "Erreur dans l'analyse syntaxique@."; exit 1 
     | Lexer.Lexer_error c ->
       localisation (Lexing.lexeme_start_p buf);
-      eprintf "Erreur dans l'analyse lexicale %s @" c; exit 1
+      Printf.eprintf "Erreur dans l'analyse lexicale %s @" c; exit 1
     
 (* Si on ne veut que le parsage, on s'arrête là *)
 let () = if !parse_only then (deb "Parsage effectué\n" ; exit 0)
@@ -67,7 +67,7 @@ let circuit =
   deb "Done\n";
   cir
 (*  with
-    | e -> eprintf "Erreur dans l'analyse sémantique" ; exit 1
+    | e -> Printf.eprintf "Erreur dans l'analyse sémantique" ; exit 1
       (* A DETAILLER *)*)
       
     
@@ -118,7 +118,11 @@ let n = Graphe.size combinatoire.cgraph
 (* Tri Topologique et production du code *)
 let seqlist = 
   deb "Tri topologique et production de LICS…\n";
-  let l = Translator.lics_of_combin_graph combinatoire (n+1) in
+  let l = 
+    try Translator.lics_of_combin_graph combinatoire (n + 1)
+    with TopoSort.Circuit_combinatoire label -> Printf.eprintf "Erreur dans le tri topologique : circuit combinatoire au niveau d'un %s\n" (Noeud.string_of_label label);
+      exit 1
+  in
   deb "Done.\n";
   l
 
