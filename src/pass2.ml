@@ -38,14 +38,20 @@ let processBExpr gcur ind env vertex expr  =
   let index = ref ind in
   let rec  processRec gcur vertex expr = 
     match expr.e with
-    | EBconst cst -> let cur = Smap.find (string_of_bool cst) env in
-		     let gcur = Graphe.setLabel gcur cur.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) in
+    | EBconst cst -> 
+      assert (Smap.mem (string_of_bool cst) env) ;
+      let cur = Smap.find (string_of_bool cst) env in
+      let gcur = Graphe.setLabel gcur cur.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) in
 		     Graphe.addEdge gcur cur.(0) vertex
 
-    | EVar ident -> let cur = Smap.find ident.id env in
-		    Graphe.addEdge gcur cur.(0) vertex
-    | EArray_i(ident,index) -> let cur = Smap.find ident.id env in
-			       Graphe.addEdge gcur cur.(index) vertex
+    | EVar ident ->
+      assert (Smap.mem ident.id env) ;
+      let cur = Smap.find ident.id env in
+      Graphe.addEdge gcur cur.(0) vertex
+    | EArray_i(ident,index) ->
+      assert (Smap.mem ident.id env) ;
+      let cur = Smap.find ident.id env in
+      Graphe.addEdge gcur cur.(index) vertex
     | EPrefix(oper,exp) -> 
       let gcur = incr index ; Graphe.addVertex gcur !index in
       let gcur = Graphe.setLabel gcur !index  (Noeud.lp_to_label oper) in
@@ -86,7 +92,8 @@ let processBExpr gcur ind env vertex expr  =
 *)
 (* TODO : assign_i pour assigner  une valeur à un index d'un tableau  *)
 let processInstr gcur index env = function
-  | Assign(ident, exp) -> 
+  | Assign(ident, exp) ->
+    assert (Smap.mem ident.id env) ;
     let cur = Smap.find ident.id env in
     processBExpr gcur index env cur.(0) exp
   | _ -> failwith "Not implemented"
@@ -98,15 +105,17 @@ let processBlock gcur circuit blocks =
   let i = ref 0 in
   let rajoute_entree_bloc x = match x.e with
     | EArray_i (name,index) ->
-        entrees_blocs.(!i) <-
-          (Smap.find name.id circuit.b_blocsOutput).(index) ;
-        incr i
+      assert (Smap.mem name.id circuit.b_blocsOutput) ;
+      entrees_blocs.(!i) <-
+        (Smap.find name.id circuit.b_blocsOutput).(index) ;
+      incr i
     | EArray_r (name,min,max) ->
-        for k = min to max do
-          entrees_blocs.(!i) <-
-            (Smap.find name.id circuit.b_blocsOutput).(k) ;
-          incr i
-        done
+      for k = min to max do
+        assert (Smap.mem name.id circuit.b_blocsOutput) ;
+        entrees_blocs.(!i) <-
+          (Smap.find name.id circuit.b_blocsOutput).(k) ;
+        incr i
+      done
     | _ -> raise (Error (x.p,"mauvaise entrée")) 
   in
   begin
@@ -144,6 +153,7 @@ let processBlock gcur circuit blocks =
 let processFirstBlock gcur circuit blocks =
   let gcur = ref gcur in
   let inputs = ref [] in
+  assert (Smap.mem blocks.b_bgate_type circuit.b_gates) ;
   let gate = Smap.find blocks.b_bgate_type circuit.b_gates in
   (* crée un tableau pour les entrées élémentaires du bloc (crée les noeuds qui sont des Inputs) *)
   let entrees_blocs = Array.make gate.ginputsize (-1) in
@@ -155,7 +165,7 @@ let processFirstBlock gcur circuit blocks =
     inputs := !taille :: !inputs;
     incr taille;
   done;
-
+  
   let i = ref 0 in
   (* ajout à l'environnement b_bvertices de tableau de noeuds pour chaque entrée de la porte *)
   let ajoute_tab vertices entree = match entree.typ with
@@ -182,7 +192,9 @@ let processFirstBlock gcur circuit blocks =
 let process circuit =
   let hdAndTl_l = function
     | [] -> raise Not_found
-    | h::t -> h,t
+    | h::t ->
+(*      print_endline h.b_bname ;*)
+      h,t
   in
   let rec last_l = function
     | [] -> raise Not_found
@@ -199,11 +211,12 @@ let process circuit =
     try
       last_l circuit.b_blocks 
     with Not_found -> failwith "Pas de blocs trouvés" in
-    { igraph =
-        List.fold_left (fun gcur -> processBlock gcur circuit)
-          cir
-          t ;
-      iinputs = inputs ;
-      ioutputs = Array.to_list (Smap.find last_bloc.b_bname circuit.b_blocsOutput)
-    }
+  assert (Smap.mem last_bloc.b_bname circuit.b_blocsOutput) ;
+  { igraph =
+      List.fold_left (fun gcur -> processBlock gcur circuit)
+        cir
+        t ;
+    iinputs = inputs ;
+    ioutputs = Array.to_list (Smap.find last_bloc.b_bname circuit.b_blocsOutput)
+  }
 
