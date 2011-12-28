@@ -157,7 +157,3 @@ module Bast = struct
   (* Graphe ne comportant que des noeuds et pas encore les fils qui les relient *)
   }
 end
-    
-      
-  (* fils entre les instances de block, on garde le point de départ (nom du block et numéro de la sortie *)
-  type wire = { block_id : string ; out_id : int }
