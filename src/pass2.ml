@@ -1,9 +1,8 @@
-(* on parcour les blocs et on crée les arrêtes *)
+(* on parcourt les blocs et on crée les arêtes *)
 
 open Ast
 open Ast.Bast
 open Graphe
-(* open Semantic.Exceptions *)
 
 exception Undefined
 exception Error of pos * string
@@ -207,3 +206,4 @@ let process circuit =
       iinputs = inputs ;
       ioutputs = Array.to_list (Smap.find last_bloc.b_bname circuit.b_blocsOutput)
     }
+

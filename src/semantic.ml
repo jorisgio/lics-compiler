@@ -335,7 +335,7 @@ module CircuitToSast = struct
   let pBlock {Past.bname = name ; bgate_type = typ ; binputs = inputs} =
     {Sast.bname = name ;
      bgate_type = typ ;
-     binputs = List.map   pBlockInputs inputs} (* Est-ce la bonne méthode ? *)
+     binputs = List.map   pBlockInputs inputs}
   
   let pCircuit {Past.gates = gates ; blocks = blocks} =
     {Sast.gates = GatesToSast.buildMap (List.map GatesToSast.pGate gates) ; blocks = List.map pBlock blocks}
