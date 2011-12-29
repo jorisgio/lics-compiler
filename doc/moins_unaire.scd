@@ -6,4 +6,8 @@ Minus <-(x)
 ->(y)
 end
 
-Minus b <-()
+<- (x)
+
+Minus b <-(x)
+
+->(b[0])

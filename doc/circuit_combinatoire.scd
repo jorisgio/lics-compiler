@@ -5,4 +5,8 @@ Cir <- (a)
 ->(b,c)
 end
 
-Cir cir <- ()
+<-(a)
+
+Cir cir <- (a)
+
+->(cir[0..1])

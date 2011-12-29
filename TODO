@@ -1,8 +1,5 @@
 * AJOUT DES FOR
 * AJOUT DES SYSCALL / GESTION DE LA RAM
 
-LE PLUS URGENT :
-
-- Gérer les gates qui ont des entrées en sorties (identité).
-
+Amélioration :
 - Ne pas passer en LICS les True et False qui ne servent à rien.

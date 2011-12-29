@@ -73,6 +73,8 @@ module Past = struct
   type circuit = {
     gates : gate list ;
     blocks : block list ;
+    inputs : expr list ;
+    outputs : expr list ;
 }
 
 end
@@ -131,6 +133,8 @@ module Sast = struct
   type circuit = {
     gates : gate Smap.t ;
     blocks : block list ;
+    inputs : expr list ;
+    outputs : expr list ;
 }
 
 end
@@ -150,6 +154,8 @@ module Bast = struct
   type b_circuit = {
     b_gates : gate Smap.t ;
     b_blocks : b_block list;
+    b_inputs : expr list ;
+    b_outputs : expr list ;
     (* map qui à chaque nom de bloc associe un tableau de noeuds 
        l'élément d'index i de ce tableau est le noeud associè  à la iéme sortie du block *)
     b_blocsOutput : (int  array) Smap.t ;

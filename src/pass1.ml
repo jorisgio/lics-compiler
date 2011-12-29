@@ -96,6 +96,11 @@ let pBloc circuit =
   (* On traite tout les blocs du circuit *)
   (* Dans cet ordre, les blocs restent dans le bon ordre *)
   let blockList,graph,wirEnv = List.fold_right blocRec circuit.blocks ([],(graph),(Smap.empty)) in
-  { b_gates = circuit.gates; b_blocks = blockList; b_graphe = graph; b_blocsOutput = wirEnv }
+  { b_gates = circuit.gates;
+    b_blocks = blockList;
+    b_inputs = circuit.inputs ;
+    b_outputs = circuit.outputs ;
+    b_graphe = graph;
+    b_blocsOutput = wirEnv }
 	   
 

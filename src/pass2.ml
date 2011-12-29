@@ -98,22 +98,39 @@ let processInstr gcur index env = function
     processBExpr gcur index env cur.(0) exp
   | _ -> failwith "Not implemented"
 
-let processBlock gcur circuit blocks =
+let processBlock gcur circuit entrees_du_circuit blocks =
   let gate = Smap.find blocks.b_bgate_type circuit.b_gates in
   (* crée un tableau pour les entrées élémentaires du bloc *)
   let entrees_blocs = Array.make gate.ginputsize (-1) in
   let i = ref 0 in
   let rajoute_entree_bloc x = match x.e with
+    | EVar id -> (* alors c'est nécessairement une entrée du circuit *)
+      entrees_blocs.(!i) <- (
+        try
+          Smap.find id.id entrees_du_circuit
+        with Not_found -> raise Undefined
+      ).(0) ;
+      incr i
     | EArray_i (name,index) ->
-      assert (Smap.mem name.id circuit.b_blocsOutput) ;
-      entrees_blocs.(!i) <-
-        (Smap.find name.id circuit.b_blocsOutput).(index) ;
+      entrees_blocs.(!i) <- (
+      try
+        Smap.find name.id circuit.b_blocsOutput
+      with Not_found ->
+        try
+          Smap.find name.id entrees_du_circuit
+        with Not_found -> raise Undefined
+      ).(index) ;
       incr i
     | EArray_r (name,min,max) ->
+      let arr =
+        try
+          Smap.find name.id circuit.b_blocsOutput
+        with Not_found ->
+          try
+            Smap.find name.id entrees_du_circuit
+          with Not_found -> raise Undefined in
       for k = min to max do
-        assert (Smap.mem name.id circuit.b_blocsOutput) ;
-        entrees_blocs.(!i) <-
-          (Smap.find name.id circuit.b_blocsOutput).(k) ;
+        entrees_blocs.(!i) <- arr.(k) ;
         incr i
       done
     | _ -> raise (Error (x.p,"mauvaise entrée")) 
@@ -150,13 +167,86 @@ let processBlock gcur circuit blocks =
      (gcur,index)
     gate.gbody))
 
-let processFirstBlock gcur circuit blocks =
+
+let process circuit =
+
+(* crée un noeud par entrée et les ajoute dans une map, et dans une liste*)
+let createInputNode (gcur,taille,env,acc) expr = match expr.e with
+  | EVar { id = id ; typ = t} -> begin match t with
+      | Bool ->
+        Graphe.setLabel (Graphe.addVertex gcur taille) taille Noeud.Input ,
+        taille + 1 ,
+        Smap.add id (Array.make 1 taille) env,
+        taille::acc
+      | Array n ->
+        let gcur = ref gcur in
+        let taille = ref taille in
+        let acc = ref acc in
+        let arr = Array.make n (-1) in
+        for k = 0 to n - 1 do
+          gcur := Graphe.setLabel (Graphe.addVertex !gcur !taille) !taille Noeud.Input ;
+          acc := !taille :: !acc ;
+          arr.(k) <- !taille ;
+          incr taille ;
+        done;
+        !gcur , !taille , Smap.add id arr env , !acc
+  end
+  | _ -> failwith "Wrong Type"
+in
+
+(* renvoit une liste d'index *)
+let indexOfExpr expr acc =
+  let acc = ref acc in
+  begin
+    match expr.e with
+      | EVar(ident) -> begin
+        try
+          let ar = Smap.find ident.id circuit.b_blocsOutput in
+          for i = (Array.length ar) - 1 downto 0 do 
+            acc := ar.(i) :: !acc
+          done
+        with Not_found -> failwith "Variable de sortie du circuit non définie"
+      end
+      | EArray_i(id,i) -> begin
+        try
+          let ar = Smap.find id.id circuit.b_blocsOutput in
+          acc := ar.(i) :: !acc 
+        with Not_found -> failwith "Variable de sortie du circuit non définie"
+      end
+      | EArray_r(id,i1,i2) -> begin
+        try
+          let ar = Smap.find id.id circuit.b_blocsOutput in
+          for i = i2 downto i1 do 
+	    acc := ar.(i) :: !acc ;
+          done
+        with Not_found -> failwith "Variable de sortie du circuit non définie"
+      end
+  end;
+  !acc
+in
+
+let gcur , _ , inp_map , inp =
+  List.fold_left
+    createInputNode
+    (circuit.b_graphe,Graphe.size circuit.b_graphe,Smap.empty,[])
+    circuit.b_inputs
+in
+  { igraph =
+      List.fold_left (fun gcur -> processBlock gcur circuit inp_map)
+        gcur
+        circuit.b_blocks ;
+    iinputs = inp ;
+    ioutputs = List.fold_right indexOfExpr circuit.b_outputs []
+  }
+
+
+      
+
+(* CODE MORT
+
+
   let gcur = ref gcur in
   let inputs = ref [] in
-  assert (Smap.mem blocks.b_bgate_type circuit.b_gates) ;
-  let gate = Smap.find blocks.b_bgate_type circuit.b_gates in
-  (* crée un tableau pour les entrées élémentaires du bloc (crée les noeuds qui sont des Inputs) *)
-  let entrees_blocs = Array.make gate.ginputsize (-1) in
   let taille = ref (Graphe.size !gcur) in
   for i = 0 to gate.ginputsize - 1 do
     gcur := Graphe.addVertex !gcur !taille ;
@@ -165,6 +255,12 @@ let processFirstBlock gcur circuit blocks =
     inputs := !taille :: !inputs;
     incr taille;
   done;
+
+let processFirstBlock gcur circuit blocks =
+  assert (Smap.mem blocks.b_bgate_type circuit.b_gates) ;
+  let gate = Smap.find blocks.b_bgate_type circuit.b_gates in
+  (* crée un tableau pour les entrées élémentaires du bloc (crée les noeuds qui sont des Inputs) *)
+  let entrees_blocs = Array.make gate.ginputsize (-1) in
   
   let i = ref 0 in
   (* ajout à l'environnement b_bvertices de tableau de noeuds pour chaque entrée de la porte *)
@@ -188,35 +284,4 @@ let processFirstBlock gcur circuit blocks =
      gate.gbody) )
     ,
   List.rev !inputs
-
-let process circuit =
-  let hdAndTl_l = function
-    | [] -> raise Not_found
-    | h::t ->
-(*      print_endline h.b_bname ;*)
-      h,t
-  in
-  let rec last_l = function
-    | [] -> raise Not_found
-    | [a] -> a
-    | h::t -> last_l t
-  in
-  let h,t =
-    try
-      hdAndTl_l circuit.b_blocks
-    with Not_found -> failwith "Pas de blocs trouvés" in
-  let cir, inputs = processFirstBlock circuit.b_graphe circuit h in
-  (*Printf.printf "Nombre d'Inputs = %d\n" (List.length inputs) ;*)
-  let last_bloc = 
-    try
-      last_l circuit.b_blocks 
-    with Not_found -> failwith "Pas de blocs trouvés" in
-  assert (Smap.mem last_bloc.b_bname circuit.b_blocsOutput) ;
-  { igraph =
-      List.fold_left (fun gcur -> processBlock gcur circuit)
-        cir
-        t ;
-    iinputs = inputs ;
-    ioutputs = Array.to_list (Smap.find last_bloc.b_bname circuit.b_blocsOutput)
-  }
-
+*)

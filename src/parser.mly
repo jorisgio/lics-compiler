@@ -35,12 +35,12 @@ let position startpos endpos =
 
 %%
 (* un circuit contient : un block d'entrée, une liste de définition de portes et une liste des blocks *)
-circuit:
-	DEF
-	gate_types = gate*
-        END
-	blocks = block* EOF
-		{ { gates = gate_types ; blocks = blocks } }
+circuit: ;
+  DEF gate_types = gate* END ;
+  IN inp = inp
+    blocks = block* ;
+  OUT LPAREN out = separated_list(COMMA , expr) RPAREN EOF
+    { { gates = gate_types ; blocks = blocks ; inputs = inp ; outputs = out} }
 
 (* une porte est un identifier, une liste d'entrées, une liste d'assignement et une liste de sorties *)
 gate:
@@ -104,11 +104,7 @@ const:
 (*	| LBRACKET l = separated_list(COMMA , BOOL) RBRACKET { Carray (Array.of_list l) } *)
 ;
 
-(* les blocks sont les instanciations des portes, pour construire réelement le circuit *)
+(* les blocks sont les instanciations des portes, pour construire réellement le circuit *)
 block:
     gtype = UIDENT id = IDENT IN 
     LPAREN inp =separated_list(COMMA , expr)  RPAREN { { bname = id; bgate_type = gtype; binputs = inp } }
-(* CODE MORT
-wire:
-    bid = IDENT DOT outid = INT 	{ {block_id = bid; out_id = outid}}
-*)

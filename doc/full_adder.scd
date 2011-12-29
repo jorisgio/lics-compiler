@@ -10,4 +10,8 @@ Adder <-(a,b,c)
 
 end
 
-Adder b <-()
+<-(a,b,c)
+
+Adder b <-(a,b,c)
+
+->(b[0..1])

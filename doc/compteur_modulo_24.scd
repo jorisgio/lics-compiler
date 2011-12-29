@@ -15,17 +15,16 @@ Cm2 <-(a)
         r = a && s;
 ->(s,r)
 
-Output <-(a,b,c,d,e,f)
-->(a,b,c,d,e,f)
-
 end
 
-Cm2 b <-()
+<-(a)
 
-Cm2 c <-(b.1)
+Cm2 b <-(a)
 
-Cm2 d <-(c.1)
+Cm2 c <-(b[1])
 
-Cm3 e <-(c.1)
+Cm2 d <-(c[1])
 
-Output out <-(b.0,c.0,d.0,e.0,e.1,e.2)
+Cm3 e <-(d[1])
+
+->(b[0],c[0],d[0],e[0..2])
