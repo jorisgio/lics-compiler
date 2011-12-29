@@ -12,10 +12,15 @@ open Bast
 let pBloc circuit =
   (* Transforme un bloc. 
      Renvoit un graphe * env * wirEnv *)
+
+  let graph = Graphe.addVertex Graphe.empty 0 in
+  let graph = Graphe.setLabel graph 0 Noeud.True in
+  let graph = Graphe.addVertex graph 1  in
+  let graph = Graphe.setLabel graph 1 Noeud.False in
+  let index = ref 2 in (* prochain indice disponible dans le graphe *)
   let blocRec bloc (accList,graph,wirEnv) = 
     assert (Smap.mem bloc.bgate_type circuit.gates) ;
     let gate = Smap.find bloc.bgate_type circuit.gates in 
-    let index = ref 0 in
     (* crée un noeud pour chaque variable, excepté les entrées. 
        Construit une Map qui à chaque identifiant associe un tableau de noeuds *)
     let createNodes name ident (env,graph) =
@@ -24,10 +29,9 @@ let pBloc circuit =
 	  match ident.typ with
 	    | Bool -> begin
 	      let graph = Graphe.addVertex graph !index in
-	      let ar = Array.make 1 0 in
-	      ar.(0) <- !index ;
+	      let ar = Array.make 1 !index in
               incr index ;
-	      ((Smap.add name  ar env),graph)
+	      ((Smap.add name ar env),graph)
 	    end
 	    | Array s -> begin
 	      let ar = Array.make s 0 in
@@ -43,12 +47,6 @@ let pBloc circuit =
 	end
     in
     (* on définit l'environnement *)
-    let graph = Graphe.addVertex Graphe.empty !index in
-    let graph = Graphe.setLabel graph !index Noeud.True in
-    incr index;
-    let graph = Graphe.addVertex graph !index  in
-    let graph = Graphe.setLabel graph !index Noeud.False in
-    incr index;
     let env = Smap.add "true" [|0|] Smap.empty in
     let env = Smap.add "false" [|1|] env in
     let env,graph = Smap.fold createNodes gate.genv (env,graph)  in
@@ -97,7 +95,7 @@ let pBloc circuit =
   in
   (* On traite tout les blocs du circuit *)
   (* Dans cet ordre, les blocs restent dans le bon ordre *)
-  let blockList,graph,wirEnv = List.fold_right blocRec circuit.blocks ([],(Graphe.empty),(Smap.empty)) in
+  let blockList,graph,wirEnv = List.fold_right blocRec circuit.blocks ([],(graph),(Smap.empty)) in
   { b_gates = circuit.gates; b_blocks = blockList; b_graphe = graph; b_blocsOutput = wirEnv }
 	   
 
