@@ -70,14 +70,14 @@ let pBloc circuit =
               outputsArray.(!ind) <- ar.(i);
 	      incr ind;
 	    done;
-          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : NOT IMPLEMENTED YET"
+          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : interdit" (* à transformer en erreur plus propre *)
         end
 	| EArray_i(id,i) -> begin
           try
 	    let ar = Smap.find id.id env in
 	    outputsArray.(!ind) <- ar.(i) ;
 	    incr ind;
-          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : NOT IMPLEMENTED YET"
+          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : interdit" (* à transformer en erreur plus propre *)
         end
 	| EArray_r(id,i1,i2) -> begin
           try
@@ -86,7 +86,7 @@ let pBloc circuit =
 	      outputsArray.(!ind) <- ar.(i);
 	      incr ind;
 	    done;
-          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : NOT IMPLEMENTED YET"
+          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : interdit" (* à transformer en erreur plus propre *)
         end
     in
     let () = List.iter buildArray gate.goutputs in 
