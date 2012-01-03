@@ -76,6 +76,11 @@ let processBExpr gcur ind env vertex expr  =
 	let gcur = Graphe.setLabel gcur vertex (Noeud.lop_to_label oper) in
 	let gcur = processRec gcur vertex exp1 in
 	processRec gcur vertex exp2
+      | EMux(exp1,exp2,exp3) ->
+	let gcur = Graphe.setLabel gcur vertex Noeud.Mux in
+	let gcur = processRec gcur vertex exp1 in
+	processRec gcur vertex exp2*)
+        failwith "Mux : Not implemented"
       | _ -> failwith "You cannot assign a left value to a left value"
   in
   (g,!index)
@@ -238,50 +243,3 @@ in
     iinputs = inp ;
     ioutputs = List.fold_right indexOfExpr circuit.b_outputs []
   }
-
-
-      
-
-(* CODE MORT
-
-
-  let gcur = ref gcur in
-  let inputs = ref [] in
-  let taille = ref (Graphe.size !gcur) in
-  for i = 0 to gate.ginputsize - 1 do
-    gcur := Graphe.addVertex !gcur !taille ;
-    gcur := Graphe.setLabel !gcur !taille Noeud.Input;
-    entrees_blocs.(i) <- !taille;
-    inputs := !taille :: !inputs;
-    incr taille;
-  done;
-
-let processFirstBlock gcur circuit blocks =
-  assert (Smap.mem blocks.b_bgate_type circuit.b_gates) ;
-  let gate = Smap.find blocks.b_bgate_type circuit.b_gates in
-  (* crée un tableau pour les entrées élémentaires du bloc (crée les noeuds qui sont des Inputs) *)
-  let entrees_blocs = Array.make gate.ginputsize (-1) in
-  
-  let i = ref 0 in
-  (* ajout à l'environnement b_bvertices de tableau de noeuds pour chaque entrée de la porte *)
-  let ajoute_tab vertices entree = match entree.typ with
-    | Bool -> let t = Array.make 1 entrees_blocs.(!i) in
-      incr i ;
-      Smap.add entree.id t vertices
-    | Array n -> let t = Array.make n (-1) in
-      for k = 0 to n - 1 do
-        t.(k) <- entrees_blocs.(!i);
-        incr i
-      done;
-      Smap.add entree.id t vertices
-    | _ -> raise (WrongType ({line = 42; char_b = 42; char_e = 42},Int,Bool))
-  in
-  let env =
-    List.fold_left ajoute_tab blocks.b_bvertices gate.ginputs in
-  (fst (List.fold_left
-     (fun (gcur,index) instr -> processInstr gcur index env instr.i)
-     (!gcur,!taille)
-     gate.gbody) )
-    ,
-  List.rev !inputs
-*)

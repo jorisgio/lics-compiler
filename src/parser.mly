@@ -1,10 +1,7 @@
 %{
 open Ast.Past
 open Lexing
-(* CODE MORT
-let inputToWire b li =
-  List.map (fun i -> { out_id = int_of_string i ; block_id = b}) li
-*)
+
 let position startpos endpos =
     (* actuellement on se prive de certaines infos *)
     { line = startpos.pos_lnum ;

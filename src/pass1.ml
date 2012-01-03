@@ -1,7 +1,7 @@
 (* parcours des blocs pour construire un graphe ne contenant que des noeuds.
    On ajoute un noeud pour chaque variable locale.
    Pour chaque bloc, on construit un environnement qui 
-   à chaque identifiant de vairiable fait correspondre un numéro de noeud 
+   à chaque identifiant de variable fait correspondre un numéro de noeud 
 
    On s'occupe aussi des sorties*)
 open Graphe
@@ -43,7 +43,7 @@ let pBloc circuit =
 	      done ;
 	      ((Smap.add name ar env), !gr)
 	    end
-	    | Int ->failwith "OMG ERROR 42 §"
+	    | Int -> failwith "Int : not implemented"
 	end
     in
     (* on définit l'environnement *)
@@ -70,14 +70,14 @@ let pBloc circuit =
               outputsArray.(!ind) <- ar.(i);
 	      incr ind;
 	    done;
-          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : interdit" (* à transformer en erreur plus propre *)
+          with Not_found -> failwith "Variable non liée utilisée en sortie" (* à transformer en erreur plus propre *)
         end
 	| EArray_i(id,i) -> begin
           try
 	    let ar = Smap.find id.id env in
 	    outputsArray.(!ind) <- ar.(i) ;
 	    incr ind;
-          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : interdit" (* à transformer en erreur plus propre *)
+          with Not_found -> failwith "Variable non liée utilisée en sortie" (* à transformer en erreur plus propre *)
         end
 	| EArray_r(id,i1,i2) -> begin
           try
@@ -86,7 +86,7 @@ let pBloc circuit =
 	      outputsArray.(!ind) <- ar.(i);
 	      incr ind;
 	    done;
-          with Not_found -> failwith "Utilisation de variables d'entrées en sortie : interdit" (* à transformer en erreur plus propre *)
+          with Not_found -> failwith "Variable non liée utilisée en sortie" (* à transformer en erreur plus propre *)
         end
     in
     let () = List.iter buildArray gate.goutputs in 

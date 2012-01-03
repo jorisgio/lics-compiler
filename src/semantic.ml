@@ -132,12 +132,25 @@ module InstrToSast = struct
 	    | Or -> Sast.Bool,Sast.Or
 	    | Xor -> Sast.Bool,Sast.Xor
 	in
-	if e1.Sast.t != ty or e2.Sast.t != ty then
+	if e1.Sast.t != ty then
 	  (raise (WrongType(e1.Sast.p,e1.Sast.t,ty)))
+        else if e2.Sast.t != ty then
+	  (raise (WrongType(e2.Sast.p,e2.Sast.t,ty)))
 	else
 	  ({Sast.p = posToSast exp.p ; Sast.e = Sast.EInfix(si,e1,e2); Sast.t = ty},(undefMap))
-      | EMux(_,_,_) -> failwith "Not implemented"
+      | EMux(ex1,ex2,ex3) ->
+	let e1,undefMap = pExpr env undefMap ex1 in
+	let e2,undefMap = pExpr env undefMap ex2 in
+        let e3,undefMap = pExpr env undefMap ex3 in
 
+	if e1.Sast.t != Sast.Bool then
+	  (raise (WrongType(e1.Sast.p,e1.Sast.t,Sast.Bool)))
+        else if e2.Sast.t != Sast.Bool then
+	  (raise (WrongType(e2.Sast.p,e2.Sast.t,Sast.Bool)))
+	else if e3.Sast.t != Sast.Bool then
+	  (raise (WrongType(e3.Sast.p,e3.Sast.t,Sast.Bool)))
+        else
+          ({Sast.p = posToSast exp.p ; Sast.e = Sast.EMux(e1,e2,e3); Sast.t = Sast.Bool},(undefMap))
 
 
 

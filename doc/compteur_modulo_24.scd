@@ -5,9 +5,9 @@ Cm3 <-(a)
         t1 = reg y;
         t2 = t0 || t1;
         t3 = not t2;
-        x = mux a t0 t3;
-        y = mux a t1 t0;
-->(s,r,t)        
+        x = mux(a, t0, t3);
+        y = mux(a, t1, t0);
+->(t0,t1,t2)        
 
 Cm2 <-(a)
         t0 = a xor s;
