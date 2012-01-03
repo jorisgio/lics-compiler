@@ -7,7 +7,7 @@ Cm3 <-(a)
         t3 = not t2;
         x = mux(a, t0, t3);
         y = mux(a, t1, t0);
-->(t0,t1,t2)        
+->(x,y,t1)        
 
 Cm2 <-(a)
         t0 = a xor s;
