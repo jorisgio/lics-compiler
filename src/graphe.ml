@@ -8,7 +8,7 @@ module Noeud = struct
           | Reg | Input | Inreg
           | Not
           | And | Or | Xor | Nand
-          | Mux of int * int * int
+          | Mux
 
 	(* Une comparaison sur les clés *)
 	let compare = Pervasives.compare
@@ -29,7 +29,7 @@ module Noeud = struct
 	  | Or -> "Or"
 	  | Xor -> "Xor"
 	  | Nand -> "Nand"
-	  | Mux(_,_,_) -> "Mux"	  
+	  | Mux -> "Mux"	  
 end
 
 module Graphe = struct

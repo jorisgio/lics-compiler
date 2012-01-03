@@ -63,7 +63,13 @@ let processBExpr gcur ind env vertex expr  =
       let gcur = Graphe.addEdge gcur !index vertex in
       let gcur = processRec gcur !index exp1 in
       processRec gcur !index exp2
-    | EMux(_,_,_) -> failwith "not implemented"
+    | EMux(exp1,exp2,exp3) ->
+      let gcur = incr index; Graphe.addVertex gcur !index in
+      let gcur = Graphe.setLabel gcur !index Noeud.Mux in
+      let gcur = Graphe.addEdge gcur !index vertex in
+	let gcur = processRec gcur !index exp1 in
+	let gcur = processRec gcur !index exp2 in
+	processRec gcur !index exp3
 
   in
   let g = 
@@ -79,8 +85,8 @@ let processBExpr gcur ind env vertex expr  =
       | EMux(exp1,exp2,exp3) ->
 	let gcur = Graphe.setLabel gcur vertex Noeud.Mux in
 	let gcur = processRec gcur vertex exp1 in
-	processRec gcur vertex exp2*)
-        failwith "Mux : Not implemented"
+	let gcur = processRec gcur vertex exp2 in
+	processRec gcur vertex exp3
       | _ -> failwith "You cannot assign a left value to a left value"
   in
   (g,!index)

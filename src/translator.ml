@@ -70,8 +70,12 @@ nombre d'entrées incorrect pour un opérateur unaire"
             "lics_of_combin_graph:
 nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour " ^ (Noeud.string_of_label op) )
         end
-      | Noeud.Mux (a,b,c) ->
-        Assign (k, Ternaire (Mux, a, b, c))
+      | Noeud.Mux ->
+        try let [a;b;c] = pred.(k) in
+            Assign (k, Ternaire (Mux, a, b, c))
+        with Match_failure _ -> failwith (
+            "lics_of_combin_graph:
+nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour un Mux" )
       | _ -> failwith "lics_of_combin_graph: bad elimination"
   in
   let rec traite_cp typ = function (* typ = input ou output ou inreg ... *)
