@@ -151,6 +151,7 @@ module InstrToSast = struct
 	  (raise (WrongType(e3.Sast.p,e3.Sast.t,Sast.Bool)))
         else
           ({Sast.p = posToSast exp.p ; Sast.e = Sast.EMux(e1,e2,e3); Sast.t = Sast.Bool},(undefMap))
+    
 
 
 
@@ -173,24 +174,8 @@ module InstrToSast = struct
 	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.Assign(id,e)},
 	   (Smap.add id.Sast.id [|1|] undefMap),
 	   (Smap.add id.Sast.id {Sast.id = id.Sast.id; Sast.typ = id.Sast.typ} env ))
-    (*  | For(i,ex1,ex2,li) ->
-	let inst2,undefSet,tmpEnv =
-	  match i.i with
-	    | Assign(id,e) -> if typToSast id.typ != Sast.Int then
-		(raise   (WrongType(posToSast e.p,typToSast id.typ,Sast.Int)))
-	      else
-		pInstr env undefSet i 
-	    | _ -> (raise   (Error(posToSast i.posi,"Wrong instruction")))
-	in
-	let e1,_ = pExpr env undefSet ex1 in
-	let e2,_ =  pExpr env undefSet ex2 in
-	if e1.Sast.t != Sast.Int then (raise (WrongType(e1.Sast.p,e1.Sast.t,Sast.Int))) ;
-	if e2.Sast.t != Sast.Int then (raise (WrongType(e2.Sast.p,e2.Sast.t,Sast.Int))) ;
-	let li,undef,env = pInstrList env undefSet [] li  in
-	if not (Sset.subset undef undefSet) then
-	  (raise (Error({Sast.line = 0; Sast.char_b = 0; Sast.char_e = 0},"Use of unitialised value")))
-	else
-	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.For(inst2,e1,e2,li) },undef,env)*)
+      (*| For(i,ex1,ex2,li) -> *)
+
       | Decl(id) -> 
 	let Array(size) =  id.typ in
 	let ret = ({Sast.posi = posToSast inst.posi; i = Sast.Decl(idToSast id)},
@@ -220,8 +205,6 @@ module InstrToSast = struct
       
 
 end
-
-  
 
 (* Vérifie la sémantique des portes etconstruit une map les contenant toutes *)
 module GatesToSast = struct 
@@ -336,40 +319,8 @@ end
     
 module CircuitToSast = struct
 
-  (* check les expressions en entrée des blocs *)
-  let pInputs expr = match expr.Past.e with
-      | Past.EVar id ->
-        let id = InstrToSast.idToSast id in
-        {
-        Sast.p = InstrToSast.posToSast expr.Past.p ;
-        e = Sast.EVar id;
-        t = id.Sast.typ }
-      | _ -> failwith "WrongType of Input" (* mériterait une vraie erreur *)
-
-  let pBlockInputs  expr = 
-    match expr.Past.e with
-      | Past.EArray_r(name,i1,i2) -> { Sast.p = InstrToSast.posToSast expr.Past.p ; Sast.e =
-	  Sast.EArray_r({Sast.id = name; Sast.typ = Sast.Wire },i1,i2) ; Sast.t = Sast.Array (i2 -i1) }
-      | Past.EArray_i(name,index) -> {Sast.p = InstrToSast.posToSast expr.Past.p ; Sast.e =
-	Sast.EArray_i({Sast.id = name; Sast.typ = Sast.Wire },index) ;  Sast.t = Sast.Bool }
-      | Past.EVar id ->
-        let id = InstrToSast.idToSast id in
-        {
-        Sast.p = InstrToSast.posToSast expr.Past.p ;
-        e = Sast.EVar id;
-        t = id.Sast.typ }
-      | _ -> failwith "WrongType" (* mériterait une vraie erreur *)
-	
-  let pBlock {Past.bname = name ; bgate_type = typ ; binputs = inputs} =
-    {Sast.bname = name ;
-     bgate_type = typ ;
-     binputs = List.map   pBlockInputs inputs}
-  
-  let pCircuit {Past.gates = gates ; blocks = blocks ;
-                inputs = inp ; outputs = out } = {
+  let pCircuit {Past.gates = gates ; } = {
     Sast.gates = GatesToSast.buildMap (List.map GatesToSast.pGate gates) ; 
-    blocks = List.map pBlock blocks ;
-    inputs = List.map pInputs inp ;
-    outputs = List.map pBlockInputs out
   }
+    
 end

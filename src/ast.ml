@@ -1,4 +1,3 @@
-
 module Int = struct
   type t = int
   let compare = Pervasives.compare
@@ -38,6 +37,7 @@ module Past = struct
     | EInfix of infix * expr * expr
     (* Mux *)
     | EMux of expr * expr * expr
+    | ECall of string * expr list
 	
   and expr = { p : pos; e : expression }
       
@@ -45,7 +45,9 @@ module Past = struct
     (* Assigne expr à la valeur gauche ident *)
     | Assign of ident * expr
     (* Assigne expr à la case int du tableau string *)
-    | Assign_i of string * int * expr      
+    | Assign_i of string * int * expr
+    (* Assigne expr au sous tableau *)
+    | Assign_r of string * int * int * expr
     (* Boucle For *)
     | For of instr * expr * expr * instr list 
     (* Déclare un tabeleau ou un entier *)
@@ -63,20 +65,10 @@ module Past = struct
     goutputs : expr list;
   }
     
-  type block = {
-    bname : string; 
-    bgate_type : string; (* type de la porte *)
-    binputs : expr list;
-}
-
-(* circuit *)
+  (* circuit *)
   type circuit = {
-    gates : gate list ;
-    blocks : block list ;
-    inputs : expr list ;
-    outputs : expr list ;
-}
-
+    gates : gate list ;   }
+      
 end
 
 module Sast = struct 
@@ -91,6 +83,7 @@ module Sast = struct
 	   
   type ident = { id : string; typ : types }
 
+ 
   and  expression = 
     | EBconst of bool
     | EIconst of int
@@ -100,17 +93,18 @@ module Sast = struct
     | EPrefix of prefix * expr
     | EInfix of infix * expr * expr
     | EMux of expr * expr * expr
+    | ECall of string * expr list 
 	
   and expr = { p : pos; e : expression ; t : types }
 	
   type instruction = 
     | Assign of ident * expr
     | Assign_i of ident * int * expr
-    | For of ident * expr * expr * instr list 
+    | Assign_r of ident * int * int * expr
+    | For of (ident Smap.t) * ident * int * int * instr list 
     | Decl of ident
   
   and  instr =  { posi : pos; i : instruction }
-
       
   type gate = {
     gname : string ;
@@ -123,43 +117,10 @@ module Sast = struct
     ginputsize : int;
   }
     
-  type block = {
-    bname : string; 
-    bgate_type : string; (* type de la porte *)
-    binputs : expr list;
-}
 
 (* circuit *)
   type circuit = {
-    gates : gate Smap.t ;
-    blocks : block list ;
-    inputs : expr list ;
-    outputs : expr list ;
-}
-
+    gates : gate Smap.t ;}
 end
 
-(* Ast partiel obtenu après première passe et traitement des blocs *)
 
-module Bast = struct
-  include(Sast)
-  type b_block = {
-    b_bname : string ;
-    b_bgate_type : string ;
-    b_binputs : expr list;
-    (* map qui à chaque ident associe un tableau de noeuds *)
-    b_bvertices : (int array) Smap.t;
-  }
-
-  type b_circuit = {
-    b_gates : gate Smap.t ;
-    b_blocks : b_block list;
-    b_inputs : expr list ;
-    b_outputs : expr list ;
-    (* map qui à chaque nom de bloc associe un tableau de noeuds 
-       l'élément d'index i de ce tableau est le noeud associè  à la iéme sortie du block *)
-    b_blocsOutput : (int  array) Smap.t ;
-    b_graphe : Graphe.Graphe.t ;
-  (* Graphe ne comportant que des noeuds et pas encore les fils qui les relient *)
-  }
-end
