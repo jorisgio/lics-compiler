@@ -151,6 +151,11 @@ module InstrToSast = struct
 	  (raise (WrongType(e3.Sast.p,e3.Sast.t,Sast.Bool)))
         else
           ({Sast.p = posToSast exp.p ; Sast.e = Sast.EMux(e1,e2,e3); Sast.t = Sast.Bool},(undefMap))
+      | ECall(name,args) ->
+	let el,undefMap = List.fold_right (fun exp (el,undefMap) -> 
+	  let e,undefMap = pExpr env undefMap exp in
+	  ((e::el),undefMap) ) args ([],undefMap)  in
+	  ({Sast.p = posToSast exp.p; Sast.e = Sast.ECall(name,el); Sast.t = Sast.Array(List.length el) },(undefMap))
     
 
 
@@ -194,6 +199,20 @@ module InstrToSast = struct
 	  (raise   (WrongType(e.Sast.p,e.Sast.t,Sast.Bool)))
 	else 
 	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.Assign_i(id,index,e)},
+	   (Smap.add name ar undefMap),
+	   (Smap.add id.Sast.id {Sast.id = id.Sast.id; Sast.typ = id.Sast.typ} env ))
+      | Assign_r(name, i1, i2, exp) ->
+	let  e,undefMap = pExpr env undefMap exp in
+	assert (Smap.mem name env);
+	let id = Smap.find name env in
+	let ar = Smap.find name undefMap in
+	for k = i1 to i2 do
+	  ar.(k) <- 1
+	done ;
+	(* problème if e.Sast.t != Sast.Array (i2 - i1) then 
+	  (raise (WrongType(e.Sast.p,e.Sast.t,Sast.Array(i2 -i1))))
+	else *)
+	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.Assign_r(id,i1,i2,e)},
 	   (Smap.add name ar undefMap),
 	   (Smap.add id.Sast.id {Sast.id = id.Sast.id; Sast.typ = id.Sast.typ} env ))
 	    
@@ -263,8 +282,9 @@ module GatesToSast = struct
        expr : l'expression 
        Renvoit :
        accList * accSize*)
-    let checkOutputs (expr : Past.expr) (accList,size) =
-      let expr,_ = InstrToSast.pExpr Smap.empty Smap.empty expr in
+    let checkOutputs env undef (expr : Past.expr) (accList,size) =
+
+      let expr,_ = InstrToSast.pExpr env  undef expr in
       match expr.e with
 	| EVar(ident) -> 
 	  let incr = match ident.typ with
@@ -279,7 +299,7 @@ module GatesToSast = struct
 	  (expr::accList,(size + 1))
 	| _ -> (raise  (Error(expr.p,"Not a left value")))
     in
-    let outputs,size = List.fold_right checkOutputs gate.Past.goutputs ([],0) in
+
     (* création d'un env contenant toutes les entrées *)
     let env = List.fold_left (fun env id -> Smap.add id.id id env)  Smap.empty  inputs in
     (* on ajoute  les entrées au undefMap *)
@@ -300,7 +320,8 @@ module GatesToSast = struct
 	if ar.(i) > 1 then (raise (Undefined)) ;
       done ;
     ) undefMap 
-    in	  
+    in
+    let outputs,size = List.fold_right (checkOutputs env undefMap) gate.Past.goutputs ([],0) in
     { gname = gate.Past.gname; genv = env ; ginputs = inputs ; gbody = body; goutputs = outputs ; goutputsize = size ; ginputsize = !inputsize }
 
 

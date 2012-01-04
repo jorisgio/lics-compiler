@@ -79,9 +79,9 @@ let igraph =
   deb "Done.\n";
   (*if !debug then
     begin
-      deb "INFO : Enregistrement du graphe dans graph.debug\n";
-      let f = open_out "graph.debug" in
-      Graphe.drawGraph cir.Ast.Sast.b_graphe f;
+      deb "INFO : Enregistrement du graphe dans graph1.debug\n";
+      let f = open_out "graph1.debug" in
+      Graphe.drawGraph g f;
       close_out f
     end ; *)
   g
@@ -92,8 +92,8 @@ let combinatoire =
   let g = Cycles.processRegs igraph in 
   deb "Done.\n" ;
   begin
-    deb "INFO : Enregistrement du graphe dans graph3.debug\n";
-    let f = open_out "graph3.debug" in
+    deb "INFO : Enregistrement du graphe dans graph2.debug\n";
+    let f = open_out "graph2.debug" in
     Graphe.drawGraph g.cgraph f;
     close_out f
   end ;
