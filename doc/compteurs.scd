@@ -18,11 +18,17 @@ Cm30 <-(a)
      x = s1 && (ns2 && (s3 && (s4 && s5)));
      y = not x;
 
-     s1 = reg t1;
-     s2 = reg t2;
-     s3 = reg t3;
-     s4 = reg t4;
-     s5 = reg t5;
+     tt1 = reg t1;
+     tt2 = reg t2;
+     tt3 = reg t3;
+     tt4 = reg t4;
+     tt5 = reg t5;
+
+     s1 = tt1 & y;
+     s2 = tt2 & y;
+     s3 = tt3 & y;
+     s4 = tt4 & y;
+     s5 = tt4 & y;
 
      r = a && x;
 ->(s1,s2,s3,s4,s5,r)     
