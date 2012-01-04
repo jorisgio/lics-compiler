@@ -1,13 +1,20 @@
 def
 
 Cm3 <-(a)
-        t0 = reg x;
-        t1 = reg y;
-        t2 = t0 || t1;
-        t3 = not t2;
-        x = mux(a, t0, t3);
-        y = mux(a, t1, t0);
-->(x,y,t1)        
+        b = not a;
+
+        x = reg t0;
+        c = not x ;
+
+        y = reg t1;
+        d = not y;
+        
+        t2 = (c and d) and a ;
+        t3 = b and x ;
+        t0 = t2 or t3;
+        t1 = (a and x) or (b and y);
+        z = y and a;
+->(x,y,z)
 
 Cm2 <-(a)
         t0 = a xor s;

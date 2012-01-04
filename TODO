@@ -3,3 +3,8 @@
 
 Amélioration :
 - Ne pas passer en LICS les True et False qui ne servent à rien.
+
+Grosses erreurs dans le compilo :
+le mux en fait est mal implémenté ( :-( dsl )
+problème avec les not et les reg (avec des grosses expressions -voir test :
+plante.scd )
