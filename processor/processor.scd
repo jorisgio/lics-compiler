@@ -36,7 +36,13 @@ Datapath <- (regwrite, alusrc, alucontrol[6], branch, regdst)
          alucontrol[0..5]);
 
          /* calcul de l'adresse de l'instruction suivante */
-         
+
+         /* par défaut c'est zéro */
+         array quatre[32];
+         quatre[5] = TRUE;
+
+         array addressplus[32];
+         addressplus[0..31] = Fulladder(quatre[0..31], pc[0..31]);
 
 -> (zero[0], instr[0..5], instr[26..31])
 
