@@ -1,5 +1,3 @@
-def
-
 Cm3 <-(a)
         b = not a;
 
@@ -22,16 +20,18 @@ Cm2 <-(a)
         r = a && s;
 ->(s,r)
 
-end
+Start <-(a)
 
-<-(a)
+      array b[2];
+      b[0..1] = Cm2 <-(a);
 
-Cm2 b <-(a)
+      array c[2];
+      c[0..1] = Cm2 <-(b[1]);
 
-Cm2 c <-(b[1])
+      array d[2];
+      d[0..1] = Cm2 <-(c[1]);
 
-Cm2 d <-(c[1])
-
-Cm3 e <-(d[1])
+      array e[3];
+      e[0..2] = Cm3 <-(d[1]);
 
 ->(b[0],c[0],d[0],e[0..2])

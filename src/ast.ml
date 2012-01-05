@@ -26,9 +26,9 @@ module Past = struct
     | EBconst of bool
     | EIconst of int
     (* Élément i du tableau ident *)
-    | EArray_i of string * int
+    | EArray_i of string * expr
     (* Sous tableau du tableau ident *)
-    | EArray_r of string * int * int
+    | EArray_r of string * expr * expr
     (* valeur gauche *)
     | EVar of ident
     (* opérateur préfixe *)
@@ -45,9 +45,9 @@ module Past = struct
     (* Assigne expr à la valeur gauche ident *)
     | Assign of ident * expr
     (* Assigne expr à la case int du tableau string *)
-    | Assign_i of string * int * expr
+    | Assign_i of string * expr * expr
     (* Assigne expr au sous tableau *)
-    | Assign_r of string * int * int * expr
+    | Assign_r of string * expr * expr * expr
     (* Boucle For *)
     | For of instr * expr * expr * instr list 
     (* Déclare un tabeleau ou un entier *)
@@ -73,7 +73,7 @@ end
 
 module Sast = struct 
 (* expressions entières *) 
-  type infix = Add | Sub | Mul  | Div |  And | Or | Xor
+  type infix = Add | Sub | Mul | Div | And | Or | Xor
 
   type prefix = Not | Reg | Minus
    
@@ -87,8 +87,8 @@ module Sast = struct
   and  expression = 
     | EBconst of bool
     | EIconst of int
-    | EArray_i of ident * int
-    | EArray_r of ident * int * int
+    | EArray_i of ident * expr
+    | EArray_r of ident * expr * expr
     | EVar of ident
     | EPrefix of prefix * expr
     | EInfix of infix * expr * expr
@@ -99,8 +99,8 @@ module Sast = struct
 	
   type instruction = 
     | Assign of ident * expr
-    | Assign_i of ident * int * expr
-    | Assign_r of ident * int * int * expr
+    | Assign_i of ident * expr * expr
+    | Assign_r of ident * expr * expr * expr
     | For of (ident Smap.t) * ident * int * int * instr list 
     | Decl of ident
   
