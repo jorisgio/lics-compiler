@@ -151,6 +151,12 @@ module InstrToSast = struct
 	  (raise (WrongType(e3.Sast.p,e3.Sast.t,Sast.Bool)))
         else
           ({Sast.p = posToSast exp.p ; Sast.e = Sast.EMux(e1,e2,e3); Sast.t = Sast.Bool},(undefMap))
+      | ECall(name,args) ->
+	let el,undefMap = List.fold_right (fun exp (el,undefMap) -> 
+	  let e,undefMap = pExpr env undefMap exp in
+	  ((e::el),undefMap) ) args ([],undefMap)  in
+	  ({Sast.p = posToSast exp.p; Sast.e = Sast.ECall(name,el); Sast.t = Sast.Array(List.length el) },(undefMap))
+    
 
 
 
@@ -173,24 +179,8 @@ module InstrToSast = struct
 	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.Assign(id,e)},
 	   (Smap.add id.Sast.id [|1|] undefMap),
 	   (Smap.add id.Sast.id {Sast.id = id.Sast.id; Sast.typ = id.Sast.typ} env ))
-    (*  | For(i,ex1,ex2,li) ->
-	let inst2,undefSet,tmpEnv =
-	  match i.i with
-	    | Assign(id,e) -> if typToSast id.typ != Sast.Int then
-		(raise   (WrongType(posToSast e.p,typToSast id.typ,Sast.Int)))
-	      else
-		pInstr env undefSet i 
-	    | _ -> (raise   (Error(posToSast i.posi,"Wrong instruction")))
-	in
-	let e1,_ = pExpr env undefSet ex1 in
-	let e2,_ =  pExpr env undefSet ex2 in
-	if e1.Sast.t != Sast.Int then (raise (WrongType(e1.Sast.p,e1.Sast.t,Sast.Int))) ;
-	if e2.Sast.t != Sast.Int then (raise (WrongType(e2.Sast.p,e2.Sast.t,Sast.Int))) ;
-	let li,undef,env = pInstrList env undefSet [] li  in
-	if not (Sset.subset undef undefSet) then
-	  (raise (Error({Sast.line = 0; Sast.char_b = 0; Sast.char_e = 0},"Use of unitialised value")))
-	else
-	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.For(inst2,e1,e2,li) },undef,env)*)
+      (*| For(i,ex1,ex2,li) -> *)
+
       | Decl(id) -> 
 	let Array(size) =  id.typ in
 	let ret = ({Sast.posi = posToSast inst.posi; i = Sast.Decl(idToSast id)},
@@ -211,6 +201,20 @@ module InstrToSast = struct
 	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.Assign_i(id,index,e)},
 	   (Smap.add name ar undefMap),
 	   (Smap.add id.Sast.id {Sast.id = id.Sast.id; Sast.typ = id.Sast.typ} env ))
+      | Assign_r(name, i1, i2, exp) ->
+	let  e,undefMap = pExpr env undefMap exp in
+	assert (Smap.mem name env);
+	let id = Smap.find name env in
+	let ar = Smap.find name undefMap in
+	for k = i1 to i2 do
+	  ar.(k) <- 1
+	done ;
+	(* problème if e.Sast.t != Sast.Array (i2 - i1) then 
+	  (raise (WrongType(e.Sast.p,e.Sast.t,Sast.Array(i2 -i1))))
+	else *)
+	  ({Sast.posi = posToSast inst.posi; Sast.i = Sast.Assign_r(id,i1,i2,e)},
+	   (Smap.add name ar undefMap),
+	   (Smap.add id.Sast.id {Sast.id = id.Sast.id; Sast.typ = id.Sast.typ} env ))
 	    
   and pInstrList env undefSet acc = function
   | [] -> (List.rev acc),undefSet,env
@@ -220,8 +224,6 @@ module InstrToSast = struct
       
 
 end
-
-  
 
 (* Vérifie la sémantique des portes etconstruit une map les contenant toutes *)
 module GatesToSast = struct 
@@ -280,8 +282,9 @@ module GatesToSast = struct
        expr : l'expression 
        Renvoit :
        accList * accSize*)
-    let checkOutputs (expr : Past.expr) (accList,size) =
-      let expr,_ = InstrToSast.pExpr Smap.empty Smap.empty expr in
+    let checkOutputs env undef (expr : Past.expr) (accList,size) =
+
+      let expr,_ = InstrToSast.pExpr env  undef expr in
       match expr.e with
 	| EVar(ident) -> 
 	  let incr = match ident.typ with
@@ -296,7 +299,7 @@ module GatesToSast = struct
 	  (expr::accList,(size + 1))
 	| _ -> (raise  (Error(expr.p,"Not a left value")))
     in
-    let outputs,size = List.fold_right checkOutputs gate.Past.goutputs ([],0) in
+
     (* création d'un env contenant toutes les entrées *)
     let env = List.fold_left (fun env id -> Smap.add id.id id env)  Smap.empty  inputs in
     (* on ajoute  les entrées au undefMap *)
@@ -317,7 +320,8 @@ module GatesToSast = struct
 	if ar.(i) > 1 then (raise (Undefined)) ;
       done ;
     ) undefMap 
-    in	  
+    in
+    let outputs,size = List.fold_right (checkOutputs env undefMap) gate.Past.goutputs ([],0) in
     { gname = gate.Past.gname; genv = env ; ginputs = inputs ; gbody = body; goutputs = outputs ; goutputsize = size ; ginputsize = !inputsize }
 
 
@@ -336,40 +340,8 @@ end
     
 module CircuitToSast = struct
 
-  (* check les expressions en entrée des blocs *)
-  let pInputs expr = match expr.Past.e with
-      | Past.EVar id ->
-        let id = InstrToSast.idToSast id in
-        {
-        Sast.p = InstrToSast.posToSast expr.Past.p ;
-        e = Sast.EVar id;
-        t = id.Sast.typ }
-      | _ -> failwith "WrongType of Input" (* mériterait une vraie erreur *)
-
-  let pBlockInputs  expr = 
-    match expr.Past.e with
-      | Past.EArray_r(name,i1,i2) -> { Sast.p = InstrToSast.posToSast expr.Past.p ; Sast.e =
-	  Sast.EArray_r({Sast.id = name; Sast.typ = Sast.Wire },i1,i2) ; Sast.t = Sast.Array (i2 -i1) }
-      | Past.EArray_i(name,index) -> {Sast.p = InstrToSast.posToSast expr.Past.p ; Sast.e =
-	Sast.EArray_i({Sast.id = name; Sast.typ = Sast.Wire },index) ;  Sast.t = Sast.Bool }
-      | Past.EVar id ->
-        let id = InstrToSast.idToSast id in
-        {
-        Sast.p = InstrToSast.posToSast expr.Past.p ;
-        e = Sast.EVar id;
-        t = id.Sast.typ }
-      | _ -> failwith "WrongType" (* mériterait une vraie erreur *)
-	
-  let pBlock {Past.bname = name ; bgate_type = typ ; binputs = inputs} =
-    {Sast.bname = name ;
-     bgate_type = typ ;
-     binputs = List.map   pBlockInputs inputs}
-  
-  let pCircuit {Past.gates = gates ; blocks = blocks ;
-                inputs = inp ; outputs = out } = {
+  let pCircuit {Past.gates = gates ; } = {
     Sast.gates = GatesToSast.buildMap (List.map GatesToSast.pGate gates) ; 
-    blocks = List.map pBlock blocks ;
-    inputs = List.map pInputs inp ;
-    outputs = List.map pBlockInputs out
   }
+    
 end
