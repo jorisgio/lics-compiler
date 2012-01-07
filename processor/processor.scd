@@ -42,7 +42,21 @@ Datapath <- (regwrite, alusrc, alucontrol[6], branch, regdst)
          quatre[5] = TRUE;
 
          array addressplus[32];
-         addressplus[0..31] = Fulladder(quatre[0..31], pc[0..31]);
+         addressplus[0..31] = Fulladder <- (quatre[0..31], pc[0..31]);
+
+         array sign_extend[32];
+         for(i,0,15) {
+                     sign_extend[i] = instr[i];
+         }
+         for(i,16,31) {
+                      sign_extend[i] = instr[15];
+         }
+
+         array branch[32];
+         branch([0..31]) = Fulladder <-
+         (addressplus[0..31],sign_extend[32]);
+
+         pc = MUX(zero[0],branch[0..31],addressplus[0..31]);
 
 -> (zero[0], instr[0..5], instr[26..31])
 
