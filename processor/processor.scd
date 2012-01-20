@@ -56,6 +56,9 @@ Datapath <- (regwrite, alusrc, alucontrol[6], branch, regdst)
          branch([0..31]) = Fulladder <-
          (addressplus[0..31],sign_extend[32]);
 
+         array zero[1];
+         zero[0] = Zero <- (alu[32]);
+
          pc = MUX(zero[0],branch[0..31],addressplus[0..31]);
 
 -> (zero[0], instr[0..5], instr[26..31])
