@@ -77,13 +77,13 @@ let igraph =
 
   let g = Buildgraph.pCircuit circuit in
   deb "Done.\n";
-  (*if !debug then
+  if !debug then
     begin
       deb "INFO : Enregistrement du graphe dans graph1.debug\n";
       let f = open_out "graph1.debug" in
-      Graphe.drawGraph g f;
+      Graphe.drawGraph g.igraph f;
       close_out f
-    end ; *)
+    end ;
   g
 
 (* Suppression des registres *)

@@ -51,7 +51,7 @@ module Past = struct
     (* Assigne expr au sous tableau *)
     | Assign_r of string * expr * expr * expr
     (* Boucle For *)
-    | For of instr * expr * expr * instr list 
+    | For of string * int * int * instr list 
     (* Déclare un tabeleau ou un entier *)
     | Decl of ident
 	
@@ -103,7 +103,7 @@ module Sast = struct
     | Assign of ident * expr
     | Assign_i of ident * expr * expr
     | Assign_r of ident * expr * expr * expr
-    | For of (ident Smap.t) * ident * int * int * instr list 
+    | For of (ident Smap.t) * (int Smap.t) * string * int * int * instr list 
     | Decl of ident
   
   and  instr =  { posi : pos; i : instruction }
@@ -111,6 +111,7 @@ module Sast = struct
   type gate = {
     gname : string ;
     genv : ident Smap.t;
+    gintEnv : int Smap.t; 
     ginputs : ident list;
     gbody : instr list ;
     goutputs : expr list;

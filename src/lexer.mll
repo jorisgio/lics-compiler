@@ -7,7 +7,7 @@ exception Lexer_error of string
 (* attention, tout les mots clés sont en minuscule ! *)
 let kwd_tbl = 
         [ "and", AND; "nand", NAND; "or", OR; "xor", XOR; "not", NOT;
-	       "mux", MUX; "reg", REG; "array", ARRAY;
+	       "mux", MUX; "reg", REG; "array", ARRAY; "for", FOR; 
                ]
                
 
@@ -56,7 +56,9 @@ rule token = parse
         | "&&"    { AND }
         | "||"    { OR }
         | "->"    { OUT }
-        | "<-"    { IN }
+        | "<-"    { IN  }
+	| '{'     { BBLOCK }
+	| '}'     { EBLOCK }
         | "(*"    { comment lexbuf }
         | eof     { EOF }
         | _ as c  { raise (Lexer_error ("Illegal character " ^ String.make 1 c)) }
