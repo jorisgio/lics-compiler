@@ -70,10 +70,10 @@ nombre d'entrées incorrect pour un opérateur unaire"
             "lics_of_combin_graph:
 nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour " ^ (Noeud.string_of_label op) )
         end
-      | Noeud.Mux ->
-        try let [a;b;c] = pred.(k) in
+      | Noeud.Mux (a, b, c) ->
+        if List.length pred.(k) = 3 then
             Assign (k, Ternaire (Mux, a, b, c))
-        with Match_failure _ -> failwith (
+        else failwith (
             "lics_of_combin_graph:
 nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour un Mux" )
       | _ -> failwith "lics_of_combin_graph: bad elimination"
