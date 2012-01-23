@@ -64,7 +64,7 @@ statement:
     | ARRAY id = IDENT LBRACKET n = INT RBRACKET  SEMICOLON { {posi = position $startpos $endpos; i= Decl({id = id ; typ = Array n})}}    (* déclare un tableau *)
     | id = IDENT LBRACKET i1 = expr DOTDOT  i2 = expr RBRACKET EQUAL e = expr SEMICOLON{ {posi = position $startpos $endpos; i=Assign_r(id, i1, i2, e)}}
     | FOR LPAREN s = IDENT COMMA i = INT COMMA i2 = INT RPAREN BBLOCK li = statement* EBLOCK {{posi = position $startpos $endpos; i = For(s,i,i2,li)}}
-    | id = IDENT LBRACKET i1 = INT DOTDOT i2 = INT RBRACKET EQUAL LW LPAREN id_a = IDENT LBRACKET i1_a = INT DOTDOT i2_a = INT RBRACKET RPAREN { { posi = position $startpos $endpos ; i = Lw (id, i1, i2, id_a, i1_a, i2_a) } }
+    | id = IDENT LBRACKET i1 = INT DOTDOT i2 = INT RBRACKET EQUAL LW LPAREN id_a = IDENT LBRACKET i1_a = INT DOTDOT i2_a = INT RBRACKET RPAREN SEMICOLON { { posi = position $startpos $endpos ; i = Lw (id, i1, i2, id_a, i1_a, i2_a) } }
 
 	
 expr:

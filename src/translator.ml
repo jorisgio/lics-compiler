@@ -36,24 +36,32 @@ let lics_of_combin_graph g n = (* n = max_clé + 1 *)
       if v = Noeud.Inreg || v = Noeud.Input
       then elimine t
       else h:: elimine t in
+  let rec supprNone = function
+    | [] -> []
+    | Some h :: t -> h :: supprNone t
+    | None :: t -> supprNone t
+  in
   let translate k =
     let v = Graphe.find g.cgraph k in
     Vertex.iterSucc (function x -> pred.(x) <- k::pred.(x)) v ;
     match Vertex.getLabel v with
-      | Noeud.Empty | Noeud.Reg ->
+      | Noeud.Empty -> (* c'est un noeud qui ne représente pas une porte logique
+                          mais qui peut être la sortie d'un autre noeud *)
+        None (* pas de traitement particulier *)
+      | Noeud.Reg ->
         failwith "lics_of_combin_graph: Noeud vide ou reg"
       | Noeud.True ->
-        if pred.(k) = [] then Assign (k, Const true)
+        if pred.(k) = [] then Some (Assign (k, Const true))
         else failwith "lics_of_combin_graph:
 nombre d'entrées incorrect pour une constante"
       | Noeud.False ->
-        if pred.(k) = [] then Assign (k, Const false)
+        if pred.(k) = [] then Some (Assign (k, Const false))
         else failwith "lics_of_combin_graph:
 nombre d'entrées incorrect pour une constante"
       | Noeud.Not ->
         begin
           try let [i] = pred.(k) in
-              Assign (k, Unaire (Not, i))
+              Some (Assign (k, Unaire (Not, i)))
           with Match_failure _ -> failwith
             "lics_of_combin_graph:
 nombre d'entrées incorrect pour un opérateur unaire"
@@ -66,19 +74,19 @@ nombre d'entrées incorrect pour un opérateur unaire"
         in
         begin
           try let [i;j] = pred.(k) in
-              Assign (k, Binaire (tr_op op, i, j))
+              Some (Assign (k, Binaire (tr_op op, i, j)))
           with Match_failure _ -> failwith (
             "lics_of_combin_graph:
 nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour " ^ (Noeud.string_of_label op) )
         end
       | Noeud.Mux (a, b, c) ->
         if List.length pred.(k) = 3 then
-            Assign (k, Ternaire (Mux, a, b, c))
+            Some (Assign (k, Ternaire (Mux, a, b, c)))
         else failwith (
             "lics_of_combin_graph:
 nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour un Mux" )
       | Noeud.Lw (sorties, adresse) ->
-        Lw (sorties, adresse)
+        Some (Lw (sorties, adresse))
       | _ -> failwith "lics_of_combin_graph: bad elimination"
   in
   let rec traite_cp typ = function (* typ = input ou output ou inreg ... *)
@@ -96,7 +104,7 @@ nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour
   in
   let l = traite_cp "input" g.cinputs in
   let l = l @ traite_cp "inreg" g.cinregs in
-  let l = l @ List.map translate (elimine sorted_keys) in
+  let l = l @ supprNone (List.map translate (elimine sorted_keys)) in
   let l = l @ traite_cp "output" g.coutputs in
   let l = l @ traite_cp "outreg" g.coutregs in
   l
