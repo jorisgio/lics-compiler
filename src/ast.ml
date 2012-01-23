@@ -38,6 +38,8 @@ module Past = struct
     (* Mux *)
     | EMux of expr * expr * expr
     | ECall of string * expr list
+    (* Rw *)
+    | ERw of expr list
 	
   and expr = { p : pos; e : expression }
       
