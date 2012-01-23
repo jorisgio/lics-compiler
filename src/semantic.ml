@@ -303,7 +303,7 @@ module GatesToSast = struct
 	| EArray_r(ident,i1,i2) -> 
 	  let Sast.EIconst i1 = i1.Sast.e in
 	  let Sast.EIconst i2 = i2.Sast.e in
-	  (expr::accList,(size + (i2 -i1 )))
+	  (expr::accList,(size + (i2 -i1 + 1)))
 	| EArray_i(ident,i) ->
 	  let Sast.EIconst i = i.Sast.e in
 	  (expr::accList,(size + 1))
