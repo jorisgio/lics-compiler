@@ -175,11 +175,17 @@ let pCircuit circuit =
 	  processRec gcur !index exp2
 	| EMux(exp1,exp2,exp3) ->
 	  let gcur = incr index; Graphe.addVertex gcur !index in
-	  let gcur = Graphe.setLabel gcur !index Noeud.Mux in
-	  let gcur = Graphe.addEdge gcur !index vertex in
+          let i = !index in
+          (* on est obligé de créer d'abord les noeuds parents pour pouvoir en
+             conserver leur indice dans l'étiquette de Mux *)
 	  let gcur = processRec gcur !index exp1 in
+          let i2 = !index in
 	  let gcur = processRec gcur !index exp2 in
-	  processRec gcur !index exp3
+          let i3 = !index in
+	  let gcur = processRec gcur !index exp3 in
+	  let gcur = Graphe.setLabel gcur i (Noeud.Mux (i + 1, i2 + 1, i3 + 1) )
+          in (* les noeuds des parents de Mux *)
+	  Graphe.addEdge gcur i vertex in
 
     in
     let g = 
@@ -193,11 +199,17 @@ let pCircuit circuit =
 	  let gcur = processRec gcur vertex.(0) exp1 in
 	  processRec gcur vertex.(0) exp2
 	| EMux(exp1,exp2,exp3) ->
-	  let gcur = Graphe.setLabel gcur vertex.(0) Noeud.Mux in
+          (* on est obligé de créer d'abord les noeuds parents pour pouvoir en
+             conserver leur indice dans l'étiquette de Mux *)
+          let i1 = !index in
 	  let gcur = processRec gcur vertex.(0) exp1 in
+          let i2 = !index in
 	  let gcur = processRec gcur vertex.(0) exp2 in
-	  processRec gcur vertex.(0) exp3
-      (* là c'est plus compliqué, on descend dans une autre frame *)
+          let i3 = !index in
+	  let gcur = processRec gcur vertex.(0) exp3 in
+	  let gcur = Graphe.setLabel gcur
+            vertex.(0) (Noeud.Mux (i1 + 1, i2 + 1, i3 + 1) ) in
+        (* là c'est plus compliqué, on descend dans une autre frame *)
 	| ECall(gatename,args) ->
 	  begin
 	    let callgate = 
