@@ -100,7 +100,9 @@ let pCircuit circuit =
 	let i2 = eval intEnv i2 in
 	try
 	  let ar = Smap.find id.id env in
-	  for i = i1 to i2 do 
+	  for i = i1 to i2 do
+            assert (!ind < Array.length ioArray);
+            assert (i < Array.length ar);
 	    ioArray.(!ind) <- ar.(i);
 	    incr ind;
 	  done;
@@ -458,6 +460,7 @@ let pCircuit circuit =
   let env,graph = pLevel env graph "Start" in
   (* on s'occupe maintenant des sorties *)
   i := 0;
+  (* print_int start.goutputsize ;*)
   let ar = Array.make (start.goutputsize) 0 in
   List.iter (buildArray ar i start.gintEnv env) start.goutputs;
   let oList = Array.to_list ar in
