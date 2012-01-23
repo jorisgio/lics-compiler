@@ -368,5 +368,22 @@ Le microprocesseur est largement inspiré d'un microprocesseur MIPS mais
  de la montre.
 \end_layout
 
+\begin_layout Standard
+L'ALU calcule l'addition, la soustraction, les tests de comparaison et les
+ opérations logiques bit à bit.
+\end_layout
+
+\begin_layout Standard
+Les instructions sont chargées depuis la ROM à partir de l'adresse 0.
+\end_layout
+
+\begin_layout Section
+Le programme de la montre
+\end_layout
+
+\begin_layout Standard
+___
+\end_layout
+
 \end_body
 \end_document
