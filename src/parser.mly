@@ -22,7 +22,7 @@ let position startpos endpos =
 
 %nonassoc NOT REG
 %left OR XOR
-%left AND NAND 
+%left AND
 %left TIMES DIV
 %left PLUS MINUS
 
