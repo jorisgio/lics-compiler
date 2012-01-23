@@ -38,8 +38,6 @@ module Past = struct
     (* Mux *)
     | EMux of expr * expr * expr
     | ECall of string * expr list
-    (* Rw *)
-    | ELw of expr list
 	
   and expr = { p : pos; e : expression }
       
@@ -54,6 +52,11 @@ module Past = struct
     | For of string * int * int * instr list 
     (* Déclare un tabeleau ou un entier *)
     | Decl of ident
+    (* Lw est considérée comme une instruction un peu spéciale,
+       on assigne nécessairement dans un sous-tableau,
+       on sait que cette instruction ne sera utilisée qu'avec des indices
+       constants mais on pourrait éventuellement généraliser *)
+    | Lw of string * int * int * string * int * int
 	
 
   and  instr =  { posi : pos; i : instruction }
@@ -103,8 +106,9 @@ module Sast = struct
     | Assign of ident * expr
     | Assign_i of ident * expr * expr
     | Assign_r of ident * expr * expr * expr
-    | For of (ident Smap.t) * (int Smap.t) * string * int * int * instr list 
+    | For of (ident Smap.t) * (int Smap.t) * string * int * int * instr list
     | Decl of ident
+    | Lw of string * int * int * string * int * int
   
   and  instr =  { posi : pos; i : instruction }
       

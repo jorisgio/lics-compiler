@@ -219,7 +219,10 @@ module InstrToSast = struct
 	     undefSet,
 	     (Smap.add id.Sast.id {Sast.id = id.Sast.id; Sast.typ = id.Sast.typ} env ),intEnv)
 	  | _ -> (raise (WrongType(e.Sast.p,e.Sast.t,Sast.Array(-1)))))
-	    
+      | Lw (name, i1, i2, name_ad, i1_ad, i2_ad) ->
+	assert (Smap.mem name env);
+        assert (Smap.mem name_ad env);
+        Sast.Lw (name, i1, i2, name_ad, i1_ad, i2_ad);
   and pInstrList env intEnv undefSet acc = function
   | [] -> (List.rev acc),undefSet,env,intEnv
   | i::q -> 

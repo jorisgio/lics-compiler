@@ -64,19 +64,19 @@ statement:
     | ARRAY id = IDENT LBRACKET n = INT RBRACKET  SEMICOLON { {posi = position $startpos $endpos; i= Decl({id = id ; typ = Array n})}}    (* déclare un tableau *)
     | id = IDENT LBRACKET i1 = expr DOTDOT  i2 = expr RBRACKET EQUAL e = expr SEMICOLON{ {posi = position $startpos $endpos; i=Assign_r(id, i1, i2, e)}}
     | FOR LPAREN s = IDENT COMMA i = INT COMMA i2 = INT RPAREN BBLOCK li = statement* EBLOCK {{posi = position $startpos $endpos; i = For(s,i,i2,li)}}
+    | id = IDENT LBRACKET i1 = INT DOTDOT  i2 = INT RBRACKET EQUAL LW LPAREN el = separated_list(COMMA, expr) RPAREN { { posi = position $startpos $endpos ; i = Lw (id, i1, i2, el) } }
 
 	
 expr:
-	| c = const	{ {p=position $startpos $endpos; e= c} }
-	| id = IDENT	{ {p=position $startpos $endpos; e=EVar({id = id; typ = Bool}) } }
-	| e1 = expr o = lop e2 = expr 	{ {p=position $startpos $endpos;e=EInfix (o,e1,e2)} }
-	| p = prefix e1 = expr	{ {p=position $startpos $endpos;e=EPrefix (p,e1) } }
-	| MUX LPAREN e1 = expr COMMA e2 = expr COMMA e3 = expr RPAREN { {p=position $startpos $endpos;e=EMux(e1,e2,e3) }}
-	| LPAREN e1 = expr RPAREN 	{ e1 }
-	| v = IDENT LBRACKET idx=expr RBRACKET   { {p=position $startpos $endpos;e=EArray_i(v,idx) } } (* prend un index du tableau *)
-	| v = IDENT LBRACKET min=expr DOTDOT max=expr RBRACKET  { {p=position $startpos $endpos; e=EArray_r(v,min,max)} }(*donne un sous tableau *)
-	| v = UIDENT IN inp = inpcall    { {p=position $startpos $endpos; e= ECall(v,inp)}}
-        | LW LPAREN el = separated_list(COMMA, expr) RPAREN { { p = position $startpos $endpos ; e = ELw el } }
+    | c = const	{ {p=position $startpos $endpos; e= c} }
+    | id = IDENT	{ {p=position $startpos $endpos; e=EVar({id = id; typ = Bool}) } }
+    | e1 = expr o = lop e2 = expr 	{ {p=position $startpos $endpos;e=EInfix (o,e1,e2)} }
+    | p = prefix e1 = expr	{ {p=position $startpos $endpos;e=EPrefix (p,e1) } }
+    | MUX LPAREN e1 = expr COMMA e2 = expr COMMA e3 = expr RPAREN { {p=position $startpos $endpos;e=EMux(e1,e2,e3) }}
+    | LPAREN e1 = expr RPAREN 	{ e1 }
+    | v = IDENT LBRACKET idx=expr RBRACKET   { {p=position $startpos $endpos;e=EArray_i(v,idx) } } (* prend un index du tableau *)
+    | v = IDENT LBRACKET min=expr DOTDOT max=expr RBRACKET  { {p=position $startpos $endpos; e=EArray_r(v,min,max)} }(*donne un sous tableau *)
+    | v = UIDENT IN inp = inpcall    { {p=position $startpos $endpos; e= ECall(v,inp)}}
 ;
 inpcall:
   LPAREN l=separated_list(COMMA , expr) RPAREN {l}

@@ -6,7 +6,7 @@ module Noeud = struct
           | Empty
           | True | False
           | Reg | Input | Inreg
-          | Lw of string * int list * int list (* sorties * entrees *)
+          | Lw of int list * int list (* sorties * entrees *)
           | Not
           | And | Or | Xor | Nand
           | Mux of int * int * int (* entrees *)
@@ -25,7 +25,7 @@ module Noeud = struct
 	  | Reg -> "Reg"
 	  | Input -> "Input"
 	  | Inreg -> "Inreg"
-          | Lw (orig,_,_) -> "Lw " ^ orig
+          | Lw (_,_) -> "Lw"
 	  | Not -> "Not"
 	  | And -> "And"
 	  | Or -> "Or"
