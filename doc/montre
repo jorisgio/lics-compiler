@@ -1,0 +1,79 @@
+move a1 zero
+incr a0
+b affiche
+move a2 zero
+incr a1
+beq a1 10 (-20)
+b affiche
+move a3 zero
+incr a2
+beq a2 10 (-24)
+b affiche
+move m0 zero
+move m1 un
+move m un
+
+incr a3
+beq a3 10 (-32)
+b affiche
+move m1 zero
+incr m0
+b affiche
+move j0 zero
+move j1 zero
+move j zero
+incr m
+incr m1
+b update_jours
+>ici<
+beq m 13 (-56)
+beq m1 10 (-44)
+b affiche
+move j1 zero
+incr j0
+b affiche
+move h0 zero
+move h1 zero
+move h zero
+incr j
+incr j1
+beq j jours (-72)
+beq j1 10 (-36)
+b affiche
+move h1 zero
+incr h0
+b affiche
+move mi0 zero
+incr h1
+incr h
+beq h 24 (-56)
+beq h1 10 (-28)
+b affiche
+move mi1 zero
+incr mi0
+beq mi0 6 (-32)
+b affiche
+move s0 zero
+incr mi1
+beq mi1 10 (-24)
+b affiche
+move s1 zero
+incr s0
+beq s0 6 (-24)
+b affiche
+incr s1
+beq s1 10 (-20)
+>affiche<
+b (?) # avant affiche #
+>update_jours<
+beq m 2 (28)
+beq m 4 (32)
+beq m 6 (28)
+beq m 9 (24)
+beq m 11 (20)
+move jours 31
+b ici
+move jours 28
+b ici
+move jours 30
+b ici
