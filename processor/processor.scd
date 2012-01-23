@@ -38,12 +38,12 @@ Start <- ()
          array regs[64];
          regs[0..63] = Regs <- (alu[0..31], writeReg[0..4], instr[21..25],instr[16..20], regWrite);
 
-	 array alufunc[3] 
+	 array alufunc[3] ;
 	 alufunc[0..2] = ALUControl <- (instr[31],instr[0..2]);
 
    	
 		     
-         alu[0..31] = Alu32bits <- (regs[0..31],alu2ndentry,alufunc[0..2]);
+         alu[0..31] = Alu32bits <- (regs[0..31],regs[32..63],false,instr[3],alufunc[0..2]);
 
          /* calcul de l'adresse de l'instruction suivante */
 
