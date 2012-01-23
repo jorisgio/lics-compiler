@@ -116,39 +116,39 @@ Contenu
 \begin_layout Standard
 Sont disponibles les portes logiques élémentaires 
 \emph on
-Not
+not
 \emph default
 , 
 \emph on
-And
+and
 \emph default
 , 
 \emph on
-Or
+or
 \emph default
 , 
 \emph on
-Xor
+xor
 \emph default
  et 
 \emph on
-Mux
+mux
 \emph default
 , les primitives 
 \emph on
-Reg
+reg
 \emph default
  pour les registres (1 bit) et 
 \emph on
-Rw
+rw
 \emph default
  pour lire dans la ROM, les constantes 
 \emph on
-True
+true
 \emph default
  et 
 \emph on
-False
+false
 \emph default
 .
 \end_layout
@@ -193,7 +193,7 @@ Il est possible de fournir un sous-tableau partout où est attendue une liste
 A contrario, il est indispensable de donner un sous-tableau comme sortie
  de certaines instructions (appel d'une porte et de la primitive 
 \emph on
-Rw
+rw
 \emph default
 ).
 \end_layout
@@ -346,6 +346,10 @@ Le simulateur exécute linéairement les instructions fournies dans un fichier
  Il prend en entrées les entrées du circuit et différentes options d'affichage
  (en console, en décimal et en mode graphique) ainsi que le nombre de cycles
  à effectuer.
+\end_layout
+
+\begin_layout Standard
+Une option permet de précharger la ROM avec le contenu d'un fichier.
 \end_layout
 
 \begin_layout Standard
