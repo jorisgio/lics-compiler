@@ -185,8 +185,7 @@ let pCircuit circuit =
 	  let gcur = processRec gcur !index exp3 in
 	  let gcur = Graphe.setLabel gcur i (Noeud.Mux (i + 1, i2 + 1, i3 + 1) )
           in (* les noeuds des parents de Mux *)
-	  Graphe.addEdge gcur i vertex in
-
+	  Graphe.addEdge gcur i vertex
     in
     let g = 
       match expr.e with
@@ -207,8 +206,8 @@ let pCircuit circuit =
 	  let gcur = processRec gcur vertex.(0) exp2 in
           let i3 = !index in
 	  let gcur = processRec gcur vertex.(0) exp3 in
-	  let gcur = Graphe.setLabel gcur
-            vertex.(0) (Noeud.Mux (i1 + 1, i2 + 1, i3 + 1) ) in
+	  let gcur = Graphe.setLabel gcur in
+            vertex.(0) (Noeud.Mux (i1 + 1, i2 + 1, i3 + 1) )
         (* là c'est plus compliqué, on descend dans une autre frame *)
 	| ECall(gatename,args) ->
 	  begin

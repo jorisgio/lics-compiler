@@ -16,13 +16,13 @@ let position startpos endpos =
 %token <string> IDENT UIDENT
 %token LW RW
 %token LPAREN RPAREN LBRACKET RBRACKET IN OUT
-%token AND OR XOR NAND NOT REG PLUS MINUS TIMES DIV MUX
+%token AND OR XOR NOT REG PLUS MINUS TIMES DIV MUX
 %token COMMA SEMICOLON DOTDOT DOT
 %token EQUAL EOF ARRAY
 
 %nonassoc NOT REG
 %left OR XOR
-%left AND NAND 
+%left AND
 %left TIMES DIV
 %left PLUS MINUS
 
