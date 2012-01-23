@@ -176,9 +176,7 @@ let pCircuit circuit =
 	  let cur = Smap.find (string_of_bool cst) env in
 	  let gcur = Graphe.setLabel gcur cur.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) in
 	  Graphe.addEdge gcur cur.(0) vertex
-	    
 	| EVar ident ->
-	  Printf.printf "%s" ident.id ; 
 	  assert (Smap.mem ident.id env) ;
 	  let cur = Smap.find ident.id env in
 	  Graphe.addEdge gcur cur.(0) vertex
@@ -198,7 +196,7 @@ let pCircuit circuit =
 	  let gcur = Graphe.addEdge gcur !index vertex in
 	  let gcur = processRec gcur !index exp1 in
 	  processRec gcur !index exp2
-	| EMux(exp1,exp2,exp3) ->
+	(*| EMux(exp1,exp2,exp3) ->
 	  let gcur = incr index; Graphe.addVertex gcur !index in
           let i = !index in
           (* on est obligé de créer d'abord les noeuds parents pour pouvoir en
@@ -211,7 +209,7 @@ let pCircuit circuit =
 	  let gcur = Graphe.setLabel gcur i (Noeud.Mux (i + 1, i2 + 1, i3 + 1) )
           in (* les noeuds des parents de Mux *)
 	  Graphe.addEdge gcur i vertex in
-
+	*)
     in
     let g = 
       match expr.e with
@@ -223,7 +221,7 @@ let pCircuit circuit =
 	  let gcur = Graphe.setLabel gcur vertex.(0) (Noeud.lop_to_label oper) in
 	  let gcur = processRec gcur vertex.(0) exp1 in
 	  processRec gcur vertex.(0) exp2
-	| EMux(exp1,exp2,exp3) ->
+	(*| EMux(exp1,exp2,exp3) ->
           (* on est obligé de créer d'abord les noeuds parents pour pouvoir en
              conserver leur indice dans l'étiquette de Mux *)
           let i1 = !index in
@@ -233,8 +231,8 @@ let pCircuit circuit =
           let i3 = !index in
 	  let gcur = processRec gcur vertex.(0) exp3 in
 	  let gcur = Graphe.setLabel gcur
-            vertex.(0) (Noeud.Mux (i1 + 1, i2 + 1, i3 + 1) ) in
-        (* là c'est plus compliqué, on descend dans une autre frame *)
+            vertex.(0) (Noeud.Mux (i1 + 1, i2 + 1, i3 + 1) ) in *)
+        (*   là c'est plus compliqué, on descend dans une autre frame *)
 	| ECall(gatename,args) ->
 	  begin
 	    let callgate = 
@@ -252,11 +250,11 @@ let pCircuit circuit =
 	      with Invalid_argument _ -> (
 		raise (Error ({line = 42; char_b = 42; char_e = 42},
 			      "Pas le bon nombre d'entrée pour l'appel " )))
-	    in
+	    in (*
 	    let () = if !aindex < callgate.ginputsize then
 		(raise (Error ({line = 42; char_b = 42; char_e = 42},
 			       "Pas le bon nombre d'entrée pour l'appel " )))
-	    in
+	    in *)
 	    aindex := 0 ; 
 	    
 		
@@ -333,14 +331,18 @@ let pCircuit circuit =
 		done ;
 		((Smap.add name ar fenv), !gr)
 	      end
-	      | Int -> env,graph
 	  in
+	  
 	  let env,graph = Smap.fold createNodes fenv (env,graph) in
+
 	  (* ensuite, on crée les liens, comme d'hab :Þ *)
 	  let graph  = List.fold_left (processInstr ienv env) graph li in
+	
 	  atomic graph (i+1)
+	    
       in
-      atomic graph i1 
+      atomic gcur i1
+
     |Decl(_) -> gcur
     | _ -> failwith "Oh ! Not implemented"
       
@@ -384,7 +386,7 @@ let pCircuit circuit =
 		  let graph = Graphe.addVertex graph !index in
 		  let ar = Array.make 1 !index in
 		  incr index ;
-		  Printf.printf "created %d\n" (!index -1);
+		  (*Printf.printf "created %d\n" (!index -1);*)
 		  ((Smap.add name ar env),graph)
 		end
 		| Array s -> begin
@@ -392,7 +394,7 @@ let pCircuit circuit =
 		  let gr = ref graph in
 		  for i = 0 to (s - 1) do
 	            gr := Graphe.addVertex !gr !index ;
-		    Printf.printf "created %d\n" (!index);
+		    (*Printf.printf "created %d\n" (!index);*)
 		ar.(i) <- !index ;
                 incr index ;
 		  done ;
@@ -407,8 +409,7 @@ let pCircuit circuit =
     let env = Smap.add "false" [|1|] env in
     (* on ajoute les noeuds *)
     let env,graph = Smap.fold createNodes gate.genv (env,graph) in
-    
-    
+    assert((List.length gate.gbody) <> 0);
     (* Well, maintenant il faut relier tout ces noeuds créés *)
     (env,(List.fold_left (processInstr gate.gintEnv env) graph gate.gbody))
   in
@@ -418,7 +419,7 @@ let pCircuit circuit =
     
   (* par convention, la porte principale s'appelle "Start" *)
   assert(not (Smap.is_empty circuit.gates));
-  Smap.iter (fun k _ -> Printf.printf "<%s>\n" k) circuit.gates;
+  (*Smap.iter (fun k _ -> Printf.printf "<%s>\n" k) circuit.gates; *)
   assert(Smap.mem "Start" circuit.gates);
   let start = Smap.find "Start" circuit.gates in
   (* On ajoute les entrées *)
@@ -433,14 +434,13 @@ let pCircuit circuit =
   let graph = List.fold_left (fun graph elt -> 
     let graph = Graphe.addVertex graph elt in
     Graphe.setLabel graph elt Noeud.Input ) graph iList in
-
   let env,graph = pLevel env graph "Start" in
-  
   (* on s'occupe maintenant des sorties *)
   i := 0;
   let ar = Array.make (start.goutputsize) 0 in
   List.iter (buildArray ar i start.gintEnv env) start.goutputs;
   let oList = Array.to_list ar in
+
   { igraph = graph ; iinputs = iList; ioutputs = oList }
   
     

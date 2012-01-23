@@ -75,8 +75,11 @@ expr:
 	| LPAREN e1 = expr RPAREN 	{ e1 }
 	| v = IDENT LBRACKET idx=expr RBRACKET   { {p=position $startpos $endpos;e=EArray_i(v,idx) } } (* prend un index du tableau *)
 	| v = IDENT LBRACKET min=expr DOTDOT max=expr RBRACKET  { {p=position $startpos $endpos; e=EArray_r(v,min,max)} }(*donne un sous tableau *)
-	| v = UIDENT IN inp = inp    { {p=position $startpos $endpos; e= ECall(v,inp)}}
-        | RW LPAREN el = separated_list(COMMA, expr) RPAREN { { p = position $startpos $endpos ; e = el } }
+	| v = UIDENT IN inp = inpcall    { {p=position $startpos $endpos; e= ECall(v,inp)}}
+(*        | RW LPAREN el = separated_list(COMMA, expr) RPAREN { { p = position $startpos $endpos ; e = el } } *)
+;
+inpcall:
+  LPAREN l=separated_list(COMMA , expr) RPAREN {l}
 ;
 
 
