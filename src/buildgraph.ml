@@ -169,67 +169,70 @@ let pCircuit circuit =
      Renvoit :
      le nouveau graphe *)
   let rec  processBExpr gcur intEnv env vertex expr  =
-    let rec  processRec gcur vertex expr = 
+    let rec  processRec gcur vertex expr =
       match expr.e with
 	| EBconst cst -> 
 	  assert (Smap.mem (string_of_bool cst) env) ;
 	  let cur = Smap.find (string_of_bool cst) env in
 	  let gcur = Graphe.setLabel gcur cur.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) in
-	  Graphe.addEdge gcur cur.(0) vertex
+	  Graphe.addEdge gcur cur.(0) vertex , cur.(0)
 	| EVar ident ->
 	  assert (Smap.mem ident.id env) ;
 	  let cur = Smap.find ident.id env in
-	  Graphe.addEdge gcur cur.(0) vertex
+	  Graphe.addEdge gcur cur.(0) vertex , cur.(0)
 	| EArray_i(ident,index) ->
 	  let index = eval intEnv index in
 	  assert (Smap.mem ident.id env) ;
 	  let cur = Smap.find ident.id env in
-	  Graphe.addEdge gcur cur.(index) vertex
+	  Graphe.addEdge gcur cur.(index) vertex, cur.(index)
 	| EPrefix(oper,exp) -> 
 	  let gcur = incr index ; Graphe.addVertex gcur !index in
-	  let gcur = Graphe.setLabel gcur !index  (Noeud.lp_to_label oper) in
+          let i = !index in 
+	  let gcur = Graphe.setLabel gcur !index  (Noeud.lp_to_label oper) 
+          in
 	  let gcur = Graphe.addEdge gcur !index vertex in
-	  processRec gcur !index  exp 
+	  let gcur , _ = processRec gcur !index  exp in
+          gcur , i
 	| EInfix(oper, exp1, exp2) -> 
 	  let gcur = incr index; Graphe.addVertex gcur !index in
-	  let gcur = Graphe.setLabel gcur !index (Noeud.lop_to_label oper) in
+	  let i = !index in
+          let gcur = Graphe.setLabel gcur i (Noeud.lop_to_label oper)
+          in
 	  let gcur = Graphe.addEdge gcur !index vertex in
-	  let gcur = processRec gcur !index exp1 in
-	  processRec gcur !index exp2
+	  let gcur , _ = processRec gcur !index exp1 in
+	  let gcur , _ = processRec gcur !index exp2 in
+          gcur , i
 	| EMux(exp1,exp2,exp3) ->
 	  let gcur = incr index; Graphe.addVertex gcur !index in
           let i = !index in
           (* on est obligé de créer d'abord les noeuds parents pour pouvoir en
              conserver leur indice dans l'étiquette de Mux *)
-	  let gcur = processRec gcur !index exp1 in
-          let i2 = !index in
-	  let gcur = processRec gcur !index exp2 in
-          let i3 = !index in
-	  let gcur = processRec gcur !index exp3 in
-	  let gcur = Graphe.setLabel gcur i (Noeud.Mux (i + 1, i2 + 1, i3 + 1) )
+	  let gcur , i1 = processRec gcur !index exp1 in
+	  let gcur , i2 = processRec gcur !index exp2 in
+	  let gcur , i3 = processRec gcur !index exp3 in
+	  let gcur = Graphe.setLabel gcur i (Noeud.Mux (i1, i2, i3) )
           in (* les noeuds des parents de Mux *)
-	  Graphe.addEdge gcur i vertex
+	  Graphe.addEdge gcur i vertex , i
     in
     let g = 
       match expr.e with
 	| EBconst cst -> Graphe.setLabel gcur vertex.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) 
 	| EPrefix(oper, exp) -> 
 	  let gcur = Graphe.setLabel gcur vertex.(0) (Noeud.lp_to_label oper) in
-	  processRec gcur vertex.(0) exp 
+	  let gcur , _ = processRec gcur vertex.(0) exp in
+          gcur
 	| EInfix(oper, exp1,exp2) -> 
 	  let gcur = Graphe.setLabel gcur vertex.(0) (Noeud.lop_to_label oper) in
-	  let gcur = processRec gcur vertex.(0) exp1 in
-	  processRec gcur vertex.(0) exp2
+	  let gcur , _ = processRec gcur vertex.(0) exp1 in
+	  let gcur , _ = processRec gcur vertex.(0) exp2 in
+          gcur
 	| EMux(exp1,exp2,exp3) ->
           (* on est obligé de créer d'abord les noeuds parents pour pouvoir en
              conserver leur indice dans l'étiquette de Mux *)
-          let i1 = !index in
-	  let gcur = processRec gcur vertex.(0) exp1 in
-          let i2 = !index in
-	  let gcur = processRec gcur vertex.(0) exp2 in
-          let i3 = !index in
-	  let gcur = processRec gcur vertex.(0) exp3 in
-	  Graphe.setLabel gcur vertex.(0) (Noeud.Mux (i1 + 1, i2 + 1, i3 + 1) )
+	  let gcur , i1 = processRec gcur vertex.(0) exp1 in
+	  let gcur , i2 = processRec gcur vertex.(0) exp2 in
+	  let gcur , i3 = processRec gcur vertex.(0) exp3 in
+	  Graphe.setLabel gcur vertex.(0) (Noeud.Mux (i1, i2, i3) )
         (* là c'est plus compliqué, on descend dans une autre frame *)
 	| ECall(gatename,args) ->
 	  begin
