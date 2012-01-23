@@ -1,0 +1,368 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Rapport final du projet de microprocesseur
+\end_layout
+
+\begin_layout Author
+Florian Bourse, Joris Giovannangelli, Théo Zimmermann
+\end_layout
+
+\begin_layout Date
+23 Janvier 2012
+\end_layout
+
+\begin_layout Section
+Langage de description de circuits
+\end_layout
+
+\begin_layout Subsection
+Les spécifications
+\end_layout
+
+\begin_layout Subsubsection
+Principes généraux
+\end_layout
+
+\begin_layout Standard
+Le langage que nous avons créé est un langage hiérarchisé.
+ Il permet de définir des portes logiques complexes et de les combiner entre
+ elles dans la définition d'autres portes.
+ Le circuit lui-même est vu comme une porte.
+\end_layout
+
+\begin_layout Standard
+Le programme d'un circuit consiste en la description successive et par ordre
+ hiérarchique des portes.
+\end_layout
+
+\begin_layout Standard
+La dernière porte décrit le circuit.
+\end_layout
+
+\begin_layout Subsubsection
+Définition d'une porte
+\end_layout
+
+\begin_layout Standard
+Une porte est la donnée de son nom, de la liste de ses variables d'entrée,
+ d'un ensemble d'instructions décrivant la manière dont on combine les variables
+, et de la liste de ses variables de sorties.
+\end_layout
+
+\begin_layout Subparagraph
+Contenu
+\end_layout
+
+\begin_layout Standard
+Sont disponibles les portes logiques élémentaires 
+\emph on
+Not
+\emph default
+, 
+\emph on
+And
+\emph default
+, 
+\emph on
+Or
+\emph default
+, 
+\emph on
+Xor
+\emph default
+ et 
+\emph on
+Mux
+\emph default
+, les primitives 
+\emph on
+Reg
+\emph default
+ pour les registres (1 bit) et 
+\emph on
+Rw
+\emph default
+ pour lire dans la ROM, les constantes 
+\emph on
+True
+\emph default
+ et 
+\emph on
+False
+\emph default
+.
+\end_layout
+
+\begin_layout Subparagraph
+Utilisation
+\end_layout
+
+\begin_layout Standard
+Il est possible d'assigner des expressions complexes à des variables ou
+ dans des tableaux.
+\end_layout
+
+\begin_layout Standard
+Les variables sont définies à l'occasion des assignations.
+\end_layout
+
+\begin_layout Standard
+En revanche, les tableaux doivent être déclarés avant d'être utilisés.
+\end_layout
+
+\begin_layout Standard
+Les variables définies à l'intérieur d'une porte ainsi que les variables
+ d'entrée sont utilisables dans les expressions qui se trouvent dans cette
+ porte.
+ L'ordre n'importe pas.
+ Cependant, pour que le circuit compile, il convient de ne pas créer de
+ boucle combinatoire.
+\end_layout
+
+\begin_layout Standard
+Les variables définies à l'intérieur d'une porte sont utilisables pour en
+ décrire les sorties.
+\end_layout
+
+\begin_layout Standard
+Il est possible de fournir un sous-tableau partout où est attendue une liste
+ d'instructions.
+\end_layout
+
+\begin_layout Standard
+A contrario, il est indispensable de donner un sous-tableau comme sortie
+ de certaines instructions (appel d'une porte et de la primitive 
+\emph on
+Rw
+\emph default
+).
+\end_layout
+
+\begin_layout Standard
+Enfin, une fonction 
+\emph on
+for
+\emph default
+ est disponible et elle utilise des indices entiers sur lesquels sont permis
+ les calculs de l'arithmétique élémentaire.
+\end_layout
+
+\begin_layout Subparagraph
+Syntaxe
+\end_layout
+
+\begin_layout Standard
+Le code peut être émaillé de commentaires, 
+\begin_inset Quotes eld
+\end_inset
+
+à la C
+\begin_inset Quotes erd
+\end_inset
+
+, entre les caractères 
+\begin_inset Quotes eld
+\end_inset
+
+/*
+\begin_inset Quotes erd
+\end_inset
+
+ et 
+\begin_inset Quotes eld
+\end_inset
+
+*/
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Le nom de la porte doit commencer par une majuscule.
+ Il est suivit des caractères 
+\begin_inset Quotes eld
+\end_inset
+
+<-
+\begin_inset Quotes erd
+\end_inset
+
+ puis, entre parenthèses, de la liste des entrées séparées par des virgules.
+\end_layout
+
+\begin_layout Standard
+Les entrées sont soit des variables dont on donne le nom, soit des tableaux
+ dont on donne le nom puis la taille entre crochets.
+\end_layout
+
+\begin_layout Standard
+Les instructions sont soit des déclarations de tableaux avec le mot clé
+ 
+\emph on
+array
+\emph default
+ suivi du nom du tableau et de sa taille entre crochets, soit des boucles
+ 
+\emph on
+for
+\emph default
+ avec, entre parenthèses et séparés par des virgules, le nom de l'indice,
+ sa valeur initiale et sa valeur finale puis entre crochets le corps de
+ la boucle, soit des assignations de la valeur d'une expression à une variable
+ ou un sous-tableau avec l'opérateur 
+\begin_inset Quotes eld
+\end_inset
+
+=
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Un sous-tableau est donné par son nom, suivi, entre crochets, d'un intervalle,
+ c'est-à-dire de ses deux extrémités séparées par les caractères 
+\begin_inset Quotes eld
+\end_inset
+
+..
+\begin_inset Quotes erd
+\end_inset
+
+ .
+\end_layout
+
+\begin_layout Standard
+Une expression est la combinaison des portes logiques et primitives de base,
+ soit infixes, soit préfixes, prenant leurs arguments entre parenthèses
+ quand il y en a plusieurs.
+ On peut aussi faire appel à des portes précédemment définies en passant
+ les entrées avec les caractères 
+\begin_inset Quotes eld
+\end_inset
+
+<-
+\begin_inset Quotes erd
+\end_inset
+
+ suivis d'une liste de variables entre parenthèses.
+\end_layout
+
+\begin_layout Subsection
+Le compilateur
+\end_layout
+
+\begin_layout Standard
+Le compilateur traduit le programme dans un langage intermédiaire de description
+ de net-list topologiquement triée.
+\end_layout
+
+\begin_layout Standard
+Il commence par effectuer des vérifications sémantiques puis crée un graphe
+ représentant le circuit.
+ Les registres sont 
+\begin_inset Quotes eld
+\end_inset
+
+éclatés
+\begin_inset Quotes erd
+\end_inset
+
+ entre une entrée et une sortie, ce qui permet ensuite de générer la net-list
+ en effectuant le tri topologique.
+ A cette occasion, une erreur est déclenchée en cas de circuit combinatoire.
+\end_layout
+
+\begin_layout Subsection
+Le simulateur
+\end_layout
+
+\begin_layout Standard
+Le simulateur exécute linéairement les instructions fournies dans un fichier
+ binaire produit par le compilateur.
+ Il prend en entrées les entrées du circuit et différentes options d'affichage
+ (en console, en décimal et en mode graphique) ainsi que le nombre de cycles
+ à effectuer.
+\end_layout
+
+\begin_layout Standard
+Un environnement est maintenu avec les valeurs des différentes variables
+ intermédiaires et les valeurs des registres sont transmises d'un cycle
+ sur le suivant.
+\end_layout
+
+\begin_layout Section
+Le microprocesseur
+\end_layout
+
+\begin_layout Standard
+Le microprocesseur est largement inspiré d'un microprocesseur MIPS mais
+ nous avons gardé un minimum d'instructions, utiles pour réaliser le programme
+ de la montre.
+\end_layout
+
+\end_body
+\end_document

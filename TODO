@@ -1,11 +1,12 @@
 
-* AJOUT DE RW / LW
-
 Amélioration :
 - Ne pas passer en LICS les True et False qui ne servent à rien.
 
 Grosses erreurs dans le compilo :
-- le mux en fait est mal implémenté ( :-( dsl )
 - problème avec les not et les reg (avec des grosses expressions -voir test :
 plante.scd ) : pas sûr que ce soit encore le cas
 - problème avec les for
+
+NON FAIT ET POURTANT DANS LE SUJET :
+- écrire un assembleur
+- deux modes de défilement pour la montre
