@@ -6,9 +6,10 @@ module Noeud = struct
           | Empty
           | True | False
           | Reg | Input | Inreg
+          | Lw of string * int list * int list (* sorties * entrees *)
           | Not
           | And | Or | Xor | Nand
-          | Mux
+          | Mux of int * int * int (* entrees *)
 
 	(* Une comparaison sur les clés *)
 	let compare = Pervasives.compare
@@ -24,12 +25,13 @@ module Noeud = struct
 	  | Reg -> "Reg"
 	  | Input -> "Input"
 	  | Inreg -> "Inreg"
+          | Lw (orig,_,_) -> "Lw " ^ orig
 	  | Not -> "Not"
 	  | And -> "And"
 	  | Or -> "Or"
 	  | Xor -> "Xor"
 	  | Nand -> "Nand"
-	  | Mux -> "Mux"	  
+	  | Mux (_,_,_) -> "Mux"	  
 end
 
 module Graphe = struct

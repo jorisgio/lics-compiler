@@ -56,10 +56,8 @@ brouillon 0.1
 
    	Une assertion est la donnée d'une variable, d'une fonction et de
         ses arguments, l'opérateur d'assigement est '='.
-	Notons que la syntaxe 2 = output est maladroite, mais peut être
-        simplifiera le parsage. À voir…
-        Il n'y a pas de parsage, on communique par fichier binaire, pas
-        besoin de se poser la question, donc.
+	Notons que la syntaxe 2 = output est maladroite.
+        Il n'y a pas de parsage, on communique par fichier binaire.
 	
 3. Structure
 
