@@ -22,6 +22,7 @@ let stmt_to_string = function
   | Output i -> Printf.sprintf "output %d\n" i
   | Inputreg i -> Printf.sprintf "%d = inputreg\n" i
   | Outputreg i-> Printf.sprintf "ouputreg %d\n" i
+  | Lw (_,_) -> Printf.sprintf "lw\n" (* imprécis *)
 
 let lics_of_combin_graph g n = (* n = max_clé + 1 *)
   let sorted_keys = topoSort g.cgraph in
@@ -76,6 +77,8 @@ nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour
         else failwith (
             "lics_of_combin_graph:
 nombre d'entrées (" ^ string_of_int (List.length pred.(k))  ^ ") incorrect pour un Mux" )
+      | Noeud.Lw (sorties, adresse) ->
+        Lw (sorties, adresse)
       | _ -> failwith "lics_of_combin_graph: bad elimination"
   in
   let rec traite_cp typ = function (* typ = input ou output ou inreg ... *)

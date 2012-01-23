@@ -6,7 +6,7 @@ module Noeud = struct
           | Empty
           | True | False
           | Reg | Input | Inreg
-          | Lw of int list * int list (* sorties * entrees *)
+          | Lw of int list * int list (* sorties * adresse *)
           | Not
           | And | Or | Xor | Nand
           | Mux of int * int * int (* entrees *)
