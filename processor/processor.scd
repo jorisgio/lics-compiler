@@ -67,8 +67,9 @@ Start <- ()
 	 for(i,0,29) {
          	     pc[i] = REG MUX(jump,instr[i],( MUX((zero[0] AND br),branch[i],addressplus[i]) ));
 	}
-	pc[30] = REG MUX(instr[30],false,( MUX((zero[0] AND instr[31]), branch[30], addressplus[30])));
-	pc[31] = REG MUX(instr[31],false,( MUX((zero[0] AND instr[31]), branch[31], addressplus[31])));
+	pc[29] = REG MUX(jump,false,( MUX((zero[0] AND instr[31]), br, addressplus[29])));
+	pc[30] = REG MUX(jump,false,( MUX((zero[0] AND instr[31]), br, addressplus[30])));
+	pc[31] = REG MUX(jump,false,( MUX((zero[0] AND instr[31]), br, addressplus[31])));
 
 	 
 -> ()
