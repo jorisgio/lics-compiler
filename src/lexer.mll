@@ -6,9 +6,9 @@ exception Lexer_error of string
 
 (* attention, tout les mots clés sont en minuscule ! *)
 let kwd_tbl = 
-        [ "and", AND; "or", OR; "xor", XOR; "not", NOT;
-	       "mux", MUX; "reg", REG; "array", ARRAY; "for", FOR; "rw", RW
-               ]
+        [ "and", AND; "or", OR; "xor", XOR; "not", NOT; "mux", MUX;
+          "reg", REG; "array", ARRAY; "for", FOR;
+          "lw", LW; "sw", SW ]
                
 
 let  is_keyword = 

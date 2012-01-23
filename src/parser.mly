@@ -14,7 +14,7 @@ let position startpos endpos =
 %token <int> INT
 %token <bool> BOOL
 %token <string> IDENT UIDENT
-%token LW RW
+%token LW SW
 %token LPAREN RPAREN LBRACKET RBRACKET IN OUT BBLOCK EBLOCK
 %token AND OR XOR NOT REG PLUS MINUS TIMES DIV MUX
 %token COMMA SEMICOLON DOTDOT DOT
@@ -76,7 +76,7 @@ expr:
 	| v = IDENT LBRACKET idx=expr RBRACKET   { {p=position $startpos $endpos;e=EArray_i(v,idx) } } (* prend un index du tableau *)
 	| v = IDENT LBRACKET min=expr DOTDOT max=expr RBRACKET  { {p=position $startpos $endpos; e=EArray_r(v,min,max)} }(*donne un sous tableau *)
 	| v = UIDENT IN inp = inpcall    { {p=position $startpos $endpos; e= ECall(v,inp)}}
-(*        | RW LPAREN el = separated_list(COMMA, expr) RPAREN { { p = position $startpos $endpos ; e = el } } *)
+        | LW LPAREN el = separated_list(COMMA, expr) RPAREN { { p = position $startpos $endpos ; e = ELw el } }
 ;
 inpcall:
   LPAREN l=separated_list(COMMA , expr) RPAREN {l}
@@ -89,7 +89,6 @@ inpcall:
 	| AND   {And}
         | TIMES {Mul}
         | DIV   {Div}
-(*        | NAND  {Nand} NOT IMPLEMENTED YET *)
         | PLUS  {Add}
         | MINUS {Sub}
 ;

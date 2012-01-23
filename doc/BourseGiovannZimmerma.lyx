@@ -193,7 +193,7 @@ Il est possible de fournir un sous-tableau partout où est attendue une liste
 A contrario, il est indispensable de donner un sous-tableau comme sortie
  de certaines instructions (appel d'une porte et de la primitive 
 \emph on
-rw
+lw
 \emph default
 ).
 \end_layout

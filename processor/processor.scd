@@ -10,7 +10,7 @@ Datapath <- (regwrite, alusrc, alucontrol[6], branch, regdst)
 
          /* memory unit */
          array instr[32];
-         instr[0..31] = LW(rom,pc[0..31]);
+         instr[0..31] = LW(pc[0..31]);
 
          /* multiplexeur */
          array writeReg[5];
