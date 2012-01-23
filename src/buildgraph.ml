@@ -418,8 +418,8 @@ let pCircuit circuit =
 		  for i = 0 to (s - 1) do
 	            gr := Graphe.addVertex !gr !index ;
 		    (*Printf.printf "created %d\n" (!index);*)
-		ar.(i) <- !index ;
-                incr index ;
+		    ar.(i) <- !index ;
+                    incr index ;
 		  done ;
 		  ((Smap.add name ar env), !gr)
 		end
