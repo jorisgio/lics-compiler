@@ -229,8 +229,7 @@ let pCircuit circuit =
 	  let gcur = processRec gcur vertex.(0) exp2 in
           let i3 = !index in
 	  let gcur = processRec gcur vertex.(0) exp3 in
-	  let gcur = Graphe.setLabel gcur in
-            vertex.(0) (Noeud.Mux (i1 + 1, i2 + 1, i3 + 1) )
+	  Graphe.setLabel gcur vertex.(0) (Noeud.Mux (i1 + 1, i2 + 1, i3 + 1) )
         (* là c'est plus compliqué, on descend dans une autre frame *)
 	| ECall(gatename,args) ->
 	  begin
