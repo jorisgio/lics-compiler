@@ -300,9 +300,17 @@ let pCircuit circuit =
     | Assign_r(ident, i1, i2, exp) ->
       let i1 = eval intEnv i1 in
       let i2 = eval intEnv i2 in
-      assert( Smap.mem ident.id env);
+      assert(Smap.mem ident.id env);
       let cur = Smap.find ident.id env in
       processBExpr gcur intEnv env (Array.sub cur i1 (i2 - i1 + 1) ) exp
+    | Lw (name, i1, i2, name_a, i1_a, i2_a) ->
+      assert (Smap.mem name env);
+      assert (Smap.mem name_a env);
+      let adresse = Smap.find name_a env in
+      let sortie = Smap.find name env in (* là où il faut stocker *)
+      let gcur = Graphe.addVertex gcur !index in
+      Graphe.setLabel
+        gcur !index (Noeud.Lw (Array.to_list sortie, Array.to_list adresse))
     (* on a l'env de tout les idents définis DANS le for 
        ils ne sont visibles qu'a l'intérieur du bloc *)
     (* Manière de procéder : on traite simplement le tout n fois 

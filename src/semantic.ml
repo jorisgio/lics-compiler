@@ -222,7 +222,7 @@ module InstrToSast = struct
       | Lw (name, i1, i2, name_ad, i1_ad, i2_ad) ->
 	assert (Smap.mem name env);
         assert (Smap.mem name_ad env);
-        Sast.Lw (name, i1, i2, name_ad, i1_ad, i2_ad);
+        {Sast.posi = posToSast inst.posi; Sast.i = Sast.Lw (name, i1, i2, name_ad, i1_ad, i2_ad)} , undefSet, env, intEnv
   and pInstrList env intEnv undefSet acc = function
   | [] -> (List.rev acc),undefSet,env,intEnv
   | i::q -> 
