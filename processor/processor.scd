@@ -55,12 +55,12 @@ Start <- ()
          quatre[5] = true;
 
          array addressplus[32];
-         addressplus[0..31] = Fulladder <- (quatre[0..31], pc[0..31]);
+         addressplus[0..31] = Adder32 <- (quatre[0..31], pc[0..31]);
 
 
 
          array branch[32];
-         branch[0..31] = Fulladder <-(addressplus[0..31],signextend[0..31]);
+         branch[0..31] = Adder32 <-(addressplus[0..31],signextend[0..31]);
 
          array zero[1];
          zero[0..0] = Zero <- (alu[0..31]);

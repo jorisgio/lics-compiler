@@ -32,4 +32,4 @@ Adder32 <- (a[32],b[32],carryIn)
 	    r[i+1] = out[1] and true;
 	    }
 /* on gère pas les overflow */
--> (s,r[32])
+-> (s[0..31])

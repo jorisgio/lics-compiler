@@ -4,7 +4,7 @@ Reg32 <-(inputs[32])
       for(i, 0, 31) {
       	     result[i] = reg inputs[i];
 	}
--> (result)
+-> (result[0..31])
 
 /* Unité registres */
 
