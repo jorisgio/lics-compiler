@@ -41,9 +41,9 @@ Start <- ()
 	 array alufunc[3] ;
 	 alufunc[0..2] = ALUControl <- (instr[31],instr[0..2]);
 
-   	
+         f = false;   	
 		     
-         alu[0..31] = Alu32bits <- (regs[0..31],regs[32..63],false,instr[3],alufunc[0..2]);
+         alu[0..31] = Alu32bits <- (regs[0..31],regs[32..63],f,instr[3],alufunc[0..2]);
 
          /* calcul de l'adresse de l'instruction suivante */
 
@@ -65,14 +65,15 @@ Start <- ()
          array zero[1];
          zero[0..0] = Zero <- (alu[0..31]);
 	 
-	 /* Choix du nouveau PC en fonction de l'instruction (jump, branch, li ou R-type) */
-	 array jump[32] ;
+	 /* Choix du nouveau PC en fonction de l'instruction (jump, branch,
+	 li ou R-type) */
+
 	 for(i,0,29) {
          	     pc[i] = reg mux(jump,instr[i],( mux((zero[0] and br),branch[i],addressplus[i]) ));
 	}
-	pc[29] = reg mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[29])));
-	pc[30] = reg mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[30])));
-	pc[31] = reg mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[31])));
+	pc[29] = reg mux(jump,f,( mux((zero[0] and instr[31]), br, addressplus[29])));
+	pc[30] = reg mux(jump,f,( mux((zero[0] and instr[31]), br, addressplus[30])));
+	pc[31] = reg mux(jump,f,( mux((zero[0] and instr[31]), br, addressplus[31])));
 
 	 
 -> ()

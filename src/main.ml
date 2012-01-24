@@ -29,6 +29,9 @@ let localisation pos =
   let c = pos.pos_cnum - pos.pos_bol + 1 in
   Printf.eprintf "File \"%s\", line %d, characters %d-%d:\n" !ifile l (c-1) c
 
+let localisationSast { Ast.Sast.line = l ; char_b = b ; char_e = e } =
+  Printf.eprintf "File \"%s\", line %d, characters %d-%d:\n" !ifile l b e
+
  
 (* Création d'un tampon d'Analyse Lexicale *)
 let circuit =
@@ -61,21 +64,28 @@ let () = if !parse_only then (deb "Parsage effectué\n" ; exit 0)
     
 (* Analyse sémantique *)
 let circuit =
-(*  try*)
-  deb "Analyse sémantique...\n";
-  let cir = Semantic.CircuitToSast.pCircuit circuit in
-  deb "Done\n";
-  cir
-(*  with
-    | e -> Printf.eprintf "Erreur dans l'analyse sémantique" ; exit 1
-      (* A DETAILLER *)*)
+  try
+    deb "Analyse sémantique...\n";
+    let cir = Semantic.CircuitToSast.pCircuit circuit in
+    deb "Done\n";
+    cir
+  with
+    | Semantic.Exceptions.WrongType(p,t1,t2) ->
+      localisationSast p ;
+      Printf.eprintf "Erreur de type\n" ; exit 1
+      (* A DETAILLER *)
       
     
   (* Construction du graphe *)
 let igraph =
-  deb "Construction du graphe de circuit…\n";
 
-  let g = Buildgraph.pCircuit circuit in
+  let g =
+    try
+      deb "Construction du graphe de circuit…\n";
+      Buildgraph.pCircuit circuit
+    with
+      | Buildgraph.Undefined s -> Printf.eprintf "Undefined : %s\n" s ; exit 1
+  in
   deb "Done.\n";
   if !debug then
     begin

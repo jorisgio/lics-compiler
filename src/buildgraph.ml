@@ -12,7 +12,7 @@ Une fois cela fait, on crée les liens. *)
 (* TYPES ET MODULES *)
 
 
-exception Undefined
+exception Undefined of string
 exception Error of pos * string
 exception WrongType of pos * types * types
       
@@ -241,7 +241,7 @@ let pCircuit circuit =
 	    let callgate = 
 	      try 
 		Smap.find gatename circuit.gates 
-	      with Not_found -> (raise Undefined)
+	      with Not_found -> (raise (Undefined gatename))
 	    in
 	  (* on transforme l'entrée de la porte en un unique tableau de noeud. *)
 	    let inputsArray = Array.make callgate.ginputsize (-1) in 
@@ -250,9 +250,11 @@ let pCircuit circuit =
 	    let () =
 	      try 
 		List.iter (buildArray inputsArray aindex intEnv env)  args
-	      with Invalid_argument _ -> (
-		raise (Error ({line = 42; char_b = 42; char_e = 42},
-			      "Pas le bon nombre d'entrée pour l'appel " )))
+	      with 
+                  Invalid_argument _ -> (
+		    raise (Error ({line = 42; char_b = 42; char_e = 42},
+			          "Pas le bon nombre d'entrée pour l'appel " )))
+                | Match_failure (_,_,_) -> failwith "Pb au niveau des entrées"
 	    in (*
 	    let () = if !aindex < callgate.ginputsize then
 		(raise (Error ({line = 42; char_b = 42; char_e = 42},
@@ -462,9 +464,11 @@ let pCircuit circuit =
   i := 0;
   (* print_int start.goutputsize ;*)
   let ar = Array.make (start.goutputsize) 0 in
-  List.iter (buildArray ar i start.gintEnv env) start.goutputs;
+  let () = try
+    List.iter (buildArray ar i start.gintEnv env) start.goutputs
+  with Match_failure (_,_,_) -> failwith "Erreur au niveau des sorties";
+  in
   let oList = Array.to_list ar in
-
   { igraph = graph ; iinputs = iList; ioutputs = oList }
   
     

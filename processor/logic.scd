@@ -15,7 +15,7 @@ Mux8to1 <- (control[3],inputs[8])
 -> (s) 
  
 
-Mux4t1 <- (control[2],inputs[4])
+Mux4to1 <- (control[2],inputs[4])
        s = mux(control[1],mux(control[0],inputs[0],inputs[1]),mux(control[0],inputs[2],inputs[3]));
 -> (s)
 
@@ -85,7 +85,7 @@ Demux4to16 <-(a[4])
            }
 ->(d[0..15])
 
-Demux5to32 <-(a[5])
+Demux5to32s1bit <-(a[5])
            array b[16];
            b[0..15]=Demux4to16<-(a[0..3]);
            c = not a[4];
