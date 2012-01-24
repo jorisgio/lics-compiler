@@ -101,7 +101,7 @@ let pCircuit circuit =
 	try
 	  let ar = Smap.find id.id env in
 	  for i = i1 to i2 do
-            assert (!ind < Array.length ioArray);
+            (*assert (!ind < Array.length ioArray);*)
             assert (i < Array.length ar);
 	    ioArray.(!ind) <- ar.(i);
 	    incr ind;
@@ -254,7 +254,7 @@ let pCircuit circuit =
                   Invalid_argument _ -> (
 		    raise (Error ({line = 42; char_b = 42; char_e = 42},
 			          "Pas le bon nombre d'entrée pour l'appel " )))
-                | Match_failure (_,_,_) -> failwith "Pb au niveau des entrées"
+                | _ -> failwith "Pb au niveau des entrées"
 	    in (*
 	    let () = if !aindex < callgate.ginputsize then
 		(raise (Error ({line = 42; char_b = 42; char_e = 42},
@@ -369,7 +369,6 @@ let pCircuit circuit =
       atomic gcur i2 i1)
 
     |Decl(_) -> gcur
-    | _ -> failwith "Oh ! Not implemented"
       
       
   (* construit récursive|ment le graphe, niveau par niveau
@@ -466,14 +465,8 @@ let pCircuit circuit =
   let ar = Array.make (start.goutputsize) 0 in
   let () = try
     List.iter (buildArray ar i start.gintEnv env) start.goutputs
-  with Match_failure (_,_,_) -> failwith "Erreur au niveau des sorties";
+  with _ -> failwith "Erreur au niveau des sorties";
   in
   let oList = Array.to_list ar in
   { igraph = graph ; iinputs = iList; ioutputs = oList }
-  
-    
-
-  
-    
-  
   
