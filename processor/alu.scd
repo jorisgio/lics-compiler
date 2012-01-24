@@ -1,5 +1,4 @@
 Alu1bit <-(a, b,less,ainvert, binvert, carryIn, operation[3])
-	array out[32];
 	a1 = mux(ainvert, a, not a);   
 	b1 = mux(binvert, b, not b);
  	/* ALUOp */
@@ -11,11 +10,10 @@ Alu1bit <-(a, b,less,ainvert, binvert, carryIn, operation[3])
         for (i,0,3) {
             f[i] = false;
             }
-	out[0..0] = Mux8to1<-(operation[0..2],op0,op1,op2[0],f[0],f[1],f[2],f[3],less);
--> (out[0],op2[1])
+	out = Mux8to1<-(operation[0..2],op0,op1,op2[0],f[0],f[1],f[2],f[3],less);
+-> (out,op2[1])
 
 Alulastbit <- (a, b,less,ainvert, binvert, carryIn, operation[3])
-	array out[32];
 	a1 = mux(ainvert, a, not a);   
 	b1 = mux(binvert, b, not b);
  	/* ALUOp */
@@ -27,8 +25,8 @@ Alulastbit <- (a, b,less,ainvert, binvert, carryIn, operation[3])
         for (i,0,3) {
             f[i] = false;
             }
-	out[0..0] = Mux8to1<-(operation[0..2],op0,op1,op2[0],f[0],f[1],f[2],f[3],less);
-->(out[0],op2[0])
+	out = Mux8to1<-(operation[0..2],op0,op1,op2[0],f[0],f[1],f[2],f[3],less);
+->(out,op2[0])
 
 Alu32bits <- (a[32],b[32],ainvert,binvert,carryIn,operation[3])
 	  array carry[32];
