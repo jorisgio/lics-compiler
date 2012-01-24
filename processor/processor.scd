@@ -22,10 +22,10 @@ Start <- ()
 
 	 /* l'instruction contient 6 bits d'opcode au début, seuls comptent les deux derniers */
 
-         /* multiplexeur choisissant l'addresse du rehistre à écrire */
+         /* multiplexeur choisissant l'addresse du rehistre à écrire. Pour les instructions R-types c'est dans rd, sinon c'est dans rt pour load */
          array writeReg[5];
          for(i,0,4) {
-                    writeReg[i] = mux(not instr[31], instr[i+11], instr[i+16]);
+                    writeReg[i] = mux(not instr[29], instr[i+11], instr[i+16]);
          }
 	 array alu[32];
 	 
