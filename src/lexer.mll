@@ -14,7 +14,8 @@ let kwd_tbl =
 let  is_keyword = 
    let h = Hashtbl.create 17 in
    List.iter (fun (s,t) -> Hashtbl.add h s t) kwd_tbl;
-   (fun s -> try Hashtbl.find h s  with Not_found -> IDENT s)
+   (fun s -> let s = String.lowercase s in 
+	     try Hashtbl.find h s  with Not_found -> IDENT s)
    
 let newline lexbuf =
     let pos = lexbuf.lex_curr_p in
@@ -29,7 +30,7 @@ let space = ['\t' ' ' ]
 let digit = [ '0'-'9']
 let letter = ['a'-'z' 'A'-'Z']
 let lowerletter = [ 'a'-'z' ]
-let ident = lowerletter+ digit*
+let ident = lowerletter+ (digit | letter)*
 
 
 rule token = parse
@@ -38,7 +39,7 @@ rule token = parse
         | ("true" | "false") as b { BOOL (bool_of_string b) }
         | ident as id { is_keyword id}
         (* on traite les identifiants commençant par une majuscule *)
-        | (['A'-'Z']+ letter* digit*) as id {UIDENT id }
+        | (['A'-'Z']+ (letter | digit)*) as id {UIDENT id }
         | digit+ as i { INT (int_of_string i) }
         | '='     { EQUAL }
         | '+'     { PLUS }
@@ -59,12 +60,12 @@ rule token = parse
         | "<-"    { IN  }
 	| '{'     { BBLOCK }
 	| '}'     { EBLOCK }
-        | "(*"    { comment lexbuf }
+        | "/*"    { comment lexbuf }
         | eof     { EOF }
         | _ as c  { raise (Lexer_error ("Illegal character " ^ String.make 1 c)) }
         
 and comment = parse
-  | "*)"    { token lexbuf }
+  | "*/"    { token lexbuf }
   | _       { comment lexbuf }
   | eof     { raise (Lexer_error ("unclosed comment")) }
  
