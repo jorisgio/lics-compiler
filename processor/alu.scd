@@ -1,6 +1,8 @@
 Alu1bit <-(a, b,less,ainvert, binvert, carryIn, operation[3])
-	a1 = mux(ainvert, a, not a);   
-	b1 = mux(binvert, b, not b);
+        na = not a;
+        nb = not b;
+	a1 = mux(ainvert, a, na);   
+	b1 = mux(binvert, b, nb);
  	/* ALUOp */
 	op0 = a1 and b1;
 	op1 = a1 || b1;
@@ -16,8 +18,10 @@ Alu1bit <-(a, b,less,ainvert, binvert, carryIn, operation[3])
 -> (out[0],op2[1])
 
 Alulastbit <- (a, b,less,ainvert, binvert, carryIn, operation[3])
-	a1 = mux(ainvert, a, not a);   
-	b1 = mux(binvert, b, not b);
+        na = not a;
+        nb = not b;
+	a1 = mux(ainvert, a, na);   
+	b1 = mux(binvert, b, nb);
  	/* ALUOp */
 	op0 = a1 and b1;
 	op1 = a1 || b1;

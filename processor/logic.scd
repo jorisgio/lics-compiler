@@ -1,7 +1,9 @@
 /* inverseur */
 Invert <- (a,b,ainvert,binvert)
-     a1 = mux(ainvert, a, not a);
-     b1 = mux(binvert, b, not b);
+     na = not a;
+     nb = not b;
+     a1 = mux(ainvert, a, na);
+     b1 = mux(binvert, b, nb);
      ->(a1,b1)
 
 /* 8 to 1 multiplexer, contrôle sur 3 bits, 8 entrées 1bit */ 

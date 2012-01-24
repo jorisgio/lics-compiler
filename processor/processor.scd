@@ -24,7 +24,7 @@ Start <- ()
          /* multiplexeur choisissant l'addresse du rehistre à écrire. Pour les instructions R-types c'est dans rd, sinon c'est dans rt pour load */
          array writeReg[5];
          for(i,0,4) {
-                    writeReg[i] = mux(not instr[29], instr[i+11], instr[i+16]);
+                    writeReg[i] = mux(instr[29], instr[i+16], instr[i+11]);
          }
 	 array alu[32];
 	 
@@ -68,21 +68,30 @@ Start <- ()
 	 
 	 /* Choix du nouveau PC en fonction de l'instruction (jump, branch,
 	 li ou R-type) */
-         /* rem : br = instr[31] */
 
+
+         array pctmp[32]; /* on developpe pour éviter les bugs du compilo */
+
+         /* calcul pour savoir si on branch */
+         br = zero[0] and instr[31];
 
          /* on traite à part le 0 et le 1 pour simuler un shift */
 
-         pc[0] = reg mux(jump,f,( mux((zero[0] and instr[31]),branch[0],addressplus[0]) ));
-         pc[1] = reg mux(jump,f,( mux((zero[0] and instr[31]),branch[1],addressplus[1]) ));
+         pctmp[0] = mux(jump,f,( mux(br,branch[0],addressplus[0]) ));
+         pctmp[1] = mux(jump,f,( mux(br,branch[1],addressplus[1]) ));
 	 
 	 for(i,2,27) {
-         	     pc[i] = reg mux(jump,instr[i-2],( mux((zero[0] and instr[31]),branch[i],addressplus[i]) ));
+         	     pctmp[i] = mux(jump,instr[i-2],( mux(br,branch[i],addressplus[i]) ));
 	}
-	pc[28] = reg mux(jump,addressplus[28],( mux((zero[0] and instr[31]), branch[28], addressplus[28])));
-	pc[29] = reg mux(jump,addressplus[29],( mux((zero[0] and instr[31]), branch[29], addressplus[29])));
-	pc[30] = reg mux(jump,addressplus[30],( mux((zero[0] and instr[31]), branch[30], addressplus[30])));
-	pc[31] = reg mux(jump,addressplus[31],( mux((zero[0] and instr[31]), branch[31], addressplus[31])));
+	pctmp[28] = mux(jump,addressplus[28],( mux(br, branch[28], addressplus[28])));
+	pctmp[29] = mux(jump,addressplus[29],( mux(br, branch[29], addressplus[29])));
+	pctmp[30] = mux(jump,addressplus[30],( mux(br, branch[30], addressplus[30])));
+	pctmp[31] = mux(jump,addressplus[31],( mux(br, branch[31],
+         	     addressplus[31])));
+                     
+        for(i,0,31) {
+                     pc[i] = reg pctmp[i];
+        }
 
 	 
 -> ()

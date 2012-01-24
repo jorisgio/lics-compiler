@@ -20,11 +20,11 @@ let position startpos endpos =
 %token COMMA SEMICOLON DOTDOT DOT
 %token EQUAL EOF ARRAY FOR
 
-%nonassoc NOT REG
 %left OR XOR
 %left AND
-%left TIMES DIV
+%nonassoc NOT REG
 %left PLUS MINUS
+%left TIMES DIV
 
 %start circuit
 %type <Ast.Past.circuit> circuit
