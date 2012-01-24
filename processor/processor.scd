@@ -10,7 +10,6 @@ Start <- ()
 	 datasrc = instr[29] && true;
 	 regWrite = not instr[31];
 	 jump = instr[30] && true;
-	 br = instr[31] && true;
 	 
       	 array signextend[32];
          for(i,0,15) {
@@ -57,23 +56,33 @@ Start <- ()
          array addressplus[32];
          addressplus[0..31] = Adder32 <- (quatre[0..31], pc[0..31]);
 
-
+         f0 = false;
+         f1 = false;
 
          array branch[32];
-         branch[0..31] = Adder32 <-(addressplus[0..31],signextend[0..31]);
+         /* signextend est shifté préalablement de 2 */
+         branch[0..31] = Adder32 <-(addressplus[0..31],f0,f1,signextend[0..29]);
 
          array zero[1];
          zero[0..0] = Zero <- (alu[0..31]);
 	 
 	 /* Choix du nouveau PC en fonction de l'instruction (jump, branch,
 	 li ou R-type) */
+         /* rem : br = instr[31] */
 
-	 for(i,0,29) {
-         	     pc[i] = reg mux(jump,instr[i],( mux((zero[0] and br),branch[i],addressplus[i]) ));
+
+         /* on traite à part le 0 et le 1 pour simuler un shift */
+
+         pc[0] = reg mux(jump,f,( mux((zero[0] and instr[31]),branch[0],addressplus[0]) ));
+         pc[1] = reg mux(jump,f,( mux((zero[0] and instr[31]),branch[1],addressplus[1]) ));
+	 
+	 for(i,2,27) {
+         	     pc[i] = reg mux(jump,instr[i-2],( mux((zero[0] and instr[31]),branch[i],addressplus[i]) ));
 	}
-	pc[29] = reg mux(jump,f,( mux((zero[0] and instr[31]), br, addressplus[29])));
-	pc[30] = reg mux(jump,f,( mux((zero[0] and instr[31]), br, addressplus[30])));
-	pc[31] = reg mux(jump,f,( mux((zero[0] and instr[31]), br, addressplus[31])));
+	pc[28] = reg mux(jump,addressplus[28],( mux((zero[0] and instr[31]), branch[28], addressplus[28])));
+	pc[29] = reg mux(jump,addressplus[29],( mux((zero[0] and instr[31]), branch[29], addressplus[29])));
+	pc[30] = reg mux(jump,addressplus[30],( mux((zero[0] and instr[31]), branch[30], addressplus[30])));
+	pc[31] = reg mux(jump,addressplus[31],( mux((zero[0] and instr[31]), branch[31], addressplus[31])));
 
 	 
 -> ()
