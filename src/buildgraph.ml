@@ -297,6 +297,7 @@ let pCircuit circuit =
     | Assign_i(ident, i, exp) ->
       assert(Smap.mem ident.id env);
       let i = eval intEnv i in
+      (*print_int i ;*)
       let cur = Smap.find ident.id env in
       processBExpr gcur intEnv env [|cur.(i)|] exp 
     | Assign_r(ident, i1, i2, exp) ->
@@ -331,38 +332,43 @@ let pCircuit circuit =
        en substituant la variable entière comme il faut *)
     | For(fenv,ienv,id,i1,i2,li) ->
       (* traitement pour une itération *)
+      (* print_endline
+         ("For i = " ^ string_of_int i1 ^ " to " ^ string_of_int i2); *)
       let i2 = i2 + 1 in
-      let rec atomic graph =  function
-	| i2  -> graph
-	| i -> 
-	(* d'abord, on ajoute les noeuds *)
+      let rec atomic graph i =
+        if i = i2 then graph
+        else begin
+	  (* print_endline "Un passage";*)
+	  (* d'abord, on ajoute les noeuds *)
 	  let createNodes name ident (fenv,graph) =
 	    match ident.typ with
 	      | Bool -> begin
-		let graph = Graphe.addVertex graph !index in
-		let ar = Array.make 1 !index in
-		incr index ;
-		((Smap.add name ar fenv),graph)
+	        let graph = Graphe.addVertex graph !index in
+	        let ar = Array.make 1 !index in
+	        incr index ;
+	        ((Smap.add name ar fenv),graph)
 	      end
 	      | Array s -> begin
-		let ar = Array.make s 0 in
-		let gr = ref graph in
-		for i = 0 to (s - 1) do
+	        let ar = Array.make s 0 in
+	        let gr = ref graph in
+	        for i = 0 to (s - 1) do
 	          gr := Graphe.addVertex !gr !index ;
 		  ar.(i) <- !index ;
                   incr index ;
-		done ;
-		((Smap.add name ar fenv), !gr)
+	        done ;
+	        ((Smap.add name ar fenv), !gr)
 	      end
 	  in
-	  
-	  let env,graph = Smap.fold createNodes fenv (env,graph) in
-
-	  (* ensuite, on crée les liens, comme d'hab :Þ *)
-	  let graph  = List.fold_left (processInstr ienv env) graph li in
 	
+	  let env,graph = Smap.fold createNodes fenv (env,graph) in
+          (* print_endline "On crée les liens"; *)
+	  (* ensuite, on crée les liens, comme d'hab :Þ *)
+          let ienv = Smap.add "i" i ienv in (* solution temporaire *)
+	  let graph  = List.fold_left (processInstr ienv env) graph li in
+	  
 	  atomic graph (i+1)
-	    
+        end
+	  
       in
       atomic gcur i1
 
