@@ -38,7 +38,7 @@ Alu32bits <- (a[32],b[32],ainvert,binvert,carryIn,operation[3])
 		array out[2];
 		out[0..1] = Alu1bit <- (a[i],b[i],f,ainvert,binvert,carry[i-1],operation[0..2]);
 		carry[i] = out[1] and true;
-		s[i] = out[0];
+		s[i] = out[0] and true;
 		}
 	  out31[0..1] = Alulastbit <-
 		(a[31],a[31],f,ainvert,binvert,carry[30],operation[0..2]);
