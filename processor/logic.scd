@@ -58,4 +58,41 @@ Demux2to4 <-(a,b)
 	  d3 = a and b ;
 -> (d0,d1,d2,d3)
 
-Demux3to8decoder
+Demux3to8 <-(a[3])
+          array b[4];
+          b[0..3]=Demux2to4<-(a[0..1]);
+          c = not a[2];
+          array d[8];
+          for(i,0,3) {
+          d[i] = b[i] && c;
+          }
+          for(i,0,3) {
+          d[i+4] = b[i] && a[2];
+          }
+->(d[0..7])
+
+Demux4to16 <-(a[4])
+           array b[8];
+           b[0..7]=Demux3to8<-(a[0..2]);
+           c = not a[3];
+           array d[16];
+           for(i,0,7) {
+           d[i] = b[i] && c;
+           }
+           for(i,0,7) {
+           d[i+8] = b[i] && a[3];
+           }
+->(d[0..15])
+
+Demux5to32 <-(a[5])
+           array b[16];
+           b[0..15]=Demux4to16<-(a[0..3]);
+           c = not a[4];
+           array d[32];
+           for(i,0,15) {
+           d[i] = b[i] && c;
+           }
+           for(i,0,15) {
+           d[i+16] = b[i] && a[4];
+           }
+->(d[0..31])
