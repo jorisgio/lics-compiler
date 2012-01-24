@@ -1,22 +1,22 @@
 /* inverseur */
 Invert <- (a,b,ainvert,binvert)
-     a1 = MUX(ainvert, a, NOT a);
-     b1 = MUX(binvert, b, NOT b);
+     a1 = mux(ainvert, a, not a);
+     b1 = mux(binvert, b, not b);
      ->(a1,b1)
 
 /* 8 to 1 multiplexer, contrôle sur 3 bits, 8 entrées 1bit */ 
 
 Mux8to1 <- (control[3],inputs[8])
-	n0 = MUX(control[0],inputs[0],inputs[1]);
-	n1 = MUX(control[0],inputs[2],inputs[3]);
-	n2 = MUX(control[0],inputs[4],inputs[5]);
-	n3 = MUX(control[0],inputs[6],inputs[7]);
-	s = MUX(control[2],MUX(control[1],n0,n1),MUX(control[1],n2,n3));
+	n0 = mux(control[0],inputs[0],inputs[1]);
+	n1 = mux(control[0],inputs[2],inputs[3]);
+	n2 = mux(control[0],inputs[4],inputs[5]);
+	n3 = mux(control[0],inputs[6],inputs[7]);
+	s = mux(control[2],mux(control[1],n0,n1),mux(control[1],n2,n3));
 -> (s) 
  
 
 Mux4t1 <- (control[2],inputs[4])
-       s = MUX(control[1],MUX(control[0],inputs[0],inputs[1]),MUX(control[0],inputs[2],inputs[3]));
+       s = mux(control[1],mux(control[0],inputs[0],inputs[1]),mux(control[0],inputs[2],inputs[3]));
 -> (s)
 
 Mux32to1 <- (control[5],inputs[32]) 
@@ -45,17 +45,17 @@ Mux32to1s32 <- (control[5],inputs[1024])
 /* décodeurs */
 
 Demux1to2 <-(a)
-	  s1 = NOT a;
+	  s1 = not a;
 	  s2 = a;
 -> (s1,s2)
 
 Demux2to4 <-(a,b) 
-	  a1 = NOT a;
-	  b1 = NOT b;
-	  d0 = a1 AND b1;
-	  d1 = a AND b1;
-	  d2 = a1 AND b;
-	  d3 = a AND b ;
+	  a1 = not a;
+	  b1 = not b;
+	  d0 = a1 and b1;
+	  d1 = a and b1;
+	  d2 = a1 and b;
+	  d3 = a and b ;
 -> (d0,d1,d2,d3)
 
 Demux3to8decoder

@@ -16,11 +16,11 @@ Regs <-(datasIn[32],writeReg[5],readReg1[5],readReg2[5],controlWrite)
      control[0..31] = Demux5to32s1bit <- (writeReg[0..4]);
      for(i,0,31) {
      		 /* on vérifie si on doit écrire dans ce registre */
-     		 w = controlWrite AND control[i];
+     		 w = controlWrite and control[i];
 		 /* Actualisation du registre,
 		 si on doit écrire, on actualise le registre, sinon on garde son ancienne valeur */
 		   for(j,0,31) {
-		   	       dat[j] = MUX(w,datasIn[j], regs[i+j]);
+		   	       dat[j] = mux(w,datasIn[j], regs[i+j]);
 			       regs[j+i] = REG dat[j];
 		 }
 		 

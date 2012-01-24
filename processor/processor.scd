@@ -5,10 +5,10 @@ Start <- ()
 
          /* memory unit */
          array instr[32];
-         instr[0..31] = LW(pc[0..31]);
+         instr[0..31] = lw(pc[0..31]);
 
 	 datasrc = instr[29] && true;
-	 regWrite = NOT instr[31];
+	 regWrite = not instr[31];
 	 jump = instr[30] && true;
 	 br = instr[31] && true;
 	 
@@ -25,14 +25,14 @@ Start <- ()
          /* multiplexeur choisissant l'addresse du rehistre à écrire */
          array writeReg[5];
          for(i,0,4) {
-                    writeReg[i] = MUX(NOT instr[31], instr[i+11], instr[i+16]);
+                    writeReg[i] = mux(not instr[31], instr[i+11], instr[i+16]);
          }
 	 array alu[32];
 	 
 	 /* choix de l'entrée des données à écrire dans le registre, soit le résultat de l'alu, soit les données directes pour li */	
 	 array regdataentry[32];
 	 for(i,0,31) {
-	 	     regdataentry[i] = MUX(datasrc,sign_extend[i],alu[i])
+	 	     regdataentry[i] = mux(datasrc,sign_extend[i],alu[i])
 		     }
 
          array regs[64];
@@ -65,11 +65,11 @@ Start <- ()
 	 /* Choix du nouveau PC en fonction de l'instruction (jump, branch, li ou R-type) */
 	 array jump[32] ;
 	 for(i,0,29) {
-         	     pc[i] = REG MUX(jump,instr[i],( MUX((zero[0] AND br),branch[i],addressplus[i]) ));
+         	     pc[i] = REG mux(jump,instr[i],( mux((zero[0] and br),branch[i],addressplus[i]) ));
 	}
-	pc[29] = REG MUX(jump,false,( MUX((zero[0] AND instr[31]), br, addressplus[29])));
-	pc[30] = REG MUX(jump,false,( MUX((zero[0] AND instr[31]), br, addressplus[30])));
-	pc[31] = REG MUX(jump,false,( MUX((zero[0] AND instr[31]), br, addressplus[31])));
+	pc[29] = REG mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[29])));
+	pc[30] = REG mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[30])));
+	pc[31] = REG mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[31])));
 
 	 
 -> ()

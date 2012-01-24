@@ -24,12 +24,12 @@ Zero <-(a[32])
 Adder32 <- (a[32],b[32],carryIn) 
 	array s[32];
 	array r[33];
-	r[0] = carryIn AND true;
+	r[0] = carryIn and true;
 	for(i,0,31) {
 	    array out[2];
 	    out[0..1] = Fulladder(a[i],b[i],r[j]);
-	    s[i] = out[0] AND true;
-	    r[i+1] = out[1] AND true;
+	    s[i] = out[0] and true;
+	    r[i+1] = out[1] and true;
 	    }
 /* on gère pas les overflow */
 -> (s,r[32])

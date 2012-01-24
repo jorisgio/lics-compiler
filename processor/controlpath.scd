@@ -7,7 +7,7 @@ ALUControl <- (aluop,func[3])
 	   truth1[1] = true  && true;
 	   truth1[2] = true && true;
 	   for(i,0,2) {
-	   	aluctl[i] = MUX(aluop,func[i],truth1[i]);
+	   	aluctl[i] = mux(aluop,func[i],truth1[i]);
 		}
 -> (aluctl[0..2])
 
