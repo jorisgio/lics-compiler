@@ -363,7 +363,7 @@ let pCircuit circuit =
 	  let env,graph = Smap.fold createNodes fenv (env,graph) in
           (* print_endline "On crée les liens"; *)
 	  (* ensuite, on crée les liens, comme d'hab :Þ *)
-          let ienv = Smap.add "i" i ienv in (* solution temporaire *)
+          let ienv = Smap.add id i ienv in
 	  let graph  = List.fold_left (processInstr ienv env) graph li in
 	  
 	  atomic graph (i+1)
