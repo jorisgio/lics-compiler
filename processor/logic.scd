@@ -23,7 +23,7 @@ Mux32to1 <- (control[5],inputs[32])
 	 array mux1[1];
 	 array mux2[1];
 	 array mux3[1];
-	 array mux4[];
+	 array mux4[1];
 	 array s[1];
 	 mux1[0..0] = Mux8to1<-(control[0..2],inputs[0..7]);
 	 mux2[0..0] = Mux8to1<-(control[0..2],inputs[8..15]);
@@ -38,7 +38,8 @@ Mux32to1s32 <- (control[5],inputs[1024])
 	    array s[32];
 	    for(i,0,31) {
 	    	
-	        s[i..i] = Mux32to1(control[0..4],inputs[)..(31 * i+1)]);
+	        s[i..i] =
+                 Mux32to1 <- (control[0..4],inputs[(32*i)..(32*(i+1) - 1)]);
 		}
 -> (s[0..31])
 

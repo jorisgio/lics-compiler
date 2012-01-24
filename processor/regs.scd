@@ -2,7 +2,7 @@
 Reg32 <-(inputs[32])
       array result[32];
       for(i, 0, 31) {
-      	     result[i] = REG inputs[i];
+      	     result[i] = reg inputs[i];
 	}
 -> (result)
 
@@ -21,12 +21,13 @@ Regs <-(datasIn[32],writeReg[5],readReg1[5],readReg2[5],controlWrite)
 		 si on doit écrire, on actualise le registre, sinon on garde son ancienne valeur */
 		   for(j,0,31) {
 		   	       dat[j] = mux(w,datasIn[j], regs[i+j]);
-			       regs[j+i] = REG dat[j];
-		 }
+			       regs[j+i] = reg dat[j];
+                  }
+     }
 		 
      /* Lecture des registres */
      array out1[32];
      array out2[32];
-     out1[0..31] = Mux32to1s32(readReg1[5],regs[0..1023]);
-     out2[0..31] = Mux32to1s32(readReg2[5],regs[0..1023]);
+     out1[0..31] = Mux32to1s32 <- (readReg1[0..4],regs[0..1023]);
+     out2[0..31] = Mux32to1s32 <- (readReg2[0..4],regs[0..1023]);
 -> (out1[0..31],out2[0..31])

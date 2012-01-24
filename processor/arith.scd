@@ -27,7 +27,7 @@ Adder32 <- (a[32],b[32],carryIn)
 	r[0] = carryIn and true;
 	for(i,0,31) {
 	    array out[2];
-	    out[0..1] = Fulladder(a[i],b[i],r[j]);
+	    out[0..1] = Fulladder <- (a[i],b[i],r[i]);
 	    s[i] = out[0] and true;
 	    r[i+1] = out[1] and true;
 	    }

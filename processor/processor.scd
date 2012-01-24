@@ -12,12 +12,12 @@ Start <- ()
 	 jump = instr[30] && true;
 	 br = instr[31] && true;
 	 
-      	 array sign_extend[32];
+      	 array signextend[32];
          for(i,0,15) {
-                     sign_extend[i] = instr[i] && true;
+                     signextend[i] = instr[i] && true;
          }
          for(i,16,31) {
-                      sign_extend[i] = instr[15] && true;
+                      signextend[i] = instr[15] && true;
          }
 
 	 /* l'instruction contient 6 bits d'opcode au début, seuls comptent les deux derniers */
@@ -32,7 +32,7 @@ Start <- ()
 	 /* choix de l'entrée des données à écrire dans le registre, soit le résultat de l'alu, soit les données directes pour li */	
 	 array regdataentry[32];
 	 for(i,0,31) {
-	 	     regdataentry[i] = mux(datasrc,sign_extend[i],alu[i])
+	 	     regdataentry[i] = mux(datasrc,signextend[i],alu[i]);
 		     }
 
          array regs[64];
@@ -47,9 +47,12 @@ Start <- ()
 
          /* calcul de l'adresse de l'instruction suivante */
 
-         /* par défaut c'est zéro */
+         /* Taille de 1 mot */
          array quatre[32];
-         quatre[5] = TRUE;
+         for(i,0,31) {
+                     quatre[i] = false;
+         }
+         quatre[5] = true;
 
          array addressplus[32];
          addressplus[0..31] = Fulladder <- (quatre[0..31], pc[0..31]);
@@ -57,19 +60,19 @@ Start <- ()
 
 
          array branch[32];
-         branch([0..31]) = Fulladder <-(addressplus[0..31],sign_extend[32]);
+         branch[0..31] = Fulladder <-(addressplus[0..31],signextend[0..31]);
 
          array zero[1];
-         zero[0] = Zero <- (alu[32]);
+         zero[0..0] = Zero <- (alu[0..31]);
 	 
 	 /* Choix du nouveau PC en fonction de l'instruction (jump, branch, li ou R-type) */
 	 array jump[32] ;
 	 for(i,0,29) {
-         	     pc[i] = REG mux(jump,instr[i],( mux((zero[0] and br),branch[i],addressplus[i]) ));
+         	     pc[i] = reg mux(jump,instr[i],( mux((zero[0] and br),branch[i],addressplus[i]) ));
 	}
-	pc[29] = REG mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[29])));
-	pc[30] = REG mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[30])));
-	pc[31] = REG mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[31])));
+	pc[29] = reg mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[29])));
+	pc[30] = reg mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[30])));
+	pc[31] = reg mux(jump,false,( mux((zero[0] and instr[31]), br, addressplus[31])));
 
 	 
 -> ()
