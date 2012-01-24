@@ -297,7 +297,6 @@ let pCircuit circuit =
     | Assign_i(ident, i, exp) ->
       assert(Smap.mem ident.id env);
       let i = eval intEnv i in
-      (*print_int i ;*)
       let cur = Smap.find ident.id env in
       processBExpr gcur intEnv env [|cur.(i)|] exp 
     | Assign_r(ident, i1, i2, exp) ->
@@ -330,47 +329,42 @@ let pCircuit circuit =
        ils ne sont visibles qu'a l'intérieur du bloc *)
     (* Manière de procéder : on traite simplement le tout n fois 
        en substituant la variable entière comme il faut *)
-    | For(fenv,ienv,id,i1,i2,li) ->
+    | For(fenv,ienv,id,i1,i2,li) -> (
       (* traitement pour une itération *)
-      (* print_endline
-         ("For i = " ^ string_of_int i1 ^ " to " ^ string_of_int i2); *)
-      let i2 = i2 + 1 in
-      let rec atomic graph i =
-        if i = i2 then graph
-        else begin
-	  (* print_endline "Un passage";*)
+      let rec atomic graph max =  function
+	| i when (max+1) = i -> graph
+	| i ->
+	  begin
 	  (* d'abord, on ajoute les noeuds *)
-	  let createNodes name ident (fenv,graph) =
-	    match ident.typ with
-	      | Bool -> begin
-	        let graph = Graphe.addVertex graph !index in
-	        let ar = Array.make 1 !index in
-	        incr index ;
-	        ((Smap.add name ar fenv),graph)
-	      end
-	      | Array s -> begin
-	        let ar = Array.make s 0 in
-	        let gr = ref graph in
-	        for i = 0 to (s - 1) do
-	          gr := Graphe.addVertex !gr !index ;
-		  ar.(i) <- !index ;
-                  incr index ;
-	        done ;
-	        ((Smap.add name ar fenv), !gr)
-	      end
-	  in
-	
-	  let env,graph = Smap.fold createNodes fenv (env,graph) in
-          (* print_endline "On crée les liens"; *)
-	  (* ensuite, on crée les liens, comme d'hab :Þ *)
-          let ienv = Smap.add id i ienv in
-	  let graph  = List.fold_left (processInstr ienv env) graph li in
-	  
-	  atomic graph (i+1)
-        end
-	  
+	    let createNodes name ident (aenv,graph) =
+	      match ident.typ with
+		| Bool ->
+		  begin
+		    let graph = Graphe.addVertex graph !index in
+		    let ar = Array.make 1 !index in
+		    incr index ;
+		    ((Smap.add name ar aenv),graph)
+		  end
+		| Array s -> 
+		  begin
+		    let ar = Array.make s 0 in
+		    let gr = ref graph in
+		    for i = 0 to (s - 1) do
+	              gr := Graphe.addVertex !gr !index ;
+		      ar.(i) <- !index ;
+                      incr index ;
+		    done ;
+		    ((Smap.add name ar aenv), !gr)
+		  end
+	    in
+	    let aenv,graph = Smap.fold createNodes fenv (env,graph) in
+	    (* ensuite, on crée les liens, comme d'hab :Þ *)
+	    let ienv = Smap.add id i ienv in
+	    let graph  = List.fold_left (processInstr ienv aenv) graph li in
+ 	    atomic graph max (i+1)
+	  end
       in
-      atomic gcur i1
+      atomic gcur i2 i1)
 
     |Decl(_) -> gcur
     | _ -> failwith "Oh ! Not implemented"
