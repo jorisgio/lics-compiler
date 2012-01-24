@@ -444,7 +444,7 @@ let pCircuit circuit =
   (* par convention, la porte principale s'appelle "Start" *)
   assert(not (Smap.is_empty circuit.gates));
   (*Smap.iter (fun k _ -> Printf.printf "<%s>\n" k) circuit.gates; *)
-  assert(Smap.mem "Start" circuit.gates);
+  if not (Smap.mem "Start" circuit.gates) then failwith "Pas de porte Start";
   let start = Smap.find "Start" circuit.gates in
   (* On ajoute les entrées *)
   let ar = Array.make (start.ginputsize) 0 in

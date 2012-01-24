@@ -13,15 +13,18 @@ Regs <-(datasIn[32],writeReg[5],readReg1[5],readReg2[5],controlWrite)
      array control[32];
      /* Ecriture des registres */ 
      control[0..31] = Demux5to32s1bit <- (writeReg[0..4]);
-     for(i,0,31) {
+
+     /* on fait en sorte d'éviter les for imbriqués */
+     for(i,0,1023) {
      		 /* on vérifie si on doit écrire dans ce registre */
-     		 w = controlWrite and control[i];
+     		 w = controlWrite and control[i/32];
 		 /* Actualisation du registre,
 		 si on doit écrire, on actualise le registre, sinon on garde son ancienne valeur */
-		   for(j,0,31) {
-		   	       dat = mux(w,datasIn[j], regs[i*32+j]);
-			       regs[j+i*32] = reg dat;
-                  }
+		 
+                 /* calcul du mod pour datasIn */
+		 dat = mux(w,datasIn[i-(i/32)*32], regs[i]);
+		 regs[i] = reg dat;
+                 
      }
 		 
      /* Lecture des registres */
