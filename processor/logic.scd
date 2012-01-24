@@ -47,7 +47,7 @@ Mux32to1s32 <- (control[5],inputs[1024])
 
 Demux1to2 <-(a)
 	  s1 = not a;
-	  s2 = a;
+          s2 = a && true;
 -> (s1,s2)
 
 Demux2to4 <-(a,b) 

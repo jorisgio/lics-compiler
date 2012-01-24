@@ -3,9 +3,9 @@
 ALUControl <- (aluop,func[3]) 
 	   array aluctl[3];
 	   array truth1[3];
-	   truth1[0] = false && true;
-	   truth1[1] = true  && true;
-	   truth1[2] = true && true;
+	   truth1[0] = false;
+	   truth1[1] = true;
+	   truth1[2] = true;
 	   for(i,0,2) {
 	   	aluctl[i] = mux(aluop,func[i],truth1[i]);
 		}
