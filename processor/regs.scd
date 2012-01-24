@@ -11,7 +11,6 @@ Reg32 <-(inputs[32])
 Regs <-(datasIn[32],writeReg[5],readReg1[5],readReg2[5],controlWrite) 
      array regs[1024];
      array control[32];
-     array dat[32];
      /* Ecriture des registres */ 
      control[0..31] = Demux5to32s1bit <- (writeReg[0..4]);
      for(i,0,31) {
@@ -20,8 +19,9 @@ Regs <-(datasIn[32],writeReg[5],readReg1[5],readReg2[5],controlWrite)
 		 /* Actualisation du registre,
 		 si on doit écrire, on actualise le registre, sinon on garde son ancienne valeur */
 		   for(j,0,31) {
-		   	       dat[j] = mux(w,datasIn[j], regs[i+j]);
-			       regs[j+i] = reg dat[j];
+                               array dat[32];
+		   	       dat[j] = mux(w,datasIn[j], regs[i*32+j]);
+			       regs[j+i*32] = reg dat[j];
                   }
      }
 		 
