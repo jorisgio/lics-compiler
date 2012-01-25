@@ -1,17 +1,11 @@
 
 Il faut placer la lib ograph et licsLib dans le répertoire lib/ (ignore par git)
 
-Pour construire le projet, utiliser ocamlbuild.
-ocamlbuild src/main.native par exemple
-Pour ceux qui préfèrent make, il y a un Makefile qui lance ocamlbuil
+Pour compiler le compilateur, utiliser make.
 
-pour compiler en natif :
-make native
-en bytecode :
-make bytecode
-en debug:
-make debug
-et pour clean les targets ci-dessus :
-make clean-{native,debug,bytecode}
+Pour savoir comment utiliser le compilateur en détails : ./main.native
+-help
 
-Pour savoir comment utiliser le compilateur : ./main.native -help
+En particulier, pour compiler le processeur, utiliser le script
+./processor.sh
+La sortie est processor.bin
