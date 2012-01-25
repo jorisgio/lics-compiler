@@ -8,13 +8,13 @@ Start <- (top)
 
          /* memory unit */
          array instr[32];
-         instr[0..31] = lw(pc[0..31]); 1000000000000000 00000 00000 000 100
+         instr[0..31] = lw(pc[0..31]); /*1000000000000000 00000 00000 000 100*/
 
-	 datasrc = instr[29] && true; 1
-	 regWrite = not instr[31]; 1
-	 jump = instr[30] && true; 0 
+	 datasrc = instr[29] && true; /*1*/
+	 regWrite = not instr[31]; /*1*/
+	 jump = instr[30] && true; /*0 */
 	 
-      	 array signextend[32]; 100000000000000000…
+      	 array signextend[32]; /*100000000000000000…*/
          for(i,0,15) {
                      signextend[i] = instr[i] && true;
          }
@@ -27,14 +27,14 @@ Start <- (top)
          /* multiplexeur choisissant l'addresse du rehistre à écrire. Pour les instructions R-types c'est dans rd, sinon c'est dans rt pour load */
          array writeReg[5];
          for(i,0,4) {
-                    writeReg[i] = mux(instr[29], instr[i+16], instr[i+11]); 00000
+                    writeReg[i] = mux(instr[29], instr[i+16], instr[i+11]); /*00000*/
          }
 	 array alu[32];
 	 
 	 /* choix de l'entrée des données à écrire dans le registre, soit le résultat de l'alu, soit les données directes pour li */	
 	 array regdataentry[32];
 	 for(i,0,31) {
-	 	     regdataentry[i] = mux(datasrc,signextend[i],alu[i]); 100000000000000000
+	 	     regdataentry[i] = mux(datasrc,signextend[i],alu[i]); /*100000000000000000*/
 		     }
          
          /* on reçoit deux registres utiles dans le datapath + 14 registres
