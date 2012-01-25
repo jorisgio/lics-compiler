@@ -68,7 +68,7 @@ Florian Bourse, Joris Giovannangeli, Théo Zimmermann
 \end_layout
 
 \begin_layout Date
-23 Janvier 2012
+Janvier 2012
 \end_layout
 
 \begin_layout Section
@@ -758,12 +758,12 @@ Le programme de la montre est assez simple:
 \end_layout
 
 \begin_layout Standard
-il garde en valeur dans des registres les valeurs des chiffres à retenir:
- unités et dizaines des secondes, minutes, heures, jours, mois, années,
- ainsi que les unités et les dizaines des siècles.
+il garde dans des registres les valeurs des chiffres à retenir: unités et
+ dizaines des secondes, minutes, heures, jours, mois, années, ainsi que
+ les unités et les dizaines des siècles.
  Elle comprend également un registre qui permet de compter modulo 4 pour
  savoir si l'année est bissextile ou non, ainsi que des registres contenant
- le nombre d'heures, de mois et de jours, afin de faciliter la remise a
+ le nombre d'heures, de mois et de jours, afin de faciliter la remise à
  zéro du compteur en temps voulu.
  Pour connaître le nombre de jours dans un mois, on se donne aussi un registre
  dans lequel on stocke cette information, il est mis à jour à chaque changement
