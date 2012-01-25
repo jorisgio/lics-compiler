@@ -147,7 +147,7 @@ reg
 \emph default
  pour les registres (1 bit) et 
 \emph on
-rw
+lw
 \emph default
  pour lire dans la ROM, les constantes 
 \emph on
@@ -513,7 +513,7 @@ Conventions détaillés de l'assembleur
 Les instructions sont codées sur 32bits, décomposées comme suit :
 \end_layout
 
-\begin_layout Standard
+\begin_layout LyX-Code
 [3bits] [ 29 bits ]
 \end_layout
 
@@ -530,32 +530,34 @@ Les 3 premiers bits contiennent l'opcode de l'instruction, c'est à dire
 datasrc : choisit l'entrée du bloc de registre contenant les données à écrire.
  0 : sortie de l'ALU.
  1 : la constante étendue à 32 bits contenue dans les 16 bits bas de l'instructi
-on définie comme le 3ème bit de l'opcode.
+on.
+ Défini comme le 3ème bit de l'opcode.
 \end_layout
 
 \begin_layout Description
 regWrite : choisit si on va écrire ou non dans les registres 0 : on garde
- les valeurs des registres, 1 : on écrit dans 1 registre définie comme l'opposé
- du premier bit de l'opcode.
+ les valeurs des registres, 1 : on écrit dans 1 registre.
+ Défini comme l'opposé du premier bit de l'opcode.
 \end_layout
 
 \begin_layout Description
 jump : choisit la valeur du prochain PC : soit celle venant de l'ALU, soit
  celle venant des 29 bits de la partie basse de l'instruction.
  1 : on prend la valeur de l'instr.
- 0 : on prend la valeur de l'ALU définie comme le 2ème bit de l'opcode.
+ 0 : on prend la valeur de l'ALU .
+ Défini comme le 2ème bit de l'opcode.
 \end_layout
 
 \begin_layout Description
 branch (br) : choisit la valeur du prochain PC 0 : on prend PC + 4 , 1 :
- on prend l'adresse donnée par l'instruction de branchement étendue à 32bits
- définie comme le premier bit d'opcode.
+ on prend l'adresse donnée par l'instruction de branchement étendue à 32bits.
+ Défini comme le premier bit d'opcode.
 \end_layout
 
 \begin_layout Description
 writeReg : choisit la source de l'adresse du registre à écrire, sur 5 bits.
- 0 : partie 16-20 de l'instruction, 1 : partie 11-15 de l'instruction, définie
- comme l'opposé du 3ème bit d'opcode .
+ 0 : partie 16-20 de l'instruction, 1 : partie 11-15 de l'instruction.
+ Défini comme l'opposé du 3ème bit d'opcode .
 \end_layout
 
 \begin_layout Subparagraph
@@ -563,19 +565,57 @@ R type
 \end_layout
 
 \begin_layout Standard
-Les instrucions arithmétiques et logique [ 3bits ] [ 3bits vides] [ 5 bits
- ] [ 5 bits ] [ 5 bits ] [ 5 bits vides ] [ 6bits ] opcode vide rs rt rd
- vide ALUfunc
+Les instrucions arithmétiques et logiques.
+\end_layout
+
+\begin_layout LyX-Code
+[ 3bits ] [3bits] [ 5 bits ] [ 5 bits ] [ 5 bits ] [ 5 bits] [ 6bits ] 
+\end_layout
+
+\begin_layout LyX-Code
+opcode      vide     rs          rt         rd        vide    ALUfunc
 \end_layout
 
 \begin_layout Standard
 Les 6 bits d'ALUfunc choisissent l'opération que l'ALU doit effectuer.
- Seuls les 3 bits de poids faible comptent ALUopérations : 000 : AND 100
- : OR 010 : ADD l'opcode et 000, donc : datasrc = résultat de l'instrution.
- regWrite = 1 : on écrit le résultat dans le registre, jump = 0 : on ne
- fait pas de saut, branch = 0 : on prend l'instruction suivante, writeReg
- = 1 : on prend la partie rd 11-15 de l'instruction comme registre de destinatio
-n.
+ Seuls les 3 bits de poids faible comptent ALUopérations : 
+\end_layout
+
+\begin_layout Description
+000 : AND 
+\end_layout
+
+\begin_layout Description
+100 : OR 
+\end_layout
+
+\begin_layout Description
+010 : ADD 
+\end_layout
+
+\begin_layout Standard
+L'opcode est 000, donc : 
+\end_layout
+
+\begin_layout Itemize
+datasrc = 0, résultat de l'instrution en entrée des registres
+\end_layout
+
+\begin_layout Itemize
+regWrite = 1 : on écrit le résultat dans le registre,
+\end_layout
+
+\begin_layout Itemize
+jump = 0 : on ne fait pas de saut, 
+\end_layout
+
+\begin_layout Itemize
+branch = 0 : on prend l'instruction suivante, 
+\end_layout
+
+\begin_layout Itemize
+writeReg = 1 : on prend la partie rd 11-15 de l'instruction comme registre
+ de destination.
  
 \end_layout
 
@@ -584,15 +624,39 @@ Load
 \end_layout
 
 \begin_layout Standard
-load immediate [ 3bits ] [ 3bits ] [ 5bits] [ 5 bits ] [ 16 bits ] opcode
- vide vide rd entier signé 16 bits.
+load immediate
+\end_layout
+
+\begin_layout LyX-Code
+[ 3bits ] [ 3bits ] [ 5bits] [ 5 bits ] [ 16 bits ]
+\end_layout
+
+\begin_layout LyX-Code
+opcode     vide      vide      rd         entier 
 \end_layout
 
 \begin_layout Standard
-l'opcode est : 001, donc : datasrc = 1, partie basse de l'instruction en
- entrée des registres, regWrite = 1, on écrit dans le registre jump = 0,
- branch = 0, on prend l'instruction suivante pour PC writeReg : 0, on prend
- la partie rd 26-20 comme destination
+L'opcode est : 001, donc : 
+\end_layout
+
+\begin_layout Itemize
+datasrc = 1, partie basse de l'instruction en entrée des registres, 
+\end_layout
+
+\begin_layout Itemize
+regWrite = 1, on écrit dans le registre 
+\end_layout
+
+\begin_layout Itemize
+jump = 0, 
+\end_layout
+
+\begin_layout Itemize
+branch = 0, on prend l'instruction suivante pour PC 
+\end_layout
+
+\begin_layout Itemize
+writeReg = 0, on prend la partie rd 26-20 comme destination
 \end_layout
 
 \begin_layout Subparagraph
@@ -600,12 +664,81 @@ Jump
 \end_layout
 
 \begin_layout Standard
-Les instructions de saut, avec juste jump dans les faits [ 3bits ] [ 29
- bits ] opcode addresse du futur PC 
+Les instructions de saut, avec juste jump dans les faits.
+\end_layout
+
+\begin_layout LyX-Code
+[ 3bits ] [       29 bits          ] 
+\end_layout
+
+\begin_layout LyX-Code
+  opcode     addresse du futur PC 
 \end_layout
 
 \begin_layout Standard
-l'opcode est 110, donc datasrc = 0, regWrite = 
+l'opcode est 110, donc 
+\end_layout
+
+\begin_layout Itemize
+datasrc = 0, 
+\end_layout
+
+\begin_layout Itemize
+regWrite = 0,
+\end_layout
+
+\begin_layout Itemize
+jump = 1, 
+\end_layout
+
+\begin_layout Itemize
+branch = 1 (Don't care, puisque jump = 1),
+\end_layout
+
+\begin_layout Itemize
+writeReg = 1 (Don't care, car regWrite = 0)
+\end_layout
+
+\begin_layout Subparagraph
+Branch 
+\end_layout
+
+\begin_layout Standard
+L'instruction 
+\emph on
+beq.
+\end_layout
+
+\begin_layout LyX-Code
+[ 3 bits ] [ 3bits ] [ 5bits ] [ 5bits ] [ 16 bits ]
+\end_layout
+
+\begin_layout LyX-Code
+  opcode    vide       rs        rt       addresse
+\end_layout
+
+\begin_layout Standard
+L'opcode est 100, donc : 
+\end_layout
+
+\begin_layout Itemize
+datasrc = 0
+\end_layout
+
+\begin_layout Itemize
+regWrite = 0
+\end_layout
+
+\begin_layout Itemize
+jump = 0
+\end_layout
+
+\begin_layout Itemize
+branch = 1
+\end_layout
+
+\begin_layout Itemize
+writeReg = 1 (Don't care)
 \end_layout
 
 \begin_layout Section
