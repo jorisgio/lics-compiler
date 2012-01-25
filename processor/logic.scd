@@ -13,12 +13,16 @@ Mux8to1 <- (control[3],inputs[8])
 	n1 = mux(control[0],inputs[3],inputs[2]);
 	n2 = mux(control[0],inputs[5],inputs[4]);
 	n3 = mux(control[0],inputs[7],inputs[6]);
-	s = mux(control[2],mux(control[1],n3,n2),mux(control[1],n1,n0));
+        m0 = mux(control[1],n1,n0);
+        m1 = mux(control[1],n3,n2);
+	s = mux(control[2],m1,m0);
 -> (s) 
  
 
 Mux4to1 <- (control[2],inputs[4])
-       s = mux(control[1],mux(control[0],inputs[3],inputs[2]),mux(control[0],inputs[1],inputs[0]));
+       m0 = mux(control[0],inputs[1],inputs[0]);
+       m1 = mux(control[0],inputs[3],inputs[2]);
+       s = mux(control[1],m1,m0);
 -> (s)
 
 Mux32to1 <- (control[5],inputs[32]) 

@@ -316,7 +316,7 @@ let pCircuit circuit =
       let sortie_l = Array.to_list sortie in
       let gcur = Graphe.addVertex gcur !index in
       let anc_i = !index in
-      incr index;
+      incr index; (* mystère sur le fait d'incrémenter plutôt après *)
       let gcur = Graphe.setLabel
         gcur anc_i (Noeud.Lw (sortie_l , adresse_l)) in
       (* on rajoute une arête avec chacune de ses sorties (qui resteront des
