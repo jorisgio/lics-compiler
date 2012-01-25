@@ -41,7 +41,22 @@ Regs <-(datasIn[32],writeReg[5],readReg1[5],readReg2[5],controlWrite, top)
      array out2[32];
      out1[0..31] = Mux32to1s32 <- (readReg1[0..4],regs[0..1023]);
      out2[0..31] = Mux32to1s32 <- (readReg2[0..4],regs[0..1023]);
-->(out1[0..31],out2[0..31],regs[448..511],regs[544..671],regs[352..415],regs[224..287],regs[64..191])
+
+
+     /* pour les sorties */
+     array sorties[448];
+     for (i,0,63) {
+         sorties[i] = regs[i+448] && true;
+         sorties[i+64] = regs[i + 544] && true;
+         sorties[i+128] = regs[i + 608] && true;
+         sorties[i+192] = regs[i + 352] && true;
+         sorties[i+256] = regs[i + 224] && true;
+         sorties[i+320] = regs[i + 64] && true;
+         sorties[i+384] = regs[i + 128] && true;
+     }
+     
+     
+->(out1[0..31],out2[0..31],sorties[0..447])
 
 /* on renvoit dans cet ordre $14, $15, $17, $18, $19, $20, $11, $12,
    $7, $8, $2, $3, $4, $5
