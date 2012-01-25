@@ -8,44 +8,44 @@ Invert <- (a,b,ainvert,binvert)
 
 /* 8 to 1 multiplexer, contrôle sur 3 bits, 8 entrées 1bit */ 
 
-Mux8to1 <- (control[3],inputs[8])
-	n0 = mux(control[0],inputs[1],inputs[0]);
-	n1 = mux(control[0],inputs[3],inputs[2]);
-	n2 = mux(control[0],inputs[5],inputs[4]);
-	n3 = mux(control[0],inputs[7],inputs[6]);
+Mux8to1 <- (control[3],inputs8[8])
+	n0 = mux(control[0],inputs8[1],inputs8[0]);
+	n1 = mux(control[0],inputs8[3],inputs8[2]);
+	n2 = mux(control[0],inputs8[5],inputs8[4]);
+	n3 = mux(control[0],inputs8[7],inputs8[6]);
         m0 = mux(control[1],n1,n0);
         m1 = mux(control[1],n3,n2);
 	s = mux(control[2],m1,m0);
 -> (s) 
  
 
-Mux4to1 <- (control[2],inputs[4])
-       m0 = mux(control[0],inputs[1],inputs[0]);
-       m1 = mux(control[0],inputs[3],inputs[2]);
+Mux4to1 <- (control[2],inputs4[4])
+       m0 = mux(control[0],inputs4[1],inputs4[0]);
+       m1 = mux(control[0],inputs4[3],inputs4[2]);
        s = mux(control[1],m1,m0);
 -> (s)
 
-Mux32to1 <- (control[5],inputs[32]) 
+Mux32to1 <- (control[5],inputs32[32]) 
 	 array mux1[1];
 	 array mux2[1];
 	 array mux3[1];
 	 array mux4[1];
 	 array s[1];
-	 mux1[0..0] = Mux8to1<-(control[0..2],inputs[0..7]);
-	 mux2[0..0] = Mux8to1<-(control[0..2],inputs[8..15]);
-	 mux3[0..0] = Mux8to1<-(control[0..2],inputs[16..23]);
-	 mux4[0..0] = Mux8to1<-(control[0..2],inputs[24..31]);
+	 mux1[0..0] = Mux8to1<-(control[0..2],inputs32[0..7]);
+	 mux2[0..0] = Mux8to1<-(control[0..2],inputs32[8..15]);
+	 mux3[0..0] = Mux8to1<-(control[0..2],inputs32[16..23]);
+	 mux4[0..0] = Mux8to1<-(control[0..2],inputs32[24..31]);
 	 s[0..0] = Mux4to1<-(control[3..4],mux4[0],mux3[0],mux2[0],mux1[0]);
 -> (s[0])
 
 /* il faut maintenant des entrées 32 bits */
 
-Mux32to1s32 <- (control[5],inputs[1024]) 
+Mux32to1s32 <- (control[5],inp[1024]) 
 	    array s[32];
 	    for(i,0,31) {
 	    	
 	        s[i..i] =
-                 Mux32to1 <- (control[0..4],inputs[i],inputs[i+32],inputs[i+64],inputs[i+96],inputs[i+128],inputs[i+160],inputs[i+192],inputs[i+224],inputs[i+256],inputs[i+288],inputs[i+320],inputs[i+352],inputs[i+384],inputs[i+416],inputs[i+448],inputs[i+480],inputs[i+512],inputs[i+544],inputs[i+576],inputs[i+608],inputs[i+640],inputs[i+672],inputs[i+704],inputs[i+736],inputs[i+768],inputs[i+800],inputs[i+832],inputs[i+864],inputs[i+896],inputs[i+928],inputs[i+960],inputs[i+992]);
+                 Mux32to1 <- (control[0..4],inp[i],inp[i+32],inp[i+64],inp[i+96],inp[i+128],inp[i+160],inp[i+192],inp[i+224],inp[i+256],inp[i+288],inp[i+320],inp[i+352],inp[i+384],inp[i+416],inp[i+448],inp[i+480],inp[i+512],inp[i+544],inp[i+576],inp[i+608],inp[i+640],inp[i+672],inp[i+704],inp[i+736],inp[i+768],inp[i+800],inp[i+832],inp[i+864],inp[i+896],inp[i+928],inp[i+960],inp[i+992]);
                  }
 -> (s[0..31])
 
