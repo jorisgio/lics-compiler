@@ -66,12 +66,9 @@ Start <- (top)
          array addressplus[32];
          addressplus[0..31] = Adder32 <- (un[0..31], pc[0..31],f42);
 
-         f0 = false;
-         f1 = false;
-
+	 /* Calcul de l'addresse après branchement, qui est PC + partie basse de l'instruction */
          array branch[32];
-         /* signextend est shifté préalablement de 2 */
-         branch[0..31] = Adder32 <-(addressplus[0..31],f0,f1,signextend[0..29],f42);
+         branch[0..31] = Adder32 <-(addressplus[0..31],signextend[0..31],f42);
 
          array zero[1];
          zero[0..0] = Zero <- (alu[0..31]);
@@ -79,25 +76,15 @@ Start <- (top)
 	 /* Choix du nouveau PC en fonction de l'instruction (jump, branch,
 	 li ou R-type) */
 
-
          array pctmp[32]; /* on developpe pour éviter les bugs du compilo */
 
          /* calcul pour savoir si on branch */
          br = zero[0] and instr[31];
 
-         /* on traite à part le 0 et le 1 pour simuler un shift */
-
-         pctmp[0] = mux(jump,f,( mux(br,branch[0],addressplus[0]) ));
-         pctmp[1] = mux(jump,f,( mux(br,branch[1],addressplus[1]) ));
-	 
-	 for(i,2,27) {
-         	     pctmp[i] = mux(jump,instr[i-2],( mux(br,branch[i],addressplus[i]) ));
+       	 
+	 for(i,0,31) {
+         	     pctmp[i] = mux(jump,instr[i],( mux(br,branch[i],addressplus[i]) ));
 	}
-	pctmp[28] = mux(jump,addressplus[28],( mux(br, branch[28], addressplus[28])));
-	pctmp[29] = mux(jump,addressplus[29],( mux(br, branch[29], addressplus[29])));
-	pctmp[30] = mux(jump,addressplus[30],( mux(br, branch[30], addressplus[30])));
-	pctmp[31] = mux(jump,addressplus[31],( mux(br, branch[31],
-         	     addressplus[31])));
                      
         pc[0..31] = Reg32 <- (pctmp[0..31]);
 
