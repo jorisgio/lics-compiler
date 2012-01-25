@@ -172,20 +172,24 @@ let pCircuit circuit =
      le nouveau graphe *)
   let rec  processBExpr gcur intEnv env vertex expr  =
     let rec  processRec gcur vertex expr =
+      assert (Graphe.mem gcur vertex);
       match expr.e with
 	| EBconst cst -> 
 	  assert (Smap.mem (string_of_bool cst) env) ;
 	  let cur = Smap.find (string_of_bool cst) env in
+          assert (Graphe.mem gcur cur.(0));
 	  let gcur = Graphe.setLabel gcur cur.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) in
 	  Graphe.addEdge gcur cur.(0) vertex , cur.(0)
 	| EVar ident ->
 	  assert (Smap.mem ident.id env) ;
 	  let cur = Smap.find ident.id env in
+          assert (Graphe.mem gcur cur.(0));
 	  Graphe.addEdge gcur cur.(0) vertex , cur.(0)
 	| EArray_i(ident,index) ->
 	  let index = eval intEnv index in
 	  assert (Smap.mem ident.id env) ;
 	  let cur = Smap.find ident.id env in
+          assert (Graphe.mem gcur cur.(index));
 	  Graphe.addEdge gcur cur.(index) vertex, cur.(index)
 	| EPrefix(oper,exp) -> 
 	  let gcur = incr index ; Graphe.addVertex gcur !index in
@@ -216,19 +220,25 @@ let pCircuit circuit =
           in (* les noeuds des parents de Mux *)
 	  Graphe.addEdge gcur i vertex , i
     in
-    let g = 
+    let g =
       match expr.e with
-	| EBconst cst -> Graphe.setLabel gcur vertex.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) 
+	| EBconst cst ->
+          assert (Graphe.mem gcur vertex.(0));
+          Graphe.setLabel gcur vertex.(0) (Noeud.bool_to_label (Sast.EBconst(cst))) 
 	| EPrefix(oper, exp) -> 
+          if not (Graphe.mem gcur vertex.(0)) then
+            failwith ("Erreur : vertex missing au niveau d'un " ^ (Noeud.string_of_label (Noeud.lp_to_label oper)));
 	  let gcur = Graphe.setLabel gcur vertex.(0) (Noeud.lp_to_label oper) in
 	  let gcur , _ = processRec gcur vertex.(0) exp in
           gcur
 	| EInfix(oper, exp1,exp2) -> 
+          assert (Graphe.mem gcur vertex.(0));
 	  let gcur = Graphe.setLabel gcur vertex.(0) (Noeud.lop_to_label oper) in
 	  let gcur , _ = processRec gcur vertex.(0) exp1 in
 	  let gcur , _ = processRec gcur vertex.(0) exp2 in
           gcur
 	| EMux(exp1,exp2,exp3) ->
+          assert (Graphe.mem gcur vertex.(0));
           (* on est obligé de créer d'abord les noeuds parents pour pouvoir en
              conserver leur indice dans l'étiquette de Mux *)
 	  let gcur , i1 = processRec gcur vertex.(0) exp1 in
@@ -322,11 +332,15 @@ let pCircuit circuit =
       (* on rajoute une arête avec chacune de ses sorties (qui resteront des
          noeuds vides et de ses entrées *)
       let gcur = List.fold_left
-        (fun gcur i -> Graphe.addEdge gcur anc_i i)
+        (fun gcur i -> 
+          assert (Graphe.mem gcur i);
+          Graphe.addEdge gcur anc_i i)
         gcur
         sortie_l in
       List.fold_left
-        (fun gcur i -> Graphe.addEdge gcur i anc_i)
+        (fun gcur i -> 
+          assert (Graphe.mem gcur i);
+          Graphe.addEdge gcur i anc_i)
         gcur
         adresse_l
     (* on a l'env de tout les idents définis DANS le for 
