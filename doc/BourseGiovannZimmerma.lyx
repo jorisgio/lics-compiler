@@ -355,6 +355,12 @@ dants aux variables locales) et on relie les différentes portes qu'on aura
 \end_layout
 
 \begin_layout Standard
+Nous avons rajouté une option permettant de faire une réallocation automatique
+ des numéros de variables afin de minimiser, lors de la simulation, la taille
+ de l'environnement.
+\end_layout
+
+\begin_layout Standard
 Le compilateur est sans aucun doute la partie qui nous aura demandé le plus
  de travail vu les larges possibilités dont nous avons muni notre langage.
  Il a fallu sans cesse le retoucher et y ajouter des fonctionnalités.
@@ -514,7 +520,7 @@ Les instructions sont codées sur 32bits, décomposées comme suit :
 \end_layout
 
 \begin_layout LyX-Code
-[3bits] [ 29 bits ]
+[ 3bits ] [ 29 bits ]
 \end_layout
 
 \begin_layout Standard
