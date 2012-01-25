@@ -91,12 +91,19 @@ Le langage que nous avons créé est un langage hiérarchisé.
 \end_layout
 
 \begin_layout Standard
-Le programme d'un circuit consiste en la description successive et par ordre
- hiérarchique des portes.
+Le programme d'un circuit consiste en la description successive des portes.
 \end_layout
 
 \begin_layout Standard
-La dernière porte décrit le circuit.
+Le circuit est donné par une porte de nom 
+\begin_inset Quotes eld
+\end_inset
+
+Start
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -186,7 +193,7 @@ Les variables définies à l'intérieur d'une porte sont utilisables pour en
 
 \begin_layout Standard
 Il est possible de fournir un sous-tableau partout où est attendue une liste
- d'instructions.
+ de variables.
 \end_layout
 
 \begin_layout Standard
@@ -269,9 +276,9 @@ array
 for
 \emph default
  avec, entre parenthèses et séparés par des virgules, le nom de l'indice,
- sa valeur initiale et sa valeur finale puis entre crochets le corps de
- la boucle, soit des assignations de la valeur d'une expression à une variable
- ou un sous-tableau avec l'opérateur 
+ sa valeur initiale et sa valeur finale puis, entre accolades, le corps
+ de la boucle, soit des assignations de la valeur d'une expression à une
+ variable ou un sous-tableau avec l'opérateur 
 \begin_inset Quotes eld
 \end_inset
 
@@ -321,9 +328,16 @@ Le compilateur traduit le programme dans un langage intermédiaire de descriptio
 \end_layout
 
 \begin_layout Standard
-Il commence par effectuer des vérifications sémantiques puis crée un graphe
- représentant le circuit.
- Les registres sont 
+Après avoir parsé le code, le compilateur effectue de nombreuses vérifications
+ sémantiques.
+ Cette étape est l'occasion de lister les variables qui sont définies à
+ l'intérieur de chaque porte.
+ Puis il crée un graphe représentant le circuit.
+ Ceci se fait en deux étapes : on crée les noeuds internes aux portes (correspon
+dants aux variables locales) et on relie les différentes portes qu'on aura
+ instancié en créant des arêtes supplémentaires.
+ Afin de pouvoir trier topologiquement le graphe ainsi obtenu avec un algorithme
+ usuel, les registres sont préalablement 
 \begin_inset Quotes eld
 \end_inset
 
@@ -331,9 +345,19 @@ Il commence par effectuer des vérifications sémantiques puis crée un graphe
 \begin_inset Quotes erd
 \end_inset
 
- entre une entrée et une sortie, ce qui permet ensuite de générer la net-list
- en effectuant le tri topologique.
- A cette occasion, une erreur est déclenchée en cas de circuit combinatoire.
+ entre une entrée et une sortie.
+ On mémorise dans des tableaux la correspondance qu'il y a entre entrées
+ et sorties de registres.
+ A l'occasion du tri, une erreur est déclenchée en cas de circuit combinatoire.
+ La dernière étape consiste à générer la net-list, notamment en faisant
+ correspondre à chaque noeud du graphe une variable du langage intermédiaire,
+ qui sera représentée par un numéro.
+\end_layout
+
+\begin_layout Standard
+Le compilateur est sans aucun doute la partie qui nous aura demandé le plus
+ de travail vu les larges possibilités dont nous avons muni notre langage.
+ Il a fallu sans cesse le retoucher et y ajouter des fonctionnalités.
 \end_layout
 
 \begin_layout Subsection

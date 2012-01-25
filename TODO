@@ -3,10 +3,11 @@ Amélioration :
 - Ne pas passer en LICS les True et False qui ne servent à rien.
 
 Grosses erreurs dans le compilo :
-- problème avec les not et les reg (avec des grosses expressions -voir test :
-plante.scd ) : pas sûr que ce soit encore le cas
-- problème avec les for
+- problème avec les not et les reg : pas sûr que ce soit encore le cas avec
+les nouvelles priorités
+- problème général lorsqu'on essaye de factoriser bcp (par exemple des fois
+avec mux(_,mux,mux))
+- peut-être un problème avec les for imbriqués
 
 NON FAIT ET POURTANT DANS LE SUJET :
-- écrire un assembleur
 - deux modes de défilement pour la montre
