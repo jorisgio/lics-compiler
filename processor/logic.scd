@@ -35,7 +35,7 @@ Mux32to1 <- (control[5],inputs32[32])
 	 mux2[0..0] = Mux8to1<-(control[0..2],inputs32[8..15]);
 	 mux3[0..0] = Mux8to1<-(control[0..2],inputs32[16..23]);
 	 mux4[0..0] = Mux8to1<-(control[0..2],inputs32[24..31]);
-	 s[0..0] = Mux4to1<-(control[3..4],mux4[0],mux3[0],mux2[0],mux1[0]);
+	 s[0..0] = Mux4to1<-(control[3..4],mux1[0],mux2[0],mux3[0],mux4[0]);
 -> (s[0])
 
 /* il faut maintenant des entrées 32 bits */
