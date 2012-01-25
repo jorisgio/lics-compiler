@@ -109,7 +109,11 @@ let combinatoire =
   end ;
   g
   
-let n = Graphe.size combinatoire.cgraph
+let n = Graphe.foldVertex
+  (fun i _ n -> max i n)
+  combinatoire.cgraph
+  0
+
 (*let () = printf "Max reg = %d\n" n*)
 (* Tri Topologique et production du code *)
 let seqlist = 

@@ -28,6 +28,7 @@ let lics_of_combin_graph g n = (* n = max_clé + 1 *)
   let sorted_keys = topoSort g.cgraph in
   (* lors du parcours de la liste, à tout noeud on associe la liste des
      variables qui sont ses pères *)
+  (*print_endline "Début translate";*)
   let pred = Array.create n [] in
   let rec elimine = function
     | [] -> []
