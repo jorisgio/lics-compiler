@@ -183,7 +183,7 @@ let pCircuit circuit =
 	| EVar ident ->
 	  assert (Smap.mem ident.id env) ;
 	  let cur = Smap.find ident.id env in
-          assert (Graphe.mem gcur cur.(0));
+          if not (Graphe.mem gcur cur.(0)) then failwith ("Pb pour accéder à la variable " ^ ident.id);
 	  Graphe.addEdge gcur cur.(0) vertex , cur.(0)
 	| EArray_i(ident,index) ->
 	  let index = eval intEnv index in
