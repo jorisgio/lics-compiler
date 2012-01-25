@@ -81,10 +81,14 @@ Start <- (top)
          /* calcul pour savoir si on branch */
          br = zero[0] and instr[31];
 
-       	 
-	 for(i,0,31) {
+       	 f23 = false;
+
+	 for(i,0,28) {
          	     pctmp[i] = mux(jump,instr[i],( mux(br,branch[i],addressplus[i]) ));
 	}
+	pctmp[31] =  mux(jump,f, ( mux(br,branch[31],addressplus[31]) ));
+	pctmp[30] =  mux(jump,f, ( mux(br,branch[29],addressplus[29]) ));
+	pctmp[29] =  mux(jump,f, ( mux(br,branch[30],addressplus[30]) ));
                      
         pc[0..31] = Reg32 <- (pctmp[0..31]);
 
