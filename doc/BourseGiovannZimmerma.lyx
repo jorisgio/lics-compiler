@@ -552,7 +552,7 @@ regWrite : choisit si on va écrire ou non dans les registres 0 : on garde
 jump : choisit la valeur du prochain PC : soit celle venant de l'ALU, soit
  celle venant des 29 bits de la partie basse de l'instruction.
  1 : on prend la valeur de l'instruction.
- 0 : on prend la valeur de l'ALU .
+ 0 : on prend la valeur de l'ALU.
  Défini comme le 2ème bit de l'opcode.
 \end_layout
 

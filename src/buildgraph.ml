@@ -124,7 +124,7 @@ let pCircuit circuit =
 	  ar.(k) <- ioArray.(!ind);
 	  incr ind 
 	done ;
-	Printf.printf "\n";
+	(*Printf.printf "\n";*)
 	Smap.add id.id ar callenv
       | _ -> raise (WrongType ({line = 42; char_b = 42; char_e = 42},Int,Bool))
   in
