@@ -101,12 +101,13 @@ let combinatoire =
   deb "Suppression des registres...\n" ;
   let g = Cycles.processRegs igraph in 
   deb "Done.\n" ;
-  begin
-    deb "INFO : Enregistrement du graphe dans graph2.debug\n";
-    let f = open_out "graph2.debug" in
-    Graphe.drawGraph g.cgraph f;
-    close_out f
-  end ;
+  if !debug then
+    begin
+      deb "INFO : Enregistrement du graphe dans graph2.debug\n";
+      let f = open_out "graph2.debug" in
+      Graphe.drawGraph g.cgraph f;
+      close_out f
+    end ;
   g
   
 let n = Graphe.foldVertex
