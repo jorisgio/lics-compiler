@@ -1,0 +1,1001 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass beamer
+\begin_preamble
+\usetheme{Warsaw}
+% or ...
+
+\setbeamercovered{transparent}
+% or whatever (possibly just delete it)
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language french
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman times
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 0
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language french
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Simulation d'un microprocesseur
+\end_layout
+
+\begin_layout Author
+F.
+\begin_inset space ~
+\end_inset
+
+Auteur
+\begin_inset Flex InstituteMark
+status open
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+and
+\end_layout
+
+\end_inset
+
+ S.
+\begin_inset space ~
+\end_inset
+
+Lautre
+\begin_inset Flex InstituteMark
+status collapsed
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Itemize
+composer les noms dans l'ordre dans lequel ils apparaîtrons dans l'article;
+ 
+\end_layout
+
+\begin_layout Itemize
+utiliser l'insert 
+\begin_inset Quotes fld
+\end_inset
+
+MarqueInstitution
+\begin_inset Quotes frd
+\end_inset
+
+ (
+\family typewriter
+Insérer->Inserts personnalisables->MarqueInstitution
+\family default
+) niquement si les auteurs ont des affiliations  différentes.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument
+status open
+
+\begin_layout Plain Layout
+Auteur, Lautre
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Itemize
+facultatif, à utiliser seulement avec plusieurs auteurs;
+\end_layout
+
+\begin_layout Itemize
+s'il y a vraiment beaucoup d'auteurs, utiliser 
+\begin_inset Quotes eld
+\end_inset
+
+Auteur et al.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Institute
+\begin_inset Flex InstituteMark
+status collapsed
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+
+Département  d'Informatique
+\begin_inset Newline newline
+\end_inset
+
+Université de Quelque Part
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+and
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex InstituteMark
+status collapsed
+
+\begin_layout Plain Layout
+2
+\end_layout
+
+\end_inset
+
+Département de Philosophie Théorique
+\begin_inset Newline newline
+\end_inset
+
+Université d'Ailleurs
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+- utilisez la commande 
+\backslash
+inst uniquement s'il y a plusieurs affiliations.
+\end_layout
+
+\begin_layout Plain Layout
+- faites quelque chose de simple, personne ne s'intéresse à votre adresse
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument
+status open
+
+\begin_layout Plain Layout
+Universités de Quelque Part et d'Ailleurs
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+optionnel, mais souvent nécessaire
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Date
+Conférence sur les Présentations Fabuleuses, 2006
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Itemize
+utilisez le nom de la conférence ou son abréviation; 
+\end_layout
+
+\begin_layout Itemize
+n'a pas réellement d'importance pour l'assistance qui sera présente lors
+ de la conférence; mais en a pour les personnes (y compris vous-même) qui
+ liront les transparents en ligne.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Argument
+status open
+
+\begin_layout Plain Layout
+CPF 2006
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+facultatif, devrait être une abréviation du nom de la conférence
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Si vous avez un fichier nommé "université-logo-nomfichier.xxx", où xxxest
+ un format graphique accepté par LyX (comme par exemple .png), alors vous
+ pouvez insérer votre logo ainsi :
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+logo{
+\backslash
+includegraphics[height=0.5cm]{institution-logo-filename}}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Avec la syntaxe pgf, construction équivalente, mais format graphique compris
+ par latex ou pdflatex:
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+pgfdeclareimage[height=0.5cm]{institution-logo}{institution-logo-filename}
+\end_layout
+
+\begin_layout Plain Layout
+
+%
+\backslash
+logo{
+\backslash
+pgfuseimage{institution-logo}} 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+À supprimer si vous ne voulez pas que la table des matières apparaisse au
+ début de chaque sous-section :
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+AtBeginSubsection[]{
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  
+\backslash
+frame<beamer>{ 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    
+\backslash
+frametitle{Lignes directrices}   
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+    
+\backslash
+tableofcontents[currentsection,currentsubsection] 
+\end_layout
+
+\begin_layout Plain Layout
+
+% Vous pouvez, si vous le souhaitez ajouter l'option [pausesections]
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Si vous souhaitez recouvrir vos transparents un à un, utilisez la commande
+ suivante (pour plus d'info, voir la page 74 du manuel d'utilisation de
+ Beamer (version 3.06) par Till Tantau) :
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+beamerdefaultoverlayspecification{<+->}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Sommaire
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Structurer l'exposé est une tâche difficile et la structure suivante pourrait
+ ne pas convenir.
+ Voici quelques règles à appliquer pour cet exemple ci :
+\end_layout
+
+\begin_layout Itemize
+avoir exactement deux ou trois sections (autre que le sommaire); 
+\end_layout
+
+\begin_layout Itemize
+tout au plus trois sous-sections par section; 
+\end_layout
+
+\begin_layout Itemize
+parler approximativement entre 30 secondes et 2 minutes par transparent.
+ Il  devrait donc y avoir entre 15 et 30 transparents, pour tout dire;
+\end_layout
+
+\begin_layout Itemize
+le public d'une conférence connaîtra probablement peu de chose sur le sujet
+  que vous serez en train de traiter.
+ Donc, *simplifier*
+\begin_inset space ~
+\end_inset
+
+!
+\end_layout
+
+\begin_layout Itemize
+dans un exposé de 20 minutes, garder à l'esprit les idées principales est
+ largement  suffisant pour votre assistance.
+ Laissez tomber certains détails, même s'ils vous  semblent nécessaires;
+ 
+\end_layout
+
+\begin_layout Itemize
+si un détail qui est vital pour une preuve/mise en oeuvre est omis,  le
+ dire simplement une fois.
+ Ce sera suffisant pour l'auditoire.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Simulation de circuit synchrones
+\end_layout
+
+\begin_layout Subsection
+Compilateur
+\end_layout
+
+\begin_layout BeginFrame
+Interêts de la compilation
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout BeginFrame
+Langage de description
+\end_layout
+
+\begin_layout Standard
+Langage déclaratif possèdand 3 types de variables : 
+\emph on
+Int, Bool, Array.
+ 
+\end_layout
+
+\begin_layout BeginFrame
+Compilation en 4 passes
+\end_layout
+
+\begin_layout Enumerate
+Parsage, analyse sémantique et typage
+\end_layout
+
+\begin_layout Enumerate
+Transformation en un graphe
+\end_layout
+
+\begin_layout Enumerate
+Suppression des registres
+\end_layout
+
+\begin_layout Enumerate
+Tri topologique et production de code
+\end_layout
+
+\begin_layout BeginFrame
+Analyse sémantique
+\end_layout
+
+\begin_layout Standard
+Une phase d'analyse sémantique effectue un typage basique et vérifie que
+ toutes les variables utilisées sont définies.
+\end_layout
+
+\begin_layout BeginFrame
+Construction d'un graphe
+\end_layout
+
+\begin_layout Standard
+L'arbre de syntaxe est transformé en une représentation intermédiaire sous
+ forme de graphe, qui contient :
+\end_layout
+
+\begin_layout Itemize
+un noeud pour chaque variable
+\end_layout
+
+\begin_layout Itemize
+un noeud pour chaque résultat d'expression atomique
+\end_layout
+
+\begin_layout Standard
+Exemple : 
+\end_layout
+
+\begin_layout BeginFrame
+Traitement des registres
+\end_layout
+
+\begin_layout Standard
+bar
+\end_layout
+
+\begin_layout BeginFrame
+Production de code
+\end_layout
+
+\begin_layout Standard
+foobar
+\end_layout
+
+\begin_layout Subsection
+Simulateur
+\end_layout
+
+\begin_layout BeginFrame
+Faites des titres qui informent 
+\end_layout
+
+\begin_layout Example
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+<1->
+\end_layout
+
+\end_inset
+
+Sur le premier transparent 
+\end_layout
+
+\begin_layout Separator
+
+\end_layout
+
+\begin_layout Example
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+<2->
+\end_layout
+
+\end_inset
+
+Sur le second transparent
+\end_layout
+
+\begin_layout Section
+Microprocesseur et programme de montre
+\end_layout
+
+\begin_layout Subsection
+Architecture du cpu
+\end_layout
+
+\begin_layout BeginFrame
+Architecture globale
+\end_layout
+
+\begin_layout Theorem
+Sur le premier transparent
+\end_layout
+
+\begin_layout Pause
+
+\end_layout
+
+\begin_layout Corollary
+Sur le second transparent
+\end_layout
+
+\begin_layout BeginFrame
+ALU
+\end_layout
+
+\begin_layout Standard
+A
+\end_layout
+
+\begin_layout BeginFrame
+Instructions
+\end_layout
+
+\begin_layout Standard
+foo
+\end_layout
+
+\begin_layout BeginFrame
+Assembleur
+\end_layout
+
+\begin_layout Standard
+bar
+\end_layout
+
+\begin_layout Subsection
+Montre digitale
+\end_layout
+
+\begin_layout Section*
+Résumé
+\end_layout
+
+\begin_layout BeginFrame
+Résumé
+\end_layout
+
+\begin_layout Itemize
+Le
+\color none
+ 
+\color red
+premier message principal
+\color none
+ de l'exposé en une ligne ou    deux.
+\end_layout
+
+\begin_layout Itemize
+Le
+\color none
+ 
+\color red
+deuxième message principal
+\color none
+ de l'exposé en une ligne ou deux.
+\end_layout
+
+\begin_layout Itemize
+Peut-être un
+\color none
+ 
+\color red
+troisième message
+\color none
+, mais pas plus.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+  Les perspectives sont toujours facultatives.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+vskip0pt plus.5fill
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Perspectives
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+      Problème non résolu
+\end_layout
+
+\begin_layout Itemize
+Autre problème non résolu
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section*
+\start_of_appendix
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Tout ce qui suit est facultatif et n'est typiquement pas nécessaire.
+\end_layout
+
+\end_inset
+
+Appendix
+\end_layout
+
+\begin_layout Subsection*
+Lectures complémentaires
+\end_layout
+
+\begin_layout BeginFrame
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+[allowframebreaks]
+\end_layout
+
+\end_inset
+
+Lectures complémentaires
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+beamertemplatebookbibitems
+\end_layout
+
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+  Commencer avec des livres (image d'un livre insérée)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\labelwidthstring Références
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Auteur1990"
+
+\end_inset
+
+A.
+ Auteur.
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+newblock
+\end_layout
+
+\end_inset
+
+ 
+\emph on
+Livre sur quelque chose
+\emph default
+.
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+newblock
+\end_layout
+
+\end_inset
+
+ Une Edition, 1990.
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+beamertemplatearticlebibitems
+\end_layout
+
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+  Et continuer avec les articles (image d'un article incluse).
+ Faites une liste brève.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\labelwidthstring Références
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "Quelqun2000"
+
+\end_inset
+
+S.
+ Quelqu'un.
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+newblock{}
+\end_layout
+
+\end_inset
+
+ Et ceci et cela
+\emph on
+.
+
+\emph default
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+newblock
+\end_layout
+
+\end_inset
+
+ 
+\emph on
+Journal de ceci et cela
+\emph default
+.
+ 2(1):50--100, 2000.
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\end_body
+\end_document
