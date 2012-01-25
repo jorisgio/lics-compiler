@@ -117,5 +117,7 @@ incremente:
         li      $25,    10         ;
         beq     $20,    $25,    resetunitessecondes ;
 affiche:
-        
+        beq     $30,    $31,    affiche ;
+        li      $25,    0               ;
+        add     $30,    $31,    $25     ;
         j       incremente      ;
