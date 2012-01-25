@@ -62,16 +62,16 @@ Start <- (top)
                      quatre[i] = false;
          }
          quatre[5] = true;
-
+	 f42 = false;
          array addressplus[32];
-         addressplus[0..31] = Adder32 <- (quatre[0..31], pc[0..31]);
+         addressplus[0..31] = Adder32 <- (quatre[0..31], pc[0..31],f42);
 
          f0 = false;
          f1 = false;
 
          array branch[32];
          /* signextend est shifté préalablement de 2 */
-         branch[0..31] = Adder32 <-(addressplus[0..31],f0,f1,signextend[0..29]);
+         branch[0..31] = Adder32 <-(addressplus[0..31],f0,f1,signextend[0..29],f42);
 
          array zero[1];
          zero[0..0] = Zero <- (alu[0..31]);

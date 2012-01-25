@@ -36,17 +36,16 @@ Alulastbit <- (a, b,less,ainvert, binvert, carryIn, operation[3])
 	out[0..0] = Mux8to1<-(operation[0..2],op0,op1,op2[0],f[0],f[1],f[2],f[3],l);
 ->(out[0],op2[0])
 
-Alu32bits <- (a[32],b[32],ainvert,binvert,carryIn,operation[3])
+Alu32bits <- (a[32],b[32],ainvert,binvert,operation[3])
 	  array carry[32];
 	  array s[32];
 	  array out0[2];
 	  array out31[2];
-	  
+	  f = false; 
 	  out0[0..1] = Alu1bit <-
-	  (a[0],b[0],out31[1],ainvert,binvert,carryIn,operation[0..2]);
+	  (a[0],b[0],out31[1],ainvert,binvert,f,operation[0..2]);
           carry[0] = out0[1] and true;
           
-	  f = false;
 	  for(i,1,30){
 		array out[2];
 		out[0..1] = Alu1bit <- (a[i],b[i],f,ainvert,binvert,carry[i-1],operation[0..2]);
