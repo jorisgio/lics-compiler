@@ -8,6 +8,3 @@ les nouvelles priorités
 - problème général lorsqu'on essaye de factoriser bcp (par exemple des fois
 avec mux(_,mux,mux))
 - peut-être un problème avec les for imbriqués
-
-NON FAIT ET POURTANT DANS LE SUJET :
-- deux modes de défilement pour la montre
