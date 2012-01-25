@@ -558,7 +558,8 @@ jump : choisit la valeur du prochain PC : soit celle venant de l'ALU, soit
 
 \begin_layout Description
 branch (br) : choisit la valeur du prochain PC 0 : on prend PC + 1 , 1 :
- on prend l'adresse donnée par l'instruction de branchement étendue à 32bits.
+ on prend l'adresse donnée par PC +1 auquel on ajoute la partie basse de
+ l'instruction de branchement étendue à 32bits.
  Défini comme le premier bit d'opcode.
 \end_layout
 
