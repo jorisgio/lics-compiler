@@ -191,6 +191,8 @@ let process licslist =
   in
   let sub_in_stmt = function
     | Assign(i,e) -> Assign(getReg i,sub_in_expr e)
+    | Lw(l,addr) -> Lw(List.map getReg l,addr)
+    | Sw(_,_) -> failwith "Sw not implemented with O1"
     | Input i -> Input(getReg i)
     | Output i -> Output(getReg i)
     | Inputreg i -> Inputreg(getReg i)
