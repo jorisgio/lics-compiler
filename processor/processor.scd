@@ -89,9 +89,7 @@ Start <- ()
 	pctmp[31] = mux(jump,addressplus[31],( mux(br, branch[31],
          	     addressplus[31])));
                      
-        for(i,0,31) {
-                     pc[i] = reg pctmp[i];
-        }
+        pc[0..31] = Reg32 <- (pctmp[0..31]);
 
 	 
 -> ()

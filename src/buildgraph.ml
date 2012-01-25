@@ -315,16 +315,18 @@ let pCircuit circuit =
       let sortie = Smap.find name env in (* là où il faut stocker *)
       let sortie_l = Array.to_list sortie in
       let gcur = Graphe.addVertex gcur !index in
+      let anc_i = !index in
+      incr index;
       let gcur = Graphe.setLabel
-        gcur !index (Noeud.Lw (sortie_l , adresse_l)) in
+        gcur anc_i (Noeud.Lw (sortie_l , adresse_l)) in
       (* on rajoute une arête avec chacune de ses sorties (qui resteront des
          noeuds vides et de ses entrées *)
       let gcur = List.fold_left
-        (fun gcur i -> Graphe.addEdge gcur !index i)
+        (fun gcur i -> Graphe.addEdge gcur anc_i i)
         gcur
         sortie_l in
       List.fold_left
-        (fun gcur i -> Graphe.addEdge gcur i !index)
+        (fun gcur i -> Graphe.addEdge gcur i anc_i)
         gcur
         adresse_l
     (* on a l'env de tout les idents définis DANS le for 
