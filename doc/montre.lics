@@ -22,7 +22,7 @@ resetmois:
         li      $9,     1                                 ;
         add     $6,     $6,     $1                        ;
         li      $25,    4                                 ;
-        beq     $6,     $25     bissextile                ;
+        beq     $6,     $25,    bissextile                ;
         li      $21,    0                                 ;
         j       apresbissextile                           ;
 bissextile:
