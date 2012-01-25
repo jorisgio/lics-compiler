@@ -78,10 +78,8 @@ let pCircuit circuit =
     match expr.e with
       | EVar(ident) -> begin
 	try
-	  Printf.printf "%s : " ident.id;
 	  let ar = Smap.find ident.id env in
 	  for i = 0 to (Array.length ar) - 1 do 
-	    Printf.printf "%d - "  ar.(i);
 	    ioArray.(!ind) <- ar.(i);
 	    incr ind;
 	  done;
@@ -90,10 +88,8 @@ let pCircuit circuit =
       end
       | EArray_i(id,i) -> begin
 	let i = eval intEnv i in
-	 Printf.printf "%s : " id.id;
 	try
 	  let ar = Smap.find id.id env in
-	  Printf.printf "%d - "  ar.(i);
 	  ioArray.(!ind) <- ar.(i) ;
 	  incr ind;
 	with Not_found -> failwith "Variable non liée utilisée en entrée" 
@@ -102,12 +98,10 @@ let pCircuit circuit =
       | EArray_r(id,i1,i2) -> begin
 	let i1 = eval intEnv i1 in
 	let i2 = eval intEnv i2 in
-	Printf.printf "%s : " id.id;
 	try
 	  let ar = Smap.find id.id env in
 	  for i = i1 to i2 do
             (*assert (!ind < Array.length ioArray);*)
-	    Printf.printf "%d - "  ar.(i);
             assert (i < Array.length ar);
 	    ioArray.(!ind) <- ar.(i);
 	    incr ind;
@@ -122,15 +116,12 @@ let pCircuit circuit =
     match id.typ with 
       | Bool -> 
 	let ar = Array.make 1 ioArray.(!ind) in
-	Printf.printf "%s -> %d\n" id.id ioArray.(!ind);
 	incr ind ;
 	Smap.add id.id ar callenv 
       | Array n -> 
-	Printf.printf "%s -> " id.id;
 	let ar = Array.make n (-4) in
 	for k = 0 to n - 1 do
 	  ar.(k) <- ioArray.(!ind);
-	  Printf.printf "%d,"  ioArray.(!ind);
 	  incr ind 
 	done ;
 	Printf.printf "\n";
@@ -279,7 +270,6 @@ let pCircuit circuit =
 		(raise (Error ({line = 42; char_b = 42; char_e = 42},
 			       "Pas le bon nombre d'entrée pour l'appel " )))
 	    in *)
-	    Printf.printf "Input Vars and nodes\n";
 	    aindex := 0 ; 
 	    
 		
@@ -288,7 +278,6 @@ let pCircuit circuit =
 	     on associe un tableau de noeuds *) 
 	    
 	    let callenv = List.fold_left (addInputs inputsArray aindex ) Smap.empty callgate.ginputs in
-	    if gatename = "Alu1bit" then Smap.iter (fun n ar -> Printf.printf "%s : " n; Array.iter (fun t -> Printf.printf "%d," t) ar; Printf.printf "\n") callenv;
 	    (* On ajoute aussi les noeuds de sortie, qui ont déjà été créés.
 	       cela permet d'utiliser des noeuds définis par un appel postérieur*)
 	    if (Array.length vertex) != callgate.goutputsize then failwith "Mauvais nombre de sortie";
@@ -407,7 +396,6 @@ let pCircuit circuit =
      renvoit un tableau des noeuds de sortie *)
   and pLevel env graph gatename  = 
     assert( Smap.mem gatename circuit.gates );
-    Printf.printf "%s\n" gatename;
     let gate = Smap.find gatename circuit.gates in
     (* lit le genv d'une porte 
        ajoute un noeud pour chaque identifiant du graphe
