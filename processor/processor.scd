@@ -1,4 +1,7 @@
-Start <- ()
+/* Le processeur reçoit une entrée qui vaut 1 à chaque nouvelle seconde et
+doit alors incrémenter un registre spécial $31 */
+
+Start <- (top)
          
 /* Définition des registres 32 bits */
          array pc[32];
@@ -33,9 +36,16 @@ Start <- ()
 	 for(i,0,31) {
 	 	     regdataentry[i] = mux(datasrc,signextend[i],alu[i]);
 		     }
+         
+         /* on reçoit deux registres utiles dans le datapath + 14 registres
+         supplémentaires qui vont directement en sortie du microprocesseur
+         pour affichage */
+         /* on donne un argument supplémentaire qui dit s'il faut
+         incrémenter le registre $31 qui stocke le timestamp */
 
-         array regs[64];
-         regs[0..63] = Regs <- (alu[0..31], writeReg[0..4], instr[21..25],instr[16..20], regWrite);
+         array regs[512];
+         regs[0..511] = Regs <- (alu[0..31], writeReg[0..4],
+         instr[21..25],instr[16..20], regWrite, top);
 
 	 array alufunc[3] ;
 	 alufunc[0..2] = ALUControl <- (instr[31],instr[0..2]);
@@ -92,5 +102,5 @@ Start <- ()
         pc[0..31] = Reg32 <- (pctmp[0..31]);
 
 	 
--> ()
+-> (regs[64..511]) /* on renvoit les valeurs des registres à afficher */
 
