@@ -358,6 +358,8 @@ dants aux variables locales) et on relie les différentes portes qu'on aura
 Nous avons rajouté une option permettant de faire une réallocation automatique
  des numéros de variables afin de minimiser, lors de la simulation, la taille
  de l'environnement.
+ Il s'agit d'une coloration de graphe d'interférence, résolue avec un algorithme
+ glouton.
 \end_layout
 
 \begin_layout Standard
@@ -467,7 +469,7 @@ Assembleur
 \end_layout
 
 \begin_layout Standard
-Nous disposons d'un assembleur qui est un sous-ensemble de MIPS.
+Nous disposons d'un assembleur qui est inspiré de MIPS.
  Les instructions fournies sont : 
 \emph on
 add
@@ -720,7 +722,7 @@ beq.
 \end_layout
 
 \begin_layout LyX-Code
-  opcode    vide       rs        rt       addresse
+  opcode    vide       rs        rt        offset 
 \end_layout
 
 \begin_layout Standard

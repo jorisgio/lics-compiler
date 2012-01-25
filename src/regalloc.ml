@@ -77,16 +77,20 @@ module LivenessAnalysis = struct
     | Assign(i,e) -> used_expr e
     | Inputreg _ | Input _ -> ISet.empty
     | Outputreg i | Output i -> ISet.singleton i
+    | Lw (l,_) -> List.fold_left (fun acc t -> ISet.add t acc) ISet.empty l
+    | Sw (_,_) -> ISet.empty
       
   (* temporaires définis par l'instruction *)
   let def = function
     | Input i | Inputreg i | Assign(i,_) -> [i]
+    | Sw(_,_) -> failwith "Sw not implemented with O1"
     | _ -> []
     
   (* Supprime les calculs inutiles (aka dont le résultat n'est pas réutilisé *)
   let optimizeNotUsed livelist =
     let deleteInstr is = match is.instr with
       | Assign(i,_) when not (ISet.mem i is.out_set) -> true
+      | Lw(l,_) when List.for_all (fun t ->  not (ISet.mem t is.out_set) ) l -> true
       | _ -> false
     in
     ()
