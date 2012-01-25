@@ -358,10 +358,17 @@ dants aux variables locales) et on relie les différentes portes qu'on aura
 Le compilateur est sans aucun doute la partie qui nous aura demandé le plus
  de travail vu les larges possibilités dont nous avons muni notre langage.
  Il a fallu sans cesse le retoucher et y ajouter des fonctionnalités.
+ Malgré les nombreux tests que nous avions créés, l'écriture du processeur
+ nous a conduit à trouver de nouveaux bugs, étant donné que nous n'avions
+ jamais pu tester le compilateur sur un circuit de cette ampleur.
 \end_layout
 
 \begin_layout Subsection
 Le simulateur
+\end_layout
+
+\begin_layout Paragraph
+Principe de fonctionnement
 \end_layout
 
 \begin_layout Standard
@@ -373,17 +380,43 @@ Le simulateur exécute linéairement les instructions fournies dans un fichier
 \end_layout
 
 \begin_layout Standard
-Une option permet de précharger la ROM avec le contenu d'un fichier.
-\end_layout
-
-\begin_layout Standard
 Un environnement est maintenu avec les valeurs des différentes variables
  intermédiaires et les valeurs des registres sont transmises d'un cycle
  sur le suivant.
 \end_layout
 
+\begin_layout Standard
+La ROM est représentée en mémoire par un tableau de listes de booléens.
+ Les adresses sont fournies en binaires sous forme de liste de booléens.
+\end_layout
+
+\begin_layout Paragraph
+Options supplémentaires
+\end_layout
+
+\begin_layout Standard
+Une option permet de précharger la ROM avec le contenu d'un fichier.
+ Nous avons aussi rajouté un mode de fonctionnement 
+\begin_inset Quotes eld
+\end_inset
+
+horloge
+\begin_inset Quotes erd
+\end_inset
+
+, pour des circuits à une entrée, qui met la valeur de cette entrée à 1
+ toutes les secondes (et 0 le reste du temps).
+ Ce mode permet d'exécuter la montre en temps réel.
+ Inversement, il suffit de passer une entrée constante égale à 1 pour exécuter
+ la montre en accéléré.
+\end_layout
+
 \begin_layout Section
 Le microprocesseur
+\end_layout
+
+\begin_layout Subsection
+Description générale
 \end_layout
 
 \begin_layout Standard
@@ -399,6 +432,180 @@ L'ALU calcule l'addition, la soustraction, les tests de comparaison et les
 
 \begin_layout Standard
 Les instructions sont chargées depuis la ROM à partir de l'adresse 0.
+\end_layout
+
+\begin_layout Standard
+Nous avons rajouté des instructions de branchement et de saut inconditionnel.
+\end_layout
+
+\begin_layout Standard
+L'unité de contrôle décode les instructions suivant les mêmes conventions
+ que MIPS.
+\end_layout
+
+\begin_layout Standard
+Le microprocesseur possède 32 registres ; le registre 
+\emph on
+$31
+\emph default
+ est réservé pour enregistrer la valeur du timestamp.
+ Le microprocesseur prend une entrée, un top d'horloge, et met à jour le
+ timestamp automatiquement.
+ Il renvoie systématiquement en sortie les valeurs de 14 registres déterminés
+ qui correspondent aux unités, dizaines, etc des heures, minutes, secondes,
+ jour, mois, années.
+\end_layout
+
+\begin_layout Subsection
+Assembleur
+\end_layout
+
+\begin_layout Standard
+Nous disposons d'un assembleur qui est un sous-ensemble de MIPS.
+ Les instructions fournies sont : 
+\emph on
+add
+\emph default
+, 
+\emph on
+sub
+\emph default
+, 
+\emph on
+and
+\emph default
+, 
+\emph on
+or
+\emph default
+, 
+\emph on
+li
+\emph default
+, 
+\emph on
+beq
+\emph default
+, 
+\emph on
+j
+\emph default
+ et il est possible de définir des étiquettes dans le code.
+ Le programme assembleur se charge de traduire cela en binaire, et génère
+ un fichier 
+\begin_inset Quotes eld
+\end_inset
+
+a.out
+\begin_inset Quotes erd
+\end_inset
+
+ dans le format demandé par le simulateur pour précharger la ROM.
+ Ainsi, un programme exécuté sur le microprocesseur sera systématiquement
+ préchargé dans la ROM de cette manière.
+\end_layout
+
+\begin_layout Paragraph
+Conventions détaillés de l'assembleur
+\end_layout
+
+\begin_layout Standard
+Les instructions sont codées sur 32bits, décomposées comme suit :
+\end_layout
+
+\begin_layout Standard
+[3bits] [ 29 bits ]
+\end_layout
+
+\begin_layout Standard
+Les 3 premiers bits contiennent l'opcode de l'instruction, c'est à dire
+ son type.
+ Au vu du jeu d'instruction réduit, ces bits permettent de donner directement
+ les valeurs de contrôle sans se préoccuper de mettre en place une table
+ de vérité.
+ On obtient les valeurs de contrôle suivantes :
+\end_layout
+
+\begin_layout Description
+datasrc : choisit l'entrée du bloc de registre contenant les données à écrire.
+ 0 : sortie de l'ALU.
+ 1 : la constante étendue à 32 bits contenue dans les 16 bits bas de l'instructi
+on définie comme le 3ème bit de l'opcode.
+\end_layout
+
+\begin_layout Description
+regWrite : choisit si on va écrire ou non dans les registres 0 : on garde
+ les valeurs des registres, 1 : on écrit dans 1 registre définie comme l'opposé
+ du premier bit de l'opcode.
+\end_layout
+
+\begin_layout Description
+jump : choisit la valeur du prochain PC : soit celle venant de l'ALU, soit
+ celle venant des 29 bits de la partie basse de l'instruction.
+ 1 : on prend la valeur de l'instr.
+ 0 : on prend la valeur de l'ALU définie comme le 2ème bit de l'opcode.
+\end_layout
+
+\begin_layout Description
+branch (br) : choisit la valeur du prochain PC 0 : on prend PC + 4 , 1 :
+ on prend l'adresse donnée par l'instruction de branchement étendue à 32bits
+ définie comme le premier bit d'opcode.
+\end_layout
+
+\begin_layout Description
+writeReg : choisit la source de l'adresse du registre à écrire, sur 5 bits.
+ 0 : partie 16-20 de l'instruction, 1 : partie 11-15 de l'instruction, définie
+ comme l'opposé du 3ème bit d'opcode .
+\end_layout
+
+\begin_layout Subparagraph
+R type
+\end_layout
+
+\begin_layout Standard
+Les instrucions arithmétiques et logique [ 3bits ] [ 3bits vides] [ 5 bits
+ ] [ 5 bits ] [ 5 bits ] [ 5 bits vides ] [ 6bits ] opcode vide rs rt rd
+ vide ALUfunc
+\end_layout
+
+\begin_layout Standard
+Les 6 bits d'ALUfunc choisissent l'opération que l'ALU doit effectuer.
+ Seuls les 3 bits de poids faible comptent ALUopérations : 000 : AND 100
+ : OR 010 : ADD l'opcode et 000, donc : datasrc = résultat de l'instrution.
+ regWrite = 1 : on écrit le résultat dans le registre, jump = 0 : on ne
+ fait pas de saut, branch = 0 : on prend l'instruction suivante, writeReg
+ = 1 : on prend la partie rd 11-15 de l'instruction comme registre de destinatio
+n.
+ 
+\end_layout
+
+\begin_layout Subparagraph
+Load 
+\end_layout
+
+\begin_layout Standard
+load immediate [ 3bits ] [ 3bits ] [ 5bits] [ 5 bits ] [ 16 bits ] opcode
+ vide vide rd entier signé 16 bits.
+\end_layout
+
+\begin_layout Standard
+l'opcode est : 001, donc : datasrc = 1, partie basse de l'instruction en
+ entrée des registres, regWrite = 1, on écrit dans le registre jump = 0,
+ branch = 0, on prend l'instruction suivante pour PC writeReg : 0, on prend
+ la partie rd 26-20 comme destination
+\end_layout
+
+\begin_layout Subparagraph
+Jump
+\end_layout
+
+\begin_layout Standard
+Les instructions de saut, avec juste jump dans les faits [ 3bits ] [ 29
+ bits ] opcode addresse du futur PC 
+\end_layout
+
+\begin_layout Standard
+l'opcode est 110, donc datasrc = 0, regWrite = 
 \end_layout
 
 \begin_layout Section
@@ -424,8 +631,10 @@ il garde en valeur dans des registres les valeurs des chiffres à retenir:
 
 \begin_layout Standard
 Ensuite, on effectue une simple boucle, qui incrémente le chiffre des unités
- des secondes, et qui transmet la retenue si il dépasse, qui va se propager
- jusqu'à actualisation de la date.
+ des secondes à chaque fois que le timestamp a changé, celui-ci étant lié
+ aux entrées fournies par le simulateur, et qui transmet la retenue s'il
+ dépasse le maximum autorisé (9), qui va se propager jusqu'à actualisation
+ complète de la date.
 \end_layout
 
 \end_body
