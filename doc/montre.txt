@@ -1,9 +1,9 @@
-move a1 zero        1 = 1; 2 = a0; 3 = a1; 4 = a2
-incr a0
-b affiche
-move a2 zero
-incr a1
-beq a1 10 (-20)
+move a1 zero        1 = 1; 2 = a0; 3 = a1; 4 = a2; 5 = a3; 6 = a
+incr a0             7 = m0; 8 = m1; 9 = m; 10 = jours; 11 = j0 
+b affiche           12 = j1; 13 = j; 14 = h0; 15 = h1; 16 = h
+move a2 zero        17 = mi0; 18 = mi1; 19 = s0; 20 = s1
+incr a1             25 = tests;
+beq a1 10 (-20)     21 = bissextile(0 ou 1);
 b affiche
 move a3 zero
 incr a2
@@ -12,7 +12,6 @@ b affiche
 move m0 zero
 move m1 un
 move m un
-
 incr a3
 beq a3 10 (-32)
 b affiche
