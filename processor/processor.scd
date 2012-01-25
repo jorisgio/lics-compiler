@@ -57,14 +57,14 @@ Start <- (top)
          /* calcul de l'adresse de l'instruction suivante */
 
          /* Taille de 1 mot */
-         array quatre[32];
-         for(i,0,31) {
-                     quatre[i] = false;
+         array un[32];
+         for(i,1,31) {
+                     un[i] = false;
          }
-         quatre[5] = true;
+         un[0] = true;
 	 f42 = false;
          array addressplus[32];
-         addressplus[0..31] = Adder32 <- (quatre[0..31], pc[0..31],f42);
+         addressplus[0..31] = Adder32 <- (un[0..31], pc[0..31],f42);
 
          f0 = false;
          f1 = false;
