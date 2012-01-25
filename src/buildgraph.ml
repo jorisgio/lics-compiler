@@ -189,7 +189,7 @@ let pCircuit circuit =
 	  let index = eval intEnv index in
 	  assert (Smap.mem ident.id env) ;
 	  let cur = Smap.find ident.id env in
-          assert (Graphe.mem gcur cur.(index));
+          (*assert (Graphe.mem gcur cur.(index));*)
 	  Graphe.addEdge gcur cur.(index) vertex, cur.(index)
 	| EPrefix(oper,exp) -> 
 	  let gcur = incr index ; Graphe.addVertex gcur !index in
