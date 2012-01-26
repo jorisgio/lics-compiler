@@ -44,13 +44,8 @@ Regs <-(datasIn[32],writeReg[5],readReg1[5],readReg2[5],controlWrite, top)
 
      /* pour les sorties */
      array sorties[448];
-     for (i,0,31) {
-     	  sorties[i] = out1[i] && true;
-	  sorties[i+32] = out2[i] && true;
-}	 
-
      for (i,0,63) {
-         /*sorties[i] = regs[i+448] && true; */
+         sorties[i] = regs[i+448] && true;
          sorties[i+64] = regs[i + 544] && true;
          sorties[i+128] = regs[i + 608] && true;
          sorties[i+192] = regs[i + 352] && true;

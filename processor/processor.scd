@@ -47,12 +47,12 @@ Start <- (top)
          regs[0..511] = Regs <- (regdataentry[0..31], writeReg[0..4],
          instr[21..25],instr[16..20], regWrite, top);
 
-	 array alufunc[3] ;
-	 alufunc[0..2] = ALUControl <- (instr[31],instr[0..2]);
+	 array alufunc[4] ;
+	 alufunc[0..3] = ALUControl <- (instr[31],instr[3],instr[0..2]);
 
          f = false;   	
 		     
-         alu[0..31] = Alu32bits <- (regs[0..31],regs[32..63],f,instr[3],alufunc[0..2]);
+         alu[0..31] = Alu32bits <- (regs[0..31],regs[32..63],f,alufunc[0..3]);
 
          /* calcul de l'adresse de l'instruction suivante */
 
@@ -92,6 +92,7 @@ Start <- (top)
                      
         pc[0..31] = Reg32 <- (pctmp[0..31]);
 
+}
 
--> (regs[64..511],alu[0..31]) /* on renvoit les valeurs des registres à afficher */
+-> (regs[64..511]) /* on renvoit les valeurs des registres à afficher */
 
