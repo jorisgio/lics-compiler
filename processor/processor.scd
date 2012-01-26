@@ -92,6 +92,6 @@ Start <- (top)
                      
         pc[0..31] = Reg32 <- (pctmp[0..31]);
 
-	 
--> (regs[64..511]) /* on renvoit les valeurs des registres à afficher */
+
+-> (regs[64..511],alu[0..31]) /* on renvoit les valeurs des registres à afficher */
 

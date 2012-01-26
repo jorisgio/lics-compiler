@@ -4,10 +4,10 @@ ALUControl <- (aluop,func[3])
 	   array aluctl[3];
 	   array truth1[3];
 	   truth1[0] = false;
-	   truth1[1] = true;
-	   truth1[2] = true;
+	   truth1[1] = false;
+	   truth1[2] = false;
 	   for(i,0,2) {
-	   	aluctl[i] = mux(aluop,func[i],truth1[i]);
+	   	aluctl[i] = mux(aluop,truth1[i],func[i]);
 		}
 -> (aluctl[0..2])
 
